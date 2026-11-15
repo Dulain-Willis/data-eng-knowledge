@@ -76,7 +76,7 @@ Among a partition's replicas, 1 is the leader and the rest are followers. A prod
 
 The reason for exactly 1 writer is the offset. Offsets form a sequence with no gaps, decided once. If broker 1 and broker 2 both accepted records for orders-0, each would hand out offset 17 to a different record, and the 2 logs would disagree about what offset 17 means. A single leader decides the order once, every follower copies that order, and the guarantee from the log lesson holds on every replica: offset 17 of orders-0 is 1 record, everywhere.
 
-![Pipeline diagram 1](images/kafka_replication_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_replication_beginner_diagram_1.png)
 
 
 <br>
@@ -173,11 +173,11 @@ At 09:00:04 broker 3's disk started stalling. It kept answering, slowly, so at 0
 
 **Healthy followers**
 
-![Healthy followers](images/kafka_replication_beginner_animation_1_healthy-followers.gif)
+![Healthy followers](_images/kafka_replication_beginner_animation_1_healthy-followers.gif)
 
 **Broker 3 stalls**
 
-![Broker 3 stalls](images/kafka_replication_beginner_animation_1_broker-3-stalls.gif)
+![Broker 3 stalls](_images/kafka_replication_beginner_animation_1_broker-3-stalls.gif)
 
 Running `--describe` at 09:00:35 prints `Isr: 1,2` against `Replicas: 1,2,3`: 1 replica is assigned and not caught up. The lag rule covers a follower that is alive and stuck; a broker that stops altogether leaves every ISR sooner, about 9 seconds after it falls silent, through the session timeout section 4 introduces.
 
@@ -297,11 +297,11 @@ The pause has 2 parts. The controller needs around 9 seconds, the session timeou
 
 **No failure**
 
-![No failure](images/kafka_replication_beginner_animation_2_no-failure.gif)
+![No failure](_images/kafka_replication_beginner_animation_2_no-failure.gif)
 
 **Broker 2 killed at 2 s**
 
-![Broker 2 killed at 2 s](images/kafka_replication_beginner_animation_2_broker-2-killed-at-2-s.gif)
+![Broker 2 killed at 2 s](_images/kafka_replication_beginner_animation_2_broker-2-killed-at-2-s.gif)
 
 A dead leader's partitions each pass to the next in-sync broker in their Replicas list. On the 4-broker layout broker 2 leads only orders-1, so broker 3 inherits it alone. On topics with many more partitions than brokers, each pass of the assignment puts a different broker second, so the leadership of a broker that led 100 partitions, and its producers' retries, splits across the survivors.
 

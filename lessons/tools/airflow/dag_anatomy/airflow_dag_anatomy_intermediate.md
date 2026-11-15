@@ -13,7 +13,7 @@ Airbnb open-sourced Airflow in 2015. Say a pricing team there is launching a new
 
 In Airflow 3 one component owns your DAG files: the dag processor. It walks the dags folder, imports each `.py` file as a Python module, collects every DAG object that import produced, and writes a serialized copy of each DAG into the metadata database. The scheduler and the web UI read that serialized copy and never open the file. When the processor reaches the end of the folder it returns to the start and imports everything again, and it keeps doing that for as long as it runs. Everything in this lesson follows from that loop: what it costs, why a file can fall out of it, and why a test on your laptop can tell you what the processor will do.
 
-![Pipeline diagram 1](images/airflow_dag_anatomy_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_dag_anatomy_intermediate_diagram_1.png)
 
 
 <br>

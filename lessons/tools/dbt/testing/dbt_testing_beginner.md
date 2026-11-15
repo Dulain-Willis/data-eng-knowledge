@@ -310,15 +310,15 @@ Put a `not_null` test on 3 versions of the same column and the 3 outcomes separa
 
 `dbt build` runs each model and then the tests declared on it before it moves to anything that reads from that model. A test that fails stops the build from running the models downstream of the tested model, and dbt marks each of them SKIP. Models elsewhere in the DAG, with no path leading back to the failed test, keep building, so 1 bad column holds back only the part of the project that depends on it.
 
-![Pipeline diagram 1](images/dbt_testing_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_testing_beginner_diagram_1.png)
 
 **data_tests: unique, not_null**
 
-![data_tests: unique, not_null](images/dbt_testing_beginner_animation_1_data-tests-unique-not-null.gif)
+![data_tests: unique, not_null](_images/dbt_testing_beginner_animation_1_data-tests-unique-not-null.gif)
 
 **no data_tests**
 
-![no data_tests](images/dbt_testing_beginner_animation_1_no-data-tests.gif)
+![no data_tests](_images/dbt_testing_beginner_animation_1_no-data-tests.gif)
 
 *$ dbt build*
 

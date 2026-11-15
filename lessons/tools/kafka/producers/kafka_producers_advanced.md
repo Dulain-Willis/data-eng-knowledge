@@ -35,7 +35,7 @@ producer.commit_transaction()
 
 `init_transactions()` runs once per producer. It asks any broker where the transaction coordinator for `fare-writer-7` is: the coordinator is the leader of the partition of the internal topic `__transaction_state` that the id hashes to, a normal broker with a normal replicated log. The coordinator assigns producer id 4001 at epoch 0, writes that assignment to its log, and aborts anything an earlier run under the same id left open. `begin_transaction()` sends nothing: it flips local state. The first `produce()` to a partition appends the record there and, on a 4.x cluster, that partition's leader tells the coordinator it now belongs to the open transaction. By the time `commit_transaction()` runs, the coordinator knows the transaction touched `fares-2` and `driver-payouts-5`.
 
-![Pipeline diagram 1](images/kafka_producers_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_producers_advanced_diagram_1.png)
 
 
 <br>
@@ -153,11 +153,11 @@ Take `user-1`. The Java client computes murmur2 of the 6 bytes of `user-1` and g
 
 **Java client**
 
-![Java client](images/kafka_producers_advanced_animation_1_java-client.gif)
+![Java client](_images/kafka_producers_advanced_animation_1_java-client.gif)
 
 **librdkafka client**
 
-![librdkafka client](images/kafka_producers_advanced_animation_1_librdkafka-client.gif)
+![librdkafka client](_images/kafka_producers_advanced_animation_1_librdkafka-client.gif)
 
 The bytes matter as much as the function. Both libraries hash the serialized key, so 2 producers using the same library still disagree if 1 serializes the user id as the string `42` (2 bytes) and the other as a 4-byte integer. A topic's partitioning contract is 3 things together: the key's bytes, the hash function and the partition count, and any producer that changes 1 of the 3 is writing to a different place.
 
@@ -202,11 +202,11 @@ The pattern in the table is exact. A key stays when its hash mod 6 is 0, 1 or 2,
 
 **3 partitions**
 
-![3 partitions](images/kafka_producers_advanced_animation_2_3-partitions.gif)
+![3 partitions](_images/kafka_producers_advanced_animation_2_3-partitions.gif)
 
 **6 partitions**
 
-![6 partitions](images/kafka_producers_advanced_animation_2_6-partitions.gif)
+![6 partitions](_images/kafka_producers_advanced_animation_2_6-partitions.gif)
 
 
 <br>

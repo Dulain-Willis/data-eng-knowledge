@@ -25,7 +25,7 @@ Airflow creates the run when the window closes. The run that owns 09:00 to 10:00
 
 Read down the table and the pattern holds in every row: the name inside the run_id is the time under Window opens. Window closes and Run is created always hold the same moment seen from 2 sides, the end of one window and the first moment the run for it can exist. Whenever this lesson asks which runs exist at a given moment, the answer comes from reading a table like this one.
 
-![Animation](images/airflow_scheduling_beginner_animation_1.gif)
+![Animation](_images/airflow_scheduling_beginner_animation_1.gif)
 
 Watch where each cell appears in the animation above: the run named 00:00 lights up at 01:00, the run named 01:00 lights up at 02:00, and so on down the grid. The file names a `start_date` of midnight and a `schedule` of 1 hour, and Airflow lays the hours end to end from there. Nothing in the file states when a run starts; that follows from where its window ends.
 
@@ -174,7 +174,7 @@ Each cron preset is read exactly as the cron string beside it, so `CronDataInter
 
 Take `daily_sales`, a midnight cron with `start_date` 4 November 2026 00:00 UTC, deployed and unpaused at 09:00 on 4 November. Its first window is 4 November 00:00 to 5 November 00:00. That window is still open at 09:00, at 15:00 and at 23:59. At 00:00 on 5 November it closes, and the first run appears, named `scheduled__2026-11-04T00:00:00+00:00`. Nothing was wrong during the wait; the DAG had no complete day to count.
 
-![Animation](images/airflow_scheduling_beginner_animation_2.gif)
+![Animation](_images/airflow_scheduling_beginner_animation_2.gif)
 
 - 09:00 on 4 November: file read, DAG unpaused, no window closed yet, no run.
 - 15:00 on 4 November: still inside the first window, still no run.
@@ -237,11 +237,11 @@ Take `daily_refunds`, which runs at 00:00 every day from a `start_date` of 3 Nov
 
 **catchup=True**
 
-![catchup=True](images/airflow_scheduling_beginner_animation_3_catchup-true.gif)
+![catchup=True](_images/airflow_scheduling_beginner_animation_3_catchup-true.gif)
 
 **catchup=False**
 
-![catchup=False](images/airflow_scheduling_beginner_animation_3_catchup-false.gif)
+![catchup=False](_images/airflow_scheduling_beginner_animation_3_catchup-false.gif)
 
 The animation shows the 06:30 moment from both sides. The 2 variants have the same file apart from 1 line, and that line decides whether 3 November exists in the table the DAG writes. Airflow 3 defaults `catchup` to `False`, so a DAG that says nothing about it skips to the latest window; write the setting out either way so a reader of the file knows what will happen the day it is unpaused.
 

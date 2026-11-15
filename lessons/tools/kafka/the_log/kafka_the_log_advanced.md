@@ -136,11 +136,11 @@ The animation sends the same 6 records from offset 0, each tile showing its stam
 
 **from offset 0**
 
-![from offset 0](images/kafka_the_log_advanced_animation_1_from-offset-0.gif)
+![from offset 0](_images/kafka_the_log_advanced_animation_1_from-offset-0.gif)
 
 **start at offset 3**
 
-![start at offset 3](images/kafka_the_log_advanced_animation_1_start-at-offset-3.gif)
+![start at offset 3](_images/kafka_the_log_advanced_animation_1_start-at-offset-3.gif)
 
 > Where the timestamp is read again
 >
@@ -223,7 +223,7 @@ LogAppendTime would not repair this: it stamps only later appends, and segment 2
 
 A partition that keeps 90 days at 2 TB a day needs 180 TB of broker disk, and broker disk is the costly kind: fast, local and sized for every partition the broker holds. Most of those bytes are read once, by the readers who keep up, and then sit until retention deletes them. Tiered storage moves closed segments off the broker to an object store, a system that holds files cheaply and serves them over the network at some latency, while the topic keeps reading as 1 log. A reader asking for offset 0 still gets offset 0; the broker fetches the segment from the store and hands the records over.
 
-![Pipeline diagram 1](images/kafka_the_log_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_the_log_advanced_diagram_1.png)
 
 
 <br>

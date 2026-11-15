@@ -20,7 +20,7 @@ Midnight at Netflix: a new season drops and devices in every time zone send play
 
 A call to `send()` appends the record to the open batch for its partition in the record accumulator, the producer's buffer. It returns a future before any byte reaches the network. A separate sender thread drains the accumulator: it takes every batch that is ready, groups the batches by the broker that leads their partitions, and sends 1 produce request per broker. A producer writing to 12 partitions led by 3 brokers can ship 12 batches in 3 requests, and the brokers see 3 requests' worth of handling per round instead of 12.
 
-![Pipeline diagram 1](images/kafka_producers_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_producers_intermediate_diagram_1.png)
 
 
 <br>
@@ -45,7 +45,7 @@ A batch is ready once its bytes reach `batch.size`, which defaults to 16384. It 
 
 *The model behind the table: 2000 records a second of 200 bytes each to 1 partition, a broker that answers in 10 ms, and max.in.flight.requests.per.connection at 5.*
 
-![Animation](images/kafka_producers_intermediate_animation_1.gif)
+![Animation](_images/kafka_producers_intermediate_animation_1.gif)
 
 The scene holds `max.in.flight.requests.per.connection` at 1, so each batch waits for the answer to the one before it. In it, 8 records arrive 5 ms apart. At `linger.ms=0` the first record leaves alone, the records that land during its round trip leave together behind it, and the run takes more than 1 request. At `linger.ms=40` the first record opens a batch and waits; the other 7 arrive inside the window, and the whole run leaves in 1 request 40 ms after the first record was sent. The first record paid 40 ms for that, the last paid about 5.
 
@@ -163,7 +163,7 @@ With `enable.idempotence=true`, the 4.4 default, the producer asks a broker for 
 | 2, the retry | pid 7, seq 0, 3 records | seq 3 | finds seq 0 in its window, answers offset 40 | 40, 41, 42 |
 | 3, next batch | pid 7, seq 3, 2 records | seq 3 | appends at offsets 43 and 44 | 40 to 44 |
 
-![Animation](images/kafka_producers_intermediate_animation_2.gif)
+![Animation](_images/kafka_producers_intermediate_animation_2.gif)
 
 In the scene every attempt reaches the same leader, so the difference lies in what the leader remembers. Without idempotence the leader sees 3 arrivals of the same bytes and appends 3 times; the followers copy all 3 and the partition holds 3 charges of 40.00 for 1 invoice. With idempotence the second and third arrivals carry sequence 0 again, the leader finds sequence 0 already in its window, answers with the offset it wrote the first time, and appends nothing.
 
@@ -303,7 +303,7 @@ A sibling error, `NotEnoughReplicasAfterAppend`, arrives when the in-sync set sh
 
 The row to run is 3 replicas, `min.insync.replicas=2`, `acks=all`. Any 1 broker can die and the partition keeps taking writes, because 2 in-sync copies remain; and every acknowledged record sits on at least 2 brokers, so the death of 1 can't remove it. Lose 2 of the 3 and writes stop rather than proceed on a single copy, which is the point: the producer gets an error it can retry instead of an acknowledgement it can't trust.
 
-![Animation](images/kafka_producers_intermediate_animation_3.gif)
+![Animation](_images/kafka_producers_intermediate_animation_3.gif)
 
 Set the floor on the topic so each topic states its own contract: bin/kafka-configs.sh --bootstrap-server broker0:9092 --alter --entity-type topics --entity-name payments --add-config min.insync.replicas=2. A topic created without it inherits the broker's min.insync.replicas, which defaults to 1.
 

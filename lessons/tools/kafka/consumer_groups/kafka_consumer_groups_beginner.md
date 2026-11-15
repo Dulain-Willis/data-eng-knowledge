@@ -69,7 +69,7 @@ After that batch the consumer remembers, in its own memory, that partition 0 is 
 
 Between one `poll` and the next, the consumer does its work on the batch: it charges the cards, writes the rows, calls the downstream service. The broker does not watch this work; it sees only the next fetch. The consumer must call `poll` again within `max.poll.interval.ms`, 5 minutes by default. A batch of 500 records that take 1 second each finishes in about 8 minutes. That is past the deadline, so the group treats the consumer as gone. What the group does about it comes in a later lesson; for now, size the batch so the loop returns in time: 500 records at 1 second each needs `max.poll.records` under 300, or a handler 2 times faster.
 
-![Animation](images/kafka_consumer_groups_beginner_animation_1.gif)
+![Animation](_images/kafka_consumer_groups_beginner_animation_1.gif)
 
 Watch the consumer's position in the animation. After each batch it moves forward by the batch size, and the next fetch asks for exactly that offset. The setting changes how many records the consumer holds at once between polls, and nothing about which records it reads or in what order.
 
@@ -133,9 +133,9 @@ Groups do not share work with each other. A `billing` group and a `fraud` group 
 | --- | --- |
 | • Partitions split between them<br><br>• Each record read by 1 of the 2<br><br>• Adding the 2nd halves the 1st one's work<br><br>• Both share 1 committed position per partition | • Each reads every partition<br><br>• Each record read by both<br><br>• Adding the 2nd changes nothing for the 1st<br><br>• Separate committed positions |
 
-![Pipeline diagram 1](images/kafka_consumer_groups_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_consumer_groups_beginner_diagram_1.png)
 
-![Animation](images/kafka_consumer_groups_beginner_animation_2.gif)
+![Animation](_images/kafka_consumer_groups_beginner_animation_2.gif)
 
 In the animation, every record with key `cust-2` lands on 1 partition, and that partition belongs to 1 member, so 1 member sees all of that customer's orders in order. With 2 members each holds 2 partitions; with 5, 4 members hold 1 each and `billing-e` holds nothing. Use the crash control to stop `billing-b`: once the coordinator notices it is gone, its partitions are dealt to the others, and when it restarts it rejoins and the group deals again.
 
@@ -183,7 +183,7 @@ With `enable.auto.commit=true`, the default, the consumer commits on its own: du
 
 `commit` comes in 2 forms. The synchronous form blocks until the coordinator confirms, so the loop pauses for a round trip but knows the position was saved before the next poll. The asynchronous form sends the commit and returns at once, so the loop keeps polling and the confirmation, or the failure, arrives later. The Java client names them `commitSync` and `commitAsync`. A loop that commits once a batch usually affords the synchronous round trip; a loop that commits after every record usually cannot.
 
-![Animation](images/kafka_consumer_groups_beginner_animation_3.gif)
+![Animation](_images/kafka_consumer_groups_beginner_animation_3.gif)
 
 In the base run the consumer commits after each batch, crashes after processing its 2nd batch, and on restart reads that batch again: 1 batch of duplicate rows lands in the ledger. In the variant the loop never commits, so the restart finds no saved position for the group and the whole partition is read from the start, doubling every row it had written. The difference between the 2 runs is 1 line in the loop.
 
@@ -233,7 +233,7 @@ group.id=report-v1
 auto.offset.reset=earliest
 ```
 
-![Animation](images/kafka_consumer_groups_beginner_animation_4.gif)
+![Animation](_images/kafka_consumer_groups_beginner_animation_4.gif)
 
 The producer writes 5 records before the consumer starts. Under `latest`, the consumer's first fetch asks for offset 5, and the 3 records the producer writes afterwards are the only ones it reads. Under `earliest`, the first fetch asks for 0, and it reads 8. Both runs commit after reading, so if either consumer restarts it continues from its commit and the setting no longer matters.
 

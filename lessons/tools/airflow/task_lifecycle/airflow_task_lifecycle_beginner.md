@@ -31,7 +31,7 @@ A DAG file names tasks. A task instance is the thing Airflow runs: one task, ins
 
 2 parties move a cell. The scheduler owns the top half of the table: it creates the cell as `none` when the run appears, moves it to `scheduled` once the tasks above it are done, and to `queued` when it hands the task to the worker pool. A worker owns the bottom half: it takes the task from the queue, writes `running`, executes the Python, and reports `success` or `failed` when the code returns or raises. The scheduler decides when a cell may run; the worker decides how it ends. Every later state in this lesson is one of these 2 parties telling the other something about a cell.
 
-![Animation](images/airflow_task_lifecycle_beginner_animation_1.gif)
+![Animation](_images/airflow_task_lifecycle_beginner_animation_1.gif)
 
 
 <br>
@@ -85,11 +85,11 @@ When `load` raises, the worker reports the failure along with the try number, 1,
 
 **load: retries=2**
 
-![load: retries=2](images/airflow_task_lifecycle_beginner_animation_2_load-retries-2.gif)
+![load: retries=2](_images/airflow_task_lifecycle_beginner_animation_2_load-retries-2.gif)
 
 **load: retries=0**
 
-![load: retries=0](images/airflow_task_lifecycle_beginner_animation_2_load-retries-0.gif)
+![load: retries=0](_images/airflow_task_lifecycle_beginner_animation_2_load-retries-0.gif)
 
 | Try | Ends by | Tries left after it | State the cell gets |
 | --- | --- | --- | --- |
@@ -155,11 +155,11 @@ def pull_returns():
 
 **pull_returns raises**
 
-![pull_returns raises](images/airflow_task_lifecycle_beginner_animation_3_pull-returns-raises.gif)
+![pull_returns raises](_images/airflow_task_lifecycle_beginner_animation_3_pull-returns-raises.gif)
 
 **pull_returns skips**
 
-![pull_returns skips](images/airflow_task_lifecycle_beginner_animation_3_pull-returns-skips.gif)
+![pull_returns skips](_images/airflow_task_lifecycle_beginner_animation_3_pull-returns-skips.gif)
 
 pull_returns raised
 
@@ -225,11 +225,11 @@ Downstream is the box that decides whether the run recovers. Take `nightly_order
 
 **Downstream ticked**
 
-![Downstream ticked](images/airflow_task_lifecycle_beginner_animation_4_downstream-ticked.gif)
+![Downstream ticked](_images/airflow_task_lifecycle_beginner_animation_4_downstream-ticked.gif)
 
 **Downstream off**
 
-![Downstream off](images/airflow_task_lifecycle_beginner_animation_4_downstream-off.gif)
+![Downstream off](_images/airflow_task_lifecycle_beginner_animation_4_downstream-off.gif)
 
 | Cell | Before the clear | Right after, Downstream ticked | Right after, Downstream off | End of night, ticked | End of night, off |
 | --- | --- | --- | --- | --- | --- |

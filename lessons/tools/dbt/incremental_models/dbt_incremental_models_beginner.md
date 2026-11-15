@@ -196,11 +196,11 @@ The animation builds plays from the same 3 rows, then adds 2 rows and builds aga
 
 **+materialized: table**
 
-![+materialized: table](images/dbt_incremental_models_beginner_animation_1_materialized-table.gif)
+![+materialized: table](_images/dbt_incremental_models_beginner_animation_1_materialized-table.gif)
 
 **+materialized: incremental**
 
-![+materialized: incremental](images/dbt_incremental_models_beginner_animation_1_materialized-incremental.gif)
+![+materialized: incremental](_images/dbt_incremental_models_beginner_animation_1_materialized-incremental.gif)
 
 *$ dbt run*
 
@@ -447,7 +447,7 @@ Event 2 was recorded with 9,000 ms played. The next day the app re-sends it with
 
 A plain run has no way to find that row. Its filter looks only past the watermark, and dbt keeps no list of the source rows that changed, so the repair for a rewrite behind the line is to read everything again.
 
-![Animation](images/dbt_incremental_models_beginner_animation_2.gif)
+![Animation](_images/dbt_incremental_models_beginner_animation_2.gif)
 
 *$ dbt run*
 

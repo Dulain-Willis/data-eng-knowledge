@@ -30,7 +30,7 @@ The `@` operator exists because `stg_orders+` picks `fct_orders` without `stg_cu
 
 A test joins the set through its parents. With the default indirect selection, called eager, dbt includes a test when at least one of its parents is selected, which is why the `unique` test is selected along with `stg_orders+` and with `stg_orders+1`. A `relationships` test between `fct_orders` and `stg_customers` would be selected with `fct_orders` alone, and would fail in the same empty schema for the same reason the join did.
 
-![Animation](images/dbt_deployment_intermediate_animation_1.gif)
+![Animation](_images/dbt_deployment_intermediate_animation_1.gif)
 
 *$ dbt build*
 
@@ -311,7 +311,7 @@ Deferral changes `ref` and nothing else. A `source('raw', 'orders')` call compil
 
 ### Where the prod manifest comes from
 
-![Pipeline diagram 1](images/dbt_deployment_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_deployment_intermediate_diagram_1.png)
 
 The scheduled job from the beginner lesson writes `target/manifest.json` on every run. Publish that file somewhere every developer can fetch it, such as a bucket the job uploads to after it finishes, and fetch it into `prod-artifacts` before a deferred build. The manifest describes the project as prod last parsed it, so a deferred ref points at a table that exists only if that build completed; a prod run that failed halfway still wrote a manifest naming models it never built, which is why the publish step belongs after a successful run.
 
@@ -326,7 +326,7 @@ The scheduled job from the beginner lesson writes `target/manifest.json` on ever
 
 A pull request changes a few files. Continuous integration answers whether the project still builds and its tests still pass with those files in it, and the beginner answer, a full build into a scratch schema, costs 40 minutes per push on the 140-model project. Slim CI puts the 3 previous sections together: `state:modified+` picks the changed models and their descendants, `--defer` reads every other model from production, and a CI target writes into a schema owned by the pull request.
 
-![Pipeline diagram 2](images/dbt_deployment_intermediate_diagram_2.png)
+![Pipeline diagram 2](_images/dbt_deployment_intermediate_diagram_2.png)
 
 ```sql
 ci:
