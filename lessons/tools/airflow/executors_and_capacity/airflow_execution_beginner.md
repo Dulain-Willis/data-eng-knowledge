@@ -363,12 +363,4 @@ Picture a hypothetical Monday at Airbnb, the company where Airflow was written: 
 - A pool stands for an external resource, is sized to that resource's limit, and is shared by every DAG that names it.
 - A poke-mode sensor holds its worker and pool slots for its whole wait; reschedule mode holds them only while a poke runs.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

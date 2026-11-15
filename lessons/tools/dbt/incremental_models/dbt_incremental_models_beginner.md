@@ -495,12 +495,4 @@ A ride-hailing company's analytics team keeps a trips table with 1 row per compl
 - The first run renders the filter away and reads every source row, costing the same as a table build; the saving starts on the second run.
 - A changed SELECT or a corrected old source row calls for --full-refresh, which rebuilds the table from the start at night 1's cost.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

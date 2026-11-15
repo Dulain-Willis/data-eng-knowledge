@@ -391,12 +391,4 @@ A food delivery company discovers on Thursday that a currency bug skewed Monday,
 - SQLExecuteQueryOperator renders its sql field, runs a list of statements in order, and pushes the last result unless told not to.
 - The Rendered Templates tab and airflow tasks render show the exact string a field became for one run, which is where a template bug is read.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

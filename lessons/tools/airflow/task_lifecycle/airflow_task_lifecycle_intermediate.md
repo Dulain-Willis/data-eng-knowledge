@@ -497,12 +497,4 @@ At Airbnb, where Airflow was first written, picture a nightly pricing DAG: a bra
 - Callbacks fire only for a try that ran: a retried try fires on_retry_callback, the final failure fires on_failure_callback, and an upstream_failed cell fires nothing.
 - execution_timeout ends a try with AirflowTaskTimeout and counts as a failure for retries and callbacks; dagrun_timeout marks the run failed and skips what is left.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.
