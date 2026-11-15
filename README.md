@@ -16,7 +16,7 @@
 </div>
 <br>
 
-**My data engineering study notes as Markdown, with diagrams and animations, and an MCP server so an agent can answer from them.**
+**Data engineering lessons from DataDriven as Markdown, with diagrams, animations, and an MCP server so an agent can answer from them.**
 
 ## What is data-eng-knowledge?
 
