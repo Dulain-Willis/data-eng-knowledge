@@ -521,12 +521,4 @@ At Shopify, a merchant-analytics team inherits a 300-line churn query that the g
 - dbt creates and replaces relations for the models it parses and drops nothing else, so a frozen relation to drop by hand is left behind by every rename and deletion, and by every schema move or new version.
 - A legacy query is refactored by parking it as a model and carving layers by grain. An audit runs until 0 rows differ, and only then do the readers swap over and the leftovers get dropped.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

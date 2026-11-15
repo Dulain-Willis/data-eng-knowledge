@@ -507,12 +507,4 @@ DoorDash's deliveries fact table is incremental over a change-log source. A deli
 - A batch holding one key twice fails a merge when the target already has that key, and inserts it twice when it does not; the other strategies duplicate silently. Rank by time inside the batch and keep rank 1.
 - on_schema_change decides whether the target follows the SQL; an added column is null in every old row until a full refresh fills it.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

@@ -457,12 +457,4 @@ Lyft has written publicly about running Airflow for its data platform. Picture a
 - Import the file, then airflow tasks test one task, then airflow dags test the DAG: each depth answers one question, and only the last one writes a run to the database.
 - A TaskGroup folds tasks into one node, prefixes their ids with its name, and fans one >> into edges from every leaf of one group to every root of the next.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

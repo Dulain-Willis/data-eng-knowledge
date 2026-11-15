@@ -454,12 +454,4 @@ At Stripe, a daily settlement table tells each business what will reach its bank
 - A compound key is proven by unique and not_null on a cast, separated, concatenated key column plus not_null on each part, or by a group by over the parts with having count(\*) > 1.
 - A test is worth its cost when its failure changes what someone does: grain tests, relationships in marts, accepted_values on branched columns and money invariants qualify; blanket not_null and unowned warnings do not.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

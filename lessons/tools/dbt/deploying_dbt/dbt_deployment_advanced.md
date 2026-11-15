@@ -435,12 +435,4 @@ GitLab's data team schedules its dbt project in jobs that run as extracts from S
 - run_results.json loaded into a table every night, on any outcome, answers both the alert questions about the latest run and the trend questions about every run before it.
 - Split a project into scheduler tasks only along differences in schedule, waits and failure rules, and let dbt build, threads and dbt retry handle everything inside a task.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.
