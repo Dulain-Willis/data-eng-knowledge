@@ -69,8 +69,12 @@ def parse(html):
     return BeautifulSoup(html, builder=builder)
 
 
-# Prose that points at an exercise below it; dropped (with its block) when exercises are left out.
-EXERCISE_REF = re.compile(r"\bdrill below\b", re.I)
+def load_drops(slug):
+    """Text prefixes of blocks to drop from this lesson when its exercises are left out, from
+    tools/drops.json: prose or headings that only introduce an exercise ("The drill below ...").
+    Kept by hand, one entry per block, so nothing is deleted by pattern."""
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "drops.json")) as f:
+        return json.load(f).get(slug, [])
 
 
 def clean(soup):
@@ -347,12 +351,14 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
-    drop_exercise_refs: the exercises are left out, so drop prose blocks that point at one
-    ("The drill below ...").
+    drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
+    (text prefixes from tools/drops.json) that only introduce one; an entry that matches
+    nothing prints a warning.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
+    dropped = set()
     animation_infos = animation_info(html)
     soup = parse(html)
     clean(soup)
@@ -376,8 +382,10 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
                   file=sys.stderr)
         if kind in SKIPPED_BLOCKS:
             block.decompose()
-        elif (drop_exercise_refs and kind in ("body_text", "rich_text")
-              and EXERCISE_REF.search(block.get_text(" "))):
+        elif drop_exercise_refs and any(
+                " ".join(block.get_text(" ").split()).startswith(d) for d in drops):
+            hit = next(d for d in drops if " ".join(block.get_text(" ").split()).startswith(d))
+            dropped.add(hit)
             block.decompose()
         elif kind == "multiple_choice":
             p_el = block.find("p")
@@ -452,6 +460,10 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         if token:
             md = md.replace(token, text)
     md = md.rstrip("\n") + (tokens[None] if None in tokens else "") + "\n"
+    if drop_exercise_refs:
+        for d in drops:
+            if d not in dropped:
+                print(f"warning: tools/drops.json entry matched nothing: {d!r}", file=sys.stderr)
     return add_section_breaks(md)
 
 
@@ -1191,7 +1203,8 @@ def main():
             for anchor, group in groups:
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
-        f.write(convert(html, images, sections, animations, drop_refs))
+        f.write(convert(html, images, sections, animations, drop_refs,
+                       load_drops(slug)))
     print(path)
 
 

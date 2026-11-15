@@ -1,0 +1,12 @@
+{
+  "kafka_the_log_advanced": [
+    "Try it. The drill below hands you 1 partition",
+    "The drill below gives you a partition with 1 future stamp"
+  ],
+  "data_modeling_dimensional": [
+    "The story below makes the grain choice for"
+  ],
+  "data_modeling_relationships": [
+    "Capstone: design the reactions model"
+  ]
+}
