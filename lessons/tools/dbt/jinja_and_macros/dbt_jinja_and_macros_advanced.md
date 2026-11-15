@@ -443,12 +443,4 @@ A subscription software company closes its monthly books from a dbt project. The
 - A materialization owns every statement around the SELECT and is justified only when the DDL itself has to differ; a hook or a config covers the rest.
 - A macro is a jump the reader has to follow, so it is worth a file only when the SQL it replaces must change in several models at once.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

@@ -603,12 +603,4 @@ A new engineer clones a team's project built the way this lesson builds one, and
 - var() reads a run's parameter from dbt_project.yml or --vars, with the command winning; env_var() reads the shell, always as a string, and is the place for credentials and per-environment names.
 - A missing var, env var or macro name fails at compile time, before any SQL is sent; a wrong column inside a macro fails in the warehouse.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

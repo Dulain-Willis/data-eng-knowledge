@@ -390,12 +390,4 @@ Airbnb created Airflow in 2014 to run the jobs behind its data warehouse. Pictur
 - catchup = True creates 1 run per closed window when a DAG is unpaused; catchup = False , the Airflow 3 default, creates 1 run for the latest closed window only.
 - A manual run carries manual__ and the trigger moment as its logical date, is handed the latest closed window, and leaves the schedule untouched.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

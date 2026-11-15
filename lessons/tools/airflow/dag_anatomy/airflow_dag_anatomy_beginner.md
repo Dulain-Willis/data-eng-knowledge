@@ -430,12 +430,4 @@ A food-delivery company pays its couriers every morning. The payout job needs ye
 - With @task, calling a decorated function creates the task, and passing its result into another call both draws the edge and carries the value.
 - The graph is the shape of one run; the grid is every run as a column, every task as a row, and every cell a state you can read before opening a log.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

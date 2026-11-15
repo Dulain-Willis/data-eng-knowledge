@@ -580,12 +580,4 @@ Duolingo's team ships the streak rewrite from the intro. The empty build runs fi
 - An empty build renders every input as 0 rows and runs every statement, proving shape, types and contracts in minutes, and proving nothing about data.
 - Each test belongs at the first layer its fault can appear, so the first failure in a build names its cause instead of a model 3 steps downstream.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

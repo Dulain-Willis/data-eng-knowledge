@@ -532,12 +532,4 @@ A ride-hailing marketplace keeps a trips fact of 5 billion rows, built hourly fr
 - incremental_predicates tell the merge which part of the target can hold matches, and must cover every target row the batch can touch, or the merge inserts duplicates.
 - A backfill names a range with --event-time-start and --event-time-end and rebuilds only those batches with the current code; a merge model backfills through a var that overrides its high-water mark.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

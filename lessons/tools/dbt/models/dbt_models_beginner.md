@@ -396,12 +396,4 @@ GitLab's finance team closes the quarter from recurring revenue tables that its 
 - Every ref() is an edge in the graph dbt draws from the files, and the graph is the build order: a node runs only after everything it refs has finished.
 - target/compiled holds each model's rendered SELECT and target/run holds the CREATE statement that wrapped it; read the second when a run fails.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

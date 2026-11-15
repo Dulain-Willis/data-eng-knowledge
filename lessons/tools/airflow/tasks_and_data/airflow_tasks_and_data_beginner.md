@@ -411,12 +411,4 @@ Airbnb's nightly host payouts: a DAG that sums yesterday's checkouts per host in
 - A variable is one value for the whole deployment, read when the task runs; a param belongs to a DAG, and the values a trigger gives it are stored with that run.
 - A templated field is rendered on the worker at the start of each try from the run's context, so one file yields a different command for every run.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.
