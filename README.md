@@ -1,3 +1,9 @@
+<h1 align="center">data-eng-knowledge</h1>
+
+<p align="center">
+Data engineering lessons for people and agents
+</p>
+
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
   <img alt="Markdown" src="https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white">
@@ -5,17 +11,10 @@
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/Dulain-Willis/data-eng-knowledge">
 </p>
 
-<h2 align="center">
-data-eng-knowledge: data engineering lessons for people and agents
-</h2>
-
 <div align="center">
 
-[Lessons »](lesson_preview) | [MCP server »](server.py) | [Converter »](tools/lesson_to_md.py)
+[Lessons »](lesson_preview) | [MCP server »](server.py)
 
-</div>
-<div align="center">
-  ⭐️ Star the repo <a href="https://github.com/Dulain-Willis/data-eng-knowledge/stargazers"><img alt="Star" src="https://img.shields.io/github/stars/Dulain-Willis/data-eng-knowledge?style=social"/></a>
 </div>
 <br>
 
