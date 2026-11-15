@@ -5,7 +5,7 @@ description: Convert a datadriven.io lesson to Markdown with tools/lesson_to_md.
 
 # Lesson to Markdown
 
-`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/images/`, where `<out_dir>` is a topic folder like `lessons/learn/architecture/storage_layers` (named after the card title in the site's UI, snake_case; all tiers of one UI card share it) (default `lessons/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
+`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/images/`, where `<out_dir>` comes from `tools/topics.json` (slug without its tier suffix -> `<area>/<topic>` under `lessons/`; a slug not in the map stops the script, so add the entry first, and ask the user which card it belongs to if unsure). It is a topic folder like `lessons/learn/architecture/storage_layers` (named after the card title in the site's UI, snake_case; all tiers of one UI card share it) (default `lessons/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
 
 ## Steps
 
@@ -24,7 +24,7 @@ Done when the status is 200.
 One `!` line: run the converter for each slug, then commit and push the files you changed.
 
 ```
-! cd ~/projects/data-eng-knowledge && for l in <slugs>; do .venv/bin/python tools/lesson_to_md.py $l lessons/<learn|interview|tools>/<area>/<topic> --screenshots || break; done && git add tools/lesson_to_md.py lessons <other changed paths> && git commit -m "<message>" && git push origin main
+! cd ~/projects/data-eng-knowledge && for l in <slugs>; do .venv/bin/python tools/lesson_to_md.py $l --screenshots || break; done && git add tools/lesson_to_md.py lessons <other changed paths> && git commit -m "<message>" && git push origin main
 ```
 
 `<slugs>` is the new lesson alone, or every lesson the change affects: each lesson that printed a warning, or every lesson in `lessons/` when the change touches shared parsing (indentation, escaping, spacing).

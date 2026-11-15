@@ -9,7 +9,9 @@ site's custom blocks (code tables, stat callouts, tips, the pipeline diagram).
 --screenshots needs playwright (see screenshot_diagrams) and saves the
 pipeline diagram as an image next to the Markdown.
 
-For personal study use. Output defaults to ./lessons/ (pass an out_dir such as lessons/learn/architecture).
+For personal study use. The output folder comes from tools/topics.json, which maps each lesson slug
+(tier suffix dropped) to its topic folder under lessons/, matching the site's UI cards. A slug missing
+from the map stops the script: add an entry, or pass out_dir explicitly to override.
 """
 import base64
 import difflib
@@ -1123,16 +1125,28 @@ def screenshot_diagrams(url, out_dir, slug):
     return names
 
 
+def topic_dir(slug):
+    """lessons/<area>/<topic> for a slug, from tools/topics.json. Exits if the slug is not mapped."""
+    with open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "topics.json")) as f:
+        topics = json.load(f)
+    key = re.sub(r"_(beginner|intermediate|advanced)$", "", slug)
+    folder = topics.get(slug) or topics.get(key)
+    if not folder:
+        sys.exit(f"{slug!r} is not in tools/topics.json. Add \"{key}\": \"<area>/<topic>\" "
+                 "(the folder named after the lesson's card in the site's UI), then rerun.")
+    return os.path.join("lessons", folder)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
         sys.exit(__doc__)
     url = args[0] if args[0].startswith("http") else BASE + args[0]
-    out_dir = args[1] if len(args) > 1 else "lessons"
+    slug = url.rstrip("/").rsplit("/", 1)[-1]
+    out_dir = args[1] if len(args) > 1 else topic_dir(slug)
     req = urllib.request.Request(url, headers={"User-Agent": "lesson-to-md/1.0"})
     html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
     os.makedirs(out_dir, exist_ok=True)
-    slug = url.rstrip("/").rsplit("/", 1)[-1]
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
                   if "--screenshots" in sys.argv else {})
