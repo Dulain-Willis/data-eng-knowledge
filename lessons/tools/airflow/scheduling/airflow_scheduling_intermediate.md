@@ -68,7 +68,7 @@ WHERE created_at >= TIMESTAMP '2026-11-03 06:00:00'
 > - data_interval_start and data_interval_end answer what the run reads: the half-open window.
 > - run_after answers when the run could first start: the window's close on a data-interval timetable.
 
-![Animation](images/airflow_scheduling_intermediate_animation_1.gif)
+![Animation](_images/airflow_scheduling_intermediate_animation_1.gif)
 
 > **TIP**
 >
@@ -152,11 +152,11 @@ schedule = CronTriggerTimetable(
 
 **data-interval reading**
 
-![data-interval reading](images/airflow_scheduling_intermediate_animation_2_data-interval-reading.gif)
+![data-interval reading](_images/airflow_scheduling_intermediate_animation_2_data-interval-reading.gif)
 
 **trigger reading (interval=1 day)**
 
-![trigger reading (interval=1 day)](images/airflow_scheduling_intermediate_animation_2_trigger-reading-interval-1-day.gif)
+![trigger reading (interval=1 day)](_images/airflow_scheduling_intermediate_animation_2_trigger-reading-interval-1-day.gif)
 
 > **TIP**
 >
@@ -265,11 +265,11 @@ Between 02:00 and 03:00 on 29 March there is no Berlin time at all; between 02:0
 
 **Berlin zone**
 
-![Berlin zone](images/airflow_scheduling_intermediate_animation_3_berlin-zone.gif)
+![Berlin zone](_images/airflow_scheduling_intermediate_animation_3_berlin-zone.gif)
 
 **UTC zone**
 
-![UTC zone](images/airflow_scheduling_intermediate_animation_3_utc-zone.gif)
+![UTC zone](_images/airflow_scheduling_intermediate_animation_3_utc-zone.gif)
 
 > **TIP**
 >
@@ -327,11 +327,11 @@ The presets `@hourly` and `@daily` expand to cron strings, as does `@weekly`, so
 
 **6-hour timedelta**
 
-![6-hour timedelta](images/airflow_scheduling_intermediate_animation_4_6-hour-timedelta.gif)
+![6-hour timedelta](_images/airflow_scheduling_intermediate_animation_4_6-hour-timedelta.gif)
 
 **6-hourly cron**
 
-![6-hourly cron](images/airflow_scheduling_intermediate_animation_4_6-hourly-cron.gif)
+![6-hourly cron](_images/airflow_scheduling_intermediate_animation_4_6-hourly-cron.gif)
 
 
 <br>

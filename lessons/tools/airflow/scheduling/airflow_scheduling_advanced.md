@@ -20,17 +20,17 @@ A cron schedule is a guess about when data is ready. An hourly orders feed that 
 
 An Asset is a name and a URI standing for data that Airflow never opens. Declaring one changes nothing in storage; it gives 2 DAGs a shared word for the same table or file. The task that updates the data lists the asset in outlets, and a DAG that should run after each update puts the same asset in schedule, in place of a cron string or a timetable.
 
-![Pipeline diagram 1](images/airflow_scheduling_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_scheduling_advanced_diagram_1.png)
 
 When `land` reaches success, Airflow writes an asset event: the asset, the instant, and the producing DAG, task and run. On its next loop the scheduler reads the new events, finds that `orders_summary` is scheduled on `orders_raw`, and creates a run of it, usually within seconds of the event. Nothing in this path reads a clock, and nothing inspects storage: the event means that a task declaring the outlet succeeded. A task that declares the outlet and writes nothing still fires it, and a task that writes the file and then fails fires nothing.
 
 **Landing succeeds every hour**
 
-![Landing succeeds every hour](images/airflow_scheduling_advanced_animation_1_landing-succeeds-every-hour.gif)
+![Landing succeeds every hour](_images/airflow_scheduling_advanced_animation_1_landing-succeeds-every-hour.gif)
 
 **Landing fails at 02:00**
 
-![Landing fails at 02:00](images/airflow_scheduling_advanced_animation_1_landing-fails-at-02-00.gif)
+![Landing fails at 02:00](_images/airflow_scheduling_advanced_animation_1_landing-fails-at-02-00.gif)
 
 
 <br>
@@ -354,11 +354,11 @@ depends_on_past=True is a task setting, set on 1 task or through default_args fo
 
 **depends_on_past=True**
 
-![depends_on_past=True](images/airflow_scheduling_advanced_animation_2_depends-on-past-true.gif)
+![depends_on_past=True](_images/airflow_scheduling_advanced_animation_2_depends-on-past-true.gif)
 
 **depends_on_past=False**
 
-![depends_on_past=False](images/airflow_scheduling_advanced_animation_2_depends-on-past-false.gif)
+![depends_on_past=False](_images/airflow_scheduling_advanced_animation_2_depends-on-past-false.gif)
 
 | Run (logical date) | Created at | extract | rollup | Run state |
 | --- | --- | --- | --- | --- |

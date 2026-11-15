@@ -71,7 +71,7 @@ sources:
 | shop.currencies | none | none | no |
 | web.events | absent from the file | 2026-11-04 01:10 | yes |
 
-![Pipeline diagram 1](images/dbt_deployment_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_deployment_advanced_diagram_1.png)
 
 `fct_orders` is built because `stg_orders` is under a fresher source, and it joins `stg_customers`, which was not rebuilt. That join reads the table `stg_customers` already holds, and that table is the right one: its source received no rows, so a rebuild would have written the same rows again. The selection stays correct because an unselected model's table is the table its unchanged source and unchanged code produce, and that holds only when the build that read the source's last rows completed. A model that errored last night kept its old table, so its source has to count as fresher again tonight. The job below covers both halves of that condition: the code that changed, and the build that did not finish.
 
@@ -278,7 +278,7 @@ A build leaves `run_results.json` in `target/` with 1 entry per node: its `uniqu
 }
 ```
 
-![Schema diagram 2](images/dbt_deployment_advanced_diagram_2.png)
+![Schema diagram 2](_images/dbt_deployment_advanced_diagram_2.png)
 
 The last task of the job reads the file and inserts 1 row per entry into `ops.dbt_run_results`, and 1 row per run into `ops.dbt_runs`, keyed on the `invocation_id` the file already carries; the run's start time is copied onto each result row so the trend queries need no join. That task has to run whether the build succeeded or failed, because the nights worth alerting on are the failed ones, so a scheduler that skips later tasks after a failure needs this one marked to run on any outcome. A row per node per night is tiny: a project of 400 nodes writes 146,000 rows a year.
 
@@ -387,7 +387,7 @@ Every dbt invocation starts a process, parses the project (partial parsing reuse
 
 A boundary between tasks earns its cost when the 2 sides differ in something the scheduler controls: when they run, what they wait for, or what happens when they fail. Models under the shop source wait for the shop extract; models under the web events wait for a different extract that lands 3 hours later. The hourly models run 24 times a day and the rest once. A group that may fail without stopping the morning's finance marts belongs in a task whose failure the scheduler records and moves past. Everything that shares a schedule, a wait and a failure rule stays in 1 task, where `dbt build` orders it, threads parallelize it and `dbt retry` resumes it.
 
-![Pipeline diagram 3](images/dbt_deployment_advanced_diagram_3.png)
+![Pipeline diagram 3](_images/dbt_deployment_advanced_diagram_3.png)
 
 
 <br>

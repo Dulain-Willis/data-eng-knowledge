@@ -23,7 +23,7 @@ Take 3 marts that read billing.subscriptions directly. The first casts started_a
 | Intermediate | int_ | staging and other intermediate models | joins and aggregations that change the grain | view or ephemeral |
 | Marts | fct_, dim_ | intermediate and staging | the tables analysts query, named for the business | table |
 
-![Pipeline diagram 1](images/dbt_models_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_models_intermediate_diagram_1.png)
 
 
 <br>
@@ -454,7 +454,7 @@ dbt snapshot reads the relation, compares it with the snapshot table by unique_k
 | dbt_updated_at | the source row's updated_at at the time of the run |
 | dbt_scd_id | a hash of the key and updated_at, 1 per version |
 
-![Animation](images/dbt_models_intermediate_animation_1.gif)
+![Animation](_images/dbt_models_intermediate_animation_1.gif)
 
 *$ dbt build*
 

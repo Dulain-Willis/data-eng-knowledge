@@ -13,7 +13,7 @@ Suppose it is 06:00 on a Monday at Airbnb, the company where Airflow was written
 
 An Airflow deployment has to decide what should run next and then run it, and afterward it has to remember what happened. Each of those 3 jobs belongs to a different process, and the processes share exactly one thing, the metadata database. A task gets from `scheduled` to `success` by passing through every process in turn, and each handoff is a row changing in that database.
 
-![Pipeline diagram 1](images/airflow_execution_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_execution_beginner_diagram_1.png)
 
 Here is the cast with the command that starts each part. The last column is the test that tells them apart: what stops happening when that one process dies while the rest stay up.
 
@@ -161,11 +161,11 @@ Mornings 2 and 3 want the same 48 tasks and both run 32, yet the 16 that wait si
 
 **max_active_tasks=2**
 
-![max_active_tasks=2](images/airflow_execution_beginner_animation_1_max-active-tasks-2.gif)
+![max_active_tasks=2](_images/airflow_execution_beginner_animation_1_max-active-tasks-2.gif)
 
 **max_active_tasks=3**
 
-![max_active_tasks=3](images/airflow_execution_beginner_animation_1_max-active-tasks-3.gif)
+![max_active_tasks=3](_images/airflow_execution_beginner_animation_1_max-active-tasks-3.gif)
 
 Play the night. At 01:00 the run appears. `pull_a` and `pull_b` move through `queued` into `running` while `pull_c` stops at `scheduled`; pause on its cell and Airflow's reason names the DAG's limit. At 01:10 the first 2 finish and `pull_c` takes its turn, so `merge` starts 10 minutes later than it would with 3 slots. Switch the variant and the 3 pulls start together.
 
@@ -236,11 +236,11 @@ At 01:05 the pool blocks `refresh_prices`, which shows `scheduled`; its details 
 
 **warehouse pool: 2 slots**
 
-![warehouse pool: 2 slots](images/airflow_execution_beginner_animation_2_warehouse-pool-2-slots.gif)
+![warehouse pool: 2 slots](_images/airflow_execution_beginner_animation_2_warehouse-pool-2-slots.gif)
 
 **warehouse pool: 4 slots**
 
-![warehouse pool: 4 slots](images/airflow_execution_beginner_animation_2_warehouse-pool-4-slots.gif)
+![warehouse pool: 4 slots](_images/airflow_execution_beginner_animation_2_warehouse-pool-4-slots.gif)
 
 Step through the hour from 01:00. `load_bookings` and `load_reviews` take both `warehouse` slots the moment the first run is created, and `load_events`, which asks for 2, waits in `scheduled` with the pool given as its reason. After 10 minutes the single-slot loads succeed, the pair of slots is free at once, and `load_events` starts. The 4-slot variant starts all 3 together.
 

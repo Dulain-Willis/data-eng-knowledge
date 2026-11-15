@@ -24,11 +24,11 @@ A consumer polls a batch, writes each row to the table, then commits its offset.
 
 **insert sink**
 
-![insert sink](images/kafka_in_the_pipeline_advanced_animation_1_insert-sink.gif)
+![insert sink](_images/kafka_in_the_pipeline_advanced_animation_1_insert-sink.gif)
 
 **upsert sink**
 
-![upsert sink](images/kafka_in_the_pipeline_advanced_animation_1_upsert-sink.gif)
+![upsert sink](_images/kafka_in_the_pipeline_advanced_animation_1_upsert-sink.gif)
 
 
 <br>
@@ -292,7 +292,7 @@ scheduled.rebalance.max.delay.ms=300000
 
 A connector is a config plus a planner. When the config arrives, the leader of the worker group assigns the connector object to a worker, and that worker calls the connector's `taskConfigs(maxTasks)` method, which splits the work: a database source divides 12 tables over `tasks.max=4` as 3 tables each, a storage sink divides the topic's partitions over its tasks. The worker writes each task config to the config topic, forwarding the write to the leader when it is not the leader itself. The leader then spreads the tasks across workers as evenly as it can. With 3 workers and a sink of 6 tasks, each worker runs 2 tasks, and 1 of them also runs the connector object, which watches for config and partition changes and replans the tasks when they change.
 
-![Pipeline diagram 1](images/kafka_in_the_pipeline_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_in_the_pipeline_advanced_diagram_1.png)
 
 | Worker | Runs | Tasks of orders-sink |
 | --- | --- | --- |

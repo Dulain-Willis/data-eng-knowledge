@@ -46,11 +46,11 @@ With the setting at true, the controller makes a replica from outside the ISR th
 
 **Election off (default)**
 
-![Election off (default)](images/kafka_replication_advanced_animation_1_election-off-default.gif)
+![Election off (default)](_images/kafka_replication_advanced_animation_1_election-off-default.gif)
 
 **Election on**
 
-![Election on](images/kafka_replication_advanced_animation_1_election-on.gif)
+![Election on](_images/kafka_replication_advanced_animation_1_election-on.gif)
 
 
 <br>
@@ -141,7 +141,7 @@ Each broker sends a heartbeat to the active controller on a fixed interval, and 
 - **2 s** — between a broker's heartbeats
 - **9 s** — of silence before fencing
 
-![Pipeline diagram 1](images/kafka_replication_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_replication_advanced_diagram_1.png)
 
 
 <br>

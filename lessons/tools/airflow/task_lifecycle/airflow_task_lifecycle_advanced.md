@@ -136,11 +136,11 @@ Play the night below. A manual trigger at 02:02 creates the run; `create_tmp` ru
 
 **load_orders fails**
 
-![load_orders fails](images/airflow_task_lifecycle_advanced_animation_1_load-orders-fails.gif)
+![load_orders fails](_images/airflow_task_lifecycle_advanced_animation_1_load-orders-fails.gif)
 
 **load_orders succeeds**
 
-![load_orders succeeds](images/airflow_task_lifecycle_advanced_animation_1_load-orders-succeeds.gif)
+![load_orders succeeds](_images/airflow_task_lifecycle_advanced_animation_1_load-orders-succeeds.gif)
 
 | What fails | load_orders | aggregate | drop_tmp | Run |
 | --- | --- | --- | --- | --- |
