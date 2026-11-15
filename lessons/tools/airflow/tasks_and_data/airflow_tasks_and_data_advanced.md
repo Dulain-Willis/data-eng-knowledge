@@ -593,12 +593,4 @@ Picture the Airbnb bookings pipeline from the intro on a full night. It pulls a 
 - A check operator fails when the data is wrong, and all_success turns that failure into upstream_failed on everything downstream; it keeps 0 retries and sits before the publish task that carries the outlet.
 - A hook owns the connection, the client and the protocol; a task owns the window, the templates, the retries and what to return; and the hook is built in execute, never at parse.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

@@ -69,7 +69,14 @@ def parse(html):
     return BeautifulSoup(html, builder=builder)
 
 
+# Prose that points at an exercise below it; dropped (with its block) when exercises are left out.
+EXERCISE_REF = re.compile(r"\bdrill below\b", re.I)
+
+
 def clean(soup):
+    # "Official <Tool> resources" panel (logo, quote, doc buttons, link table) ends every tool lesson
+    for panel in soup.select("[data-tool-partner-panel]"):
+        panel.decompose()
     for t in soup.select(".sr-only"):
         t.decompose()
     # decorative "//" that sits beside some headings
@@ -340,8 +347,10 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False):
     """diagram_images: screenshot file names, in page order, one per diagram block.
+    drop_exercise_refs: the exercises are left out, so drop prose blocks that point at one
+    ("The drill below ...").
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
     animation_infos = animation_info(html)
@@ -366,6 +375,9 @@ def convert(html, diagram_images=(), exercises=(), animations=None):
             print(f"warning: no rule for block type '{kind}'; used generic conversion",
                   file=sys.stderr)
         if kind in SKIPPED_BLOCKS:
+            block.decompose()
+        elif (drop_exercise_refs and kind in ("body_text", "rich_text")
+              and EXERCISE_REF.search(block.get_text(" "))):
             block.decompose()
         elif kind == "multiple_choice":
             p_el = block.find("p")
@@ -1153,16 +1165,17 @@ def main():
     path = os.path.join(out_dir, slug + ".md")
     with open(path, "w", encoding="utf-8") as f:
         challenges = fetch_challenges(slug)
+        drop_refs = False
         airflow = bool(challenges) and challenges[0].get("challenge_type") == "airflow"
         tool = challenges[0].get("challenge_type") if challenges else None
         if airflow and not INCLUDE_AIRFLOW_EXERCISES:
             print(f"note: {len(challenges)} Airflow exercise(s) left out "
                   f"(INCLUDE_AIRFLOW_EXERCISES is False)", file=sys.stderr)
-            sections = []
+            sections, drop_refs = [], True
         elif tool in SKIPPED_TOOL_EXERCISES:
             print(f"note: {len(challenges)} {tool} exercise(s) left out (SKIPPED_TOOL_EXERCISES)",
                   file=sys.stderr)
-            sections = []
+            sections, drop_refs = [], True
         elif airflow:
             kept = [c for c in challenges if c["config"].get("form") == "dag_repair"]
             left_out = sorted({str(c["config"].get("form")) for c in challenges if c not in kept})
@@ -1178,7 +1191,7 @@ def main():
             for anchor, group in groups:
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
-        f.write(convert(html, images, sections, animations))
+        f.write(convert(html, images, sections, animations, drop_refs))
     print(path)
 
 

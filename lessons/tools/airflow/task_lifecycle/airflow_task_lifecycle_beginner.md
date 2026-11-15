@@ -363,12 +363,4 @@ Picture an illustrative nightly host payout refresh at Airbnb, where Airflow beg
 - Clearing erases a cell's state so the scheduler treats it as new, and the Downstream box decides whether the cells below it come along.
 - Each try writes its own attempt log and try numbers never reset, so the latest file shows the ending and attempt 1 shows the cause.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

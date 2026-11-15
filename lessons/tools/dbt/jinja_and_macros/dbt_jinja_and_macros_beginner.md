@@ -509,12 +509,4 @@ GitLab's data team moves mr_by_state from models/staging to models/marts, where 
 - When more than one place sets materialized, the setting closest to the model wins: config() beats a properties file, which beats dbt_project.yml. Tags combine instead.
 - A Compilation Error means dbt couldn't render or resolve the template and sent nothing; a Database Error means the warehouse rejected SQL you can open and read.
 
-[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)
-
-Official dbt resources
-
-"dbt enables data analysts and engineers to transform their data using the same practices that software engineers use to build applications." [github.com/dbt-labs/dbt-core](https://github.com/dbt-labs/dbt-core)
-
-[Documentation](https://docs.getdbt.com/)[Get started](https://docs.getdbt.com/docs/get-started-dbt)[Source](https://github.com/dbt-labs/dbt-core)
-
 dbt and the dbt logo are trademarks of dbt Labs, LLC.

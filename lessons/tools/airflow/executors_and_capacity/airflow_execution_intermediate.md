@@ -421,12 +421,4 @@ At Airbnb, picture the 06:00 host payouts report waiting on the 02:00 bookings l
 - A pod per task buys isolation and per-task sizing through executor_config, and costs seconds to minutes of startup before every task's first line.
 - ExternalTaskSensor looks up the other DAG's run by logical date; execution_delta or execution_date_fn must produce dates the other schedule creates, or the sensor waits in silence until its timeout.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

@@ -403,12 +403,4 @@ The hypothetical Airbnb pricing run from the opening starts at 02:00 with its de
 - A log that stops without a verdict means the process is gone: the supervisor reports a killed process at once, and the scheduler reports a lost worker after the 300 second heartbeat timeout.
 - A deadline alert fires once when the clock passes reference plus interval with the run still open, in the triggerer rather than a worker, and a late run that later succeeds fires it all the same.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

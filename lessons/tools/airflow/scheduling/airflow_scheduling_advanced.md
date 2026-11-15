@@ -495,12 +495,4 @@ Shopify shows a live globe of BFCM sales each year, and in 2026 that weekend run
 - depends_on_past serializes 1 task across runs and turns a failure into a waiting chain that drains oldest first.
 - A schedule change keeps every existing run and aligns the next window down to the new schedule's previous tick; a logical date already taken is skipped without a run.
 
-[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)
-
-Official Apache Airflow resourcesversion 3.3
-
-"Platform created by the community to programmatically author, schedule and monitor workflows." [airflow.apache.org](https://airflow.apache.org/)
-
-[Documentation](https://airflow.apache.org/docs/)[Install](https://airflow.apache.org/docs/apache-airflow/stable/installation/index.html)[Community](https://airflow.apache.org/community/)
-
 Apache Airflow, Apache, Airflow, the Airflow logo, and the Apache logo are either registered trademarks or trademarks of The Apache Software Foundation.

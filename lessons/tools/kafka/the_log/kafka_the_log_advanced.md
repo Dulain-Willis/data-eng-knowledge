@@ -74,8 +74,6 @@ A pass has 2 phases. First the cleaner reads the dirty region into an offset map
 >
 > The broker's `log-cleaner.log` lists each finished pass: the partition, when it ran, and the bytes read and written. It never says why a partition was skipped: work that out from its dirty ratio, lag settings and segment ages.
 
-Try it. The drill below hands you 1 partition and the settings above; strike the records the cleaner has removed by the clock it shows.
-
 
 <br>
 
@@ -213,8 +211,6 @@ LogAppendTime would not repair this: it stamps only later appends, and segment 2
 > **TIP**
 >
 > Alert on the gap between a partition's max-timestamp offset and its latest offset. On a healthy CreateTime topic they are within a few records of each other; a gap of thousands means a stamp is holding the segment.
-
-The drill below gives you a partition with 1 future stamp in it; strike the records retention has deleted at the clock shown.
 
 
 <br>
@@ -385,33 +381,5 @@ Uber's trip-receipt topic keeps a year for audit, tiered after 3 days, with read
 - Retention deletes from the front and stops at the first segment not old enough, so 1 future stamp keeps every segment after it.
 - Tiered storage copies closed segments to a store, deletes local copies after local.retention.ms, and reads old offsets back through the broker.
 - Limits at the producer, broker, topic and consumer size a record; the claim check and chunking keep records under them.
-
-[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)
-
-Official Apache Kafka resourcesversion 4.4
-
-"Apache Kafka is an open-source distributed event streaming platform used by thousands of companies for high-performance data pipelines, streaming analytics, data integration, and mission-critical applications." [kafka.apache.org](https://kafka.apache.org/)
-
-[Documentation](https://kafka.apache.org/44/)[Quickstart](https://kafka.apache.org/quickstart/)[Download](https://kafka.apache.org/community/downloads/)[Community](https://kafka.apache.org/community/)
-
-In the documentation
-
-When Compaction Runs
-:   [Log Compaction Details](https://kafka.apache.org/44/design/design/#log-compaction-details)[min.cleanable.dirty.ratio](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_min.cleanable.dirty.ratio)
-
-Two Kinds of Timestamp
-:   [message.timestamp.type](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_message.timestamp.type)[KIP-32 Record Timestamps](https://cwiki.apache.org/confluence/display/KAFKA/KIP-32+-+Add+timestamps+to+Kafka+message)
-
-Timestamps from the Future
-:   [message.timestamp.after.max.ms](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_message.timestamp.after.max.ms)[message.timestamp.before.max.ms](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_message.timestamp.before.max.ms)
-
-Tiered Storage
-:   [Tiered Storage Overview](https://kafka.apache.org/44/operations/tiered-storage/#tiered-storage-overview)[remote.storage.enable](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_remote.storage.enable)
-
-Large Messages
-:   [max.message.bytes](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_max.message.bytes)[message.max.bytes](https://kafka.apache.org/44/configuration/broker-configs/#brokerconfigs_message.max.bytes)
-
-Further
-:   [KIP-405 Tiered Storage](https://cwiki.apache.org/confluence/display/KAFKA/KIP-405%3A+Kafka+Tiered+Storage)[max.compaction.lag.ms](https://kafka.apache.org/44/configuration/topic-configs/#topicconfigs_max.compaction.lag.ms)[Configuring The Log Cleaner](https://kafka.apache.org/44/design/design/#configuring-the-log-cleaner)
 
 Apache Kafka, Kafka, and the Kafka logo are either registered trademarks or trademarks of The Apache Software Foundation in the United States and other countries.
