@@ -429,9 +429,9 @@ def convert(html, diagram_images=(), exercises=(), animations=None):
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not
     # Tool logos are site-relative (/tool-marks/x.png); point them at the copies vendored in
-    # lesson_preview/tools/tool-marks/ so they render on GitHub (lessons live one level below tools/).
+    # lesson_preview/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
     for img in soup.find_all("img", src=re.compile(r"^/tool-marks/")):
-        img["src"] = "../" + img["src"].lstrip("/")
+        img["src"] = "../../" + img["src"].lstrip("/")
     md = markdownify(str(soup), heading_style="ATX", bullets="-", code_language="sql",
                      escape_underscores=False, newline_style="BACKSLASH")
     for token, text in tokens.items():

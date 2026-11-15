@@ -1,5 +1,5 @@
 # Index: pipeline_streaming_systems_intermediate.md
-Source: `lesson_preview/interview/architecture/pipeline_streaming_systems_intermediate.md` (478 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/streaming_systems/pipeline_streaming_systems_intermediate.md` (478 lines). Read just the line range you need (Read offset/limit).
 
 ## Consumer Groups and Offsets (L27-121)
 

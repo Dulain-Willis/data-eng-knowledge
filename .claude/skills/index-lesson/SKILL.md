@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Index a lesson
 
-Write `lesson_preview/interview/architecture/index/<lesson-stem>.md` for one lesson file. An agent answering data engineering questions reads this index, picks a section, then reads only that line range of the lesson. The index finds; the lesson teaches. Lessons stay untouched.
+Write `lesson_preview/interview/architecture/index/<lesson-stem>.md` for one lesson file (it lives in a topic folder). An agent answering data engineering questions reads this index, picks a section, then reads only that line range of the lesson. The index finds; the lesson teaches. Lessons stay untouched.
 
 Worked example: `lesson_preview/interview/architecture/index/pa_pattern_backpressure_scaling.md`.
 
@@ -36,7 +36,7 @@ Done when `python3 scripts/validate_lesson_index.py <lesson-stem>` prints `OK` (
 
 ```
 # Index: <lesson-file>.md
-Source: `lesson_preview/interview/architecture/<lesson-file>.md` (<N> lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/<topic>/<lesson-file>.md` (<N> lines). Read just the line range you need (Read offset/limit).
 
 ## <Lesson ## title, verbatim> (L<start>-<end>)
 

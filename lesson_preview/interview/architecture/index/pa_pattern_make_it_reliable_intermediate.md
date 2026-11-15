@@ -1,5 +1,5 @@
 # Index: pa_pattern_make_it_reliable_intermediate.md
-Source: `lesson_preview/interview/architecture/pa_pattern_make_it_reliable_intermediate.md` (570 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/idempotency/pa_pattern_make_it_reliable_intermediate.md` (570 lines). Read just the line range you need (Read offset/limit).
 
 ## How Do You Ensure Data Quality? (L27-132)
 

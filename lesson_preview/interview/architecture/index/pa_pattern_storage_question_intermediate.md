@@ -1,5 +1,5 @@
 # Index: pa_pattern_storage_question_intermediate.md
-Source: `lesson_preview/interview/architecture/pa_pattern_storage_question_intermediate.md` (470 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/small_file_compaction/pa_pattern_storage_question_intermediate.md` (470 lines). Read just the line range you need (Read offset/limit).
 
 ## Why Parquet? (L27-101)
 

@@ -1,5 +1,5 @@
 # Index: pipeline_keeping_data_fresh_intermediate.md
-Source: `lesson_preview/interview/architecture/pipeline_keeping_data_fresh_intermediate.md` (546 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/keeping_data_fresh/pipeline_keeping_data_fresh_intermediate.md` (546 lines). Read just the line range you need (Read offset/limit).
 
 ## Merge Strategies (L27-123)
 

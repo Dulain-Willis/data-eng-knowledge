@@ -1,5 +1,5 @@
 # Index: pipeline_how_data_moves_advanced.md
-Source: `lesson_preview/interview/architecture/pipeline_how_data_moves_advanced.md` (416 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/how_data_moves/pipeline_how_data_moves_advanced.md` (416 lines). Read just the line range you need (Read offset/limit).
 
 ## Idempotent Pipelines (L27-128)
 

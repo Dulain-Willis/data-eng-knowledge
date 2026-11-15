@@ -1,5 +1,5 @@
 # Index: pa_pattern_delivery_semantics.md
-Source: `lesson_preview/interview/architecture/pa_pattern_delivery_semantics.md` (490 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/delivery_semantics/pa_pattern_delivery_semantics.md` (490 lines). Read just the line range you need (Read offset/limit).
 
 ## "What Is Your Delivery Guarantee?" (L27-98)
 

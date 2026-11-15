@@ -1,5 +1,5 @@
 # Index: pa_pattern_idempotency.md
-Source: `lesson_preview/interview/architecture/pa_pattern_idempotency.md` (597 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/idempotency/pa_pattern_idempotency.md` (597 lines). Read just the line range you need (Read offset/limit).
 
 ## "What If Your Pipeline Runs Twice?" (L27-140)
 
