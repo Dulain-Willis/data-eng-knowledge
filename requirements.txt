@@ -1,0 +1,7 @@
+# MCP server
+mcp>=1.2
+# lesson_to_md.py converter
+beautifulsoup4
+markdownify
+# only for --screenshots
+playwright
