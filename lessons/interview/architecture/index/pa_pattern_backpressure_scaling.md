@@ -1,5 +1,5 @@
 # Index: pa_pattern_backpressure_scaling.md
-Source: `lesson_preview/interview/architecture/backpressure_and_scaling/pa_pattern_backpressure_scaling.md` (499 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/backpressure_and_scaling/pa_pattern_backpressure_scaling.md` (499 lines). Read just the line range you need (Read offset/limit).
 
 ## The Volume-Doubling Question (L27-106)
 

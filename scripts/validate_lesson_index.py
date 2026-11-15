@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Check lesson_preview/interview/architecture/index/<stem>.md against its lesson. Usage: validate_lesson_index.py <stem> [<stem> ...]"""
+"""Check lessons/interview/architecture/index/<stem>.md against its lesson. Usage: validate_lesson_index.py <stem> [<stem> ...]"""
 import re, sys, pathlib
 
-ROOT = pathlib.Path(__file__).resolve().parent.parent / "lesson_preview" / "interview" / "architecture"
+ROOT = pathlib.Path(__file__).resolve().parent.parent / "lessons" / "interview" / "architecture"
 SKIP = {"What you will be able to do", "Putting It All Together", "Key Takeaways"}
 
 
@@ -28,7 +28,7 @@ def check(stem):
             got.append((len(m.group(1)), m.group(2), int(m.group(3)), int(m.group(4))))
     top = ROOT / "INDEX.md"
     if top.exists() and not re.search(rf"^- `{re.escape(stem)}`:", top.read_text(), re.M):
-        problems.append(f"lesson_preview/interview/architecture/INDEX.md has no line starting with - `{stem}`:")
+        problems.append(f"lessons/interview/architecture/INDEX.md has no line starting with - `{stem}`:")
     src = next((l for l in idx if l.startswith("Source:")), "")
     if f"({len(lesson)} lines)" not in src:
         problems.append(f"Source line should say ({len(lesson)} lines): {src[:90]!r}")

@@ -1,6 +1,6 @@
 # Lesson index: start here
 
-Pick the lesson below, open `lesson_preview/interview/architecture/index/<lesson>.md` for its sections and line ranges, then read only that range of `lesson_preview/interview/architecture/<topic>/<lesson>.md`.
+Pick the lesson below, open `lessons/interview/architecture/index/<lesson>.md` for its sections and line ranges, then read only that range of `lessons/interview/architecture/<topic>/<lesson>.md`.
 
 `pipeline_*` lessons teach fundamentals; `pa_pattern_*` lessons go deep with numbers and interview-style answers.
 

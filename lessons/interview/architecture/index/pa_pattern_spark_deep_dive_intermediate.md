@@ -1,5 +1,5 @@
 # Index: pa_pattern_spark_deep_dive_intermediate.md
-Source: `lesson_preview/interview/architecture/backpressure_and_scaling/pa_pattern_spark_deep_dive_intermediate.md` (365 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/backpressure_and_scaling/pa_pattern_spark_deep_dive_intermediate.md` (365 lines). Read just the line range you need (Read offset/limit).
 
 ## Explain Spark Architecture (L27-81)
 

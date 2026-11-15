@@ -11,7 +11,7 @@
 
 <div align="center">
 
-[Lessons »](lesson_preview) | [MCP server »](server.py)
+[Lessons »](lessons) | [MCP server »](server.py)
 
 </div>
 <br>
@@ -34,13 +34,13 @@ https://github.com/user-attachments/assets/9647a564-275a-423a-b192-8d2cc67f057f
 
 | Area | Lessons |
 |---|---|
-| [Learn: architecture](lesson_preview/learn/architecture) | 30 |
-| [Learn: data modeling](lesson_preview/learn/data_modeling) | 11 |
-| [Interview: architecture](lesson_preview/interview/architecture) | 26 |
-| [Interview: data modeling](lesson_preview/interview/data_modeling) | 8 |
-| [Airflow](lesson_preview/tools/airflow) | 15 |
-| [dbt](lesson_preview/tools/dbt) | 15 |
-| [Kafka](lesson_preview/tools/kafka) | 15 |
+| [Learn: architecture](lessons/learn/architecture) | 30 |
+| [Learn: data modeling](lessons/learn/data_modeling) | 11 |
+| [Interview: architecture](lessons/interview/architecture) | 26 |
+| [Interview: data modeling](lessons/interview/data_modeling) | 8 |
+| [Airflow](lessons/tools/airflow) | 15 |
+| [dbt](lessons/tools/dbt) | 15 |
+| [Kafka](lessons/tools/kafka) | 15 |
 
 ## MCP server
 
@@ -51,4 +51,4 @@ uv venv .venv && uv pip install --python .venv/bin/python -r requirements.txt
 claude mcp add --scope user data-eng-knowledge -- "$PWD/.venv/bin/python" "$PWD/server.py"
 ```
 
-It reads `lesson_preview/interview/architecture/` by default; set `DATA_ENG_KNOWLEDGE_DIR` to point it somewhere else.
+It reads `lessons/interview/architecture/` by default; set `DATA_ENG_KNOWLEDGE_DIR` to point it somewhere else.

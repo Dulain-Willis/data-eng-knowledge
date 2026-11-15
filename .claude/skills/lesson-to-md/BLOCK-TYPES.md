@@ -29,6 +29,6 @@ The site builds a lesson from blocks tagged `data-note-block-type="<type>"`, and
 
 ## Repo facts
 
-- `lesson_preview/` is tracked and committed on purpose; per the user, DataDriven's people approved this copy.
+- `lessons/` is tracked and committed on purpose; per the user, DataDriven's people approved this copy.
 - Python tooling lives in `.venv/`; Playwright's Chromium sits in `~/.cache/ms-playwright`.
 - `tools/__pycache__/*.pyc` is tracked and changes on every run, so `git add` files by path.

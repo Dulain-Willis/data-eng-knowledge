@@ -1,5 +1,5 @@
 # Index: pipeline_keeping_data_fresh_beginner.md
-Source: `lesson_preview/interview/architecture/keeping_data_fresh/pipeline_keeping_data_fresh_beginner.md` (488 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/keeping_data_fresh/pipeline_keeping_data_fresh_beginner.md` (488 lines). Read just the line range you need (Read offset/limit).
 
 ## Full vs Incremental Loading (L27-118)
 
