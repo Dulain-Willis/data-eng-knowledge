@@ -1,5 +1,5 @@
 # Index: pipeline_making_it_repeatable_beginner.md
-Source: `lesson_preview/interview/architecture/pipeline_making_it_repeatable_beginner.md` (603 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/making_it_repeatable/pipeline_making_it_repeatable_beginner.md` (603 lines). Read just the line range you need (Read offset/limit).
 
 ## DAG Orchestration (L27-133)
 

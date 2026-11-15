@@ -8,7 +8,7 @@ SKIP = {"What you will be able to do", "Putting It All Together", "Key Takeaways
 
 def check(stem):
     stem = stem.removesuffix(".md")
-    lesson = (ROOT / f"{stem}.md").read_text().splitlines()
+    lesson = next(ROOT.glob(f"*/{stem}.md")).read_text().splitlines()
     idx = (ROOT / "index" / f"{stem}.md").read_text().splitlines()
     problems = []
     hs = [(len(m.group(1)), m.group(2), i) for i, l in enumerate(lesson, 1) if (m := re.match(r"^(##|###) (.*\S)", l))]

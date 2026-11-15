@@ -1,5 +1,5 @@
 # Index: pa_pattern_cdc_dual_writes.md
-Source: `lesson_preview/interview/architecture/pa_pattern_cdc_dual_writes.md` (520 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/cdc_and_dual_writes/pa_pattern_cdc_dual_writes.md` (520 lines). Read just the line range you need (Read offset/limit).
 
 ## "How Do You Extract Source Data?" (L27-108)
 

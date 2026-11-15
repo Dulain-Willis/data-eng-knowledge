@@ -1,5 +1,5 @@
 # Index: pa_pattern_late_data_watermarks.md
-Source: `lesson_preview/interview/architecture/pa_pattern_late_data_watermarks.md` (408 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/late_data_and_watermarks/pa_pattern_late_data_watermarks.md` (408 lines). Read just the line range you need (Read offset/limit).
 
 ## "What If Events Are Out of Order?" (L27-101)
 

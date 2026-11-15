@@ -1,5 +1,5 @@
 # Index: pa_pattern_dead_letter_queue.md
-Source: `lesson_preview/interview/architecture/pa_pattern_dead_letter_queue.md` (406 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/dead_letter_queue/pa_pattern_dead_letter_queue.md` (406 lines). Read just the line range you need (Read offset/limit).
 
 ## "How Do You Handle Bad Data?" (L27-68)
 

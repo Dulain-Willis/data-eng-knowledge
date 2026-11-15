@@ -4,7 +4,7 @@ Serves a folder of lessons plus hand-written indexes so an agent can look up bes
 instead of answering from training data. Layout of the content folder (KNOWLEDGE_DIR):
 
     INDEX.md                      one line per lesson (start here)
-    <lesson>.md                   the lessons
+    <topic>/<lesson>.md           the lessons, grouped in topic folders (matches the site's UI)
     index/<lesson>.md             per-lesson sections with line ranges, e.g. "### Header (L120-160)"
 
 Set DATA_ENG_KNOWLEDGE_DIR to point at a different folder.
@@ -43,7 +43,12 @@ STOP = set(
 
 
 def _lessons() -> list[str]:
-    return sorted(p.stem for p in KNOWLEDGE_DIR.glob("*.md") if p.name != "INDEX.md")
+    return sorted(p.stem for p in _paths().values())
+
+
+def _paths() -> dict[str, Path]:
+    """Lesson stem -> file, found in any topic folder (index/ is not a topic)."""
+    return {p.stem: p for p in KNOWLEDGE_DIR.glob("*/*.md") if p.parent.name != "index"}
 
 
 def _check(lesson: str) -> str | None:
@@ -108,7 +113,7 @@ def read_lesson(lesson: str, start: int, end: int) -> str:
     if err := _check(lesson):
         return err
     name = lesson.removesuffix(".md")
-    lines = (KNOWLEDGE_DIR / f"{name}.md").read_text().splitlines()
+    lines = _paths()[name].read_text().splitlines()
     start = max(1, start)
     end = min(len(lines), end, start + MAX_READ_LINES - 1)
     if start > len(lines):
@@ -154,7 +159,7 @@ def grep_lessons(pattern: str, limit: int = 20) -> str:
         return f"Bad regex: {e}"
     hits = []
     for lesson in _lessons():
-        for i, line in enumerate((KNOWLEDGE_DIR / f"{lesson}.md").read_text().splitlines(), 1):
+        for i, line in enumerate((_paths()[lesson]).read_text().splitlines(), 1):
             if rx.search(line):
                 hits.append(f"{lesson}:{i}: {line.strip()[:160]}")
     if not hits:

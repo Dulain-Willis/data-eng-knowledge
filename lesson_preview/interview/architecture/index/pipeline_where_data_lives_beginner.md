@@ -1,5 +1,5 @@
 # Index: pipeline_where_data_lives_beginner.md
-Source: `lesson_preview/interview/architecture/pipeline_where_data_lives_beginner.md` (533 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/where_data_lives/pipeline_where_data_lives_beginner.md` (533 lines). Read just the line range you need (Read offset/limit).
 
 ## Columnar vs Row (L27-146)
 

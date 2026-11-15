@@ -1,5 +1,5 @@
 # Index: pipeline_how_data_moves_beginner.md
-Source: `lesson_preview/interview/architecture/pipeline_how_data_moves_beginner.md` (508 lines). Read just the line range you need (Read offset/limit).
+Source: `lesson_preview/interview/architecture/how_data_moves/pipeline_how_data_moves_beginner.md` (508 lines). Read just the line range you need (Read offset/limit).
 
 ## Batch Processing (L27-106)
 

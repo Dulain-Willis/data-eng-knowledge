@@ -5,7 +5,7 @@ description: Convert a datadriven.io lesson to Markdown with tools/lesson_to_md.
 
 # Lesson to Markdown
 
-`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/images/`, where `<out_dir>` is a folder like `lesson_preview/learn/architecture` (default `lesson_preview/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
+`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/images/`, where `<out_dir>` is a topic folder like `lesson_preview/learn/architecture/storage_layers` (named after the card title in the site's UI, snake_case; all tiers of one UI card share it) (default `lesson_preview/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
 
 ## Steps
 
@@ -24,7 +24,7 @@ Done when the status is 200.
 One `!` line: run the converter for each slug, then commit and push the files you changed.
 
 ```
-! cd ~/projects/data-eng-knowledge && for l in <slugs>; do .venv/bin/python tools/lesson_to_md.py $l lesson_preview/<learn|interview|tools>/<topic> --screenshots || break; done && git add tools/lesson_to_md.py lesson_preview <other changed paths> && git commit -m "<message>" && git push origin main
+! cd ~/projects/data-eng-knowledge && for l in <slugs>; do .venv/bin/python tools/lesson_to_md.py $l lesson_preview/<learn|interview|tools>/<area>/<topic> --screenshots || break; done && git add tools/lesson_to_md.py lesson_preview <other changed paths> && git commit -m "<message>" && git push origin main
 ```
 
 `<slugs>` is the new lesson alone, or every lesson the change affects: each lesson that printed a warning, or every lesson in `lesson_preview/` when the change touches shared parsing (indentation, escaping, spacing).
