@@ -1,5 +1,5 @@
 # Index: pipeline_distributed_compute_beginner.md
-Source: `lesson_preview/interview/architecture/distributed_compute/pipeline_distributed_compute_beginner.md` (467 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/distributed_compute/pipeline_distributed_compute_beginner.md` (467 lines). Read just the line range you need (Read offset/limit).
 
 ## Spark Execution Model (L27-105)
 

@@ -1,5 +1,5 @@
 # Index: pipeline_how_data_moves_intermediate.md
-Source: `lesson_preview/interview/architecture/how_data_moves/pipeline_how_data_moves_intermediate.md` (411 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/how_data_moves/pipeline_how_data_moves_intermediate.md` (411 lines). Read just the line range you need (Read offset/limit).
 
 ## Batch Mechanics (L27-112)
 

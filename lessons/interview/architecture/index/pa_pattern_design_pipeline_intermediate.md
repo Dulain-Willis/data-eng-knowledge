@@ -1,5 +1,5 @@
 # Index: pa_pattern_design_pipeline_intermediate.md
-Source: `lesson_preview/interview/architecture/design_a_pipeline/pa_pattern_design_pipeline_intermediate.md` (423 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/design_a_pipeline/pa_pattern_design_pipeline_intermediate.md` (423 lines). Read just the line range you need (Read offset/limit).
 
 ## Ingestion Patterns (L28-116)
 

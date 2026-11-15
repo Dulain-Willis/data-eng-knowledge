@@ -1,5 +1,5 @@
 # Index: pa_pattern_batch_or_stream_intermediate.md
-Source: `lesson_preview/interview/architecture/delivery_semantics/pa_pattern_batch_or_stream_intermediate.md` (490 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/delivery_semantics/pa_pattern_batch_or_stream_intermediate.md` (490 lines). Read just the line range you need (Read offset/limit).
 
 ## When Would You Use Streaming? (L27-93)
 

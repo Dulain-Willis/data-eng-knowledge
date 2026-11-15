@@ -1,5 +1,5 @@
 # Index: pa_pattern_incremental_loading_intermediate.md
-Source: `lesson_preview/interview/architecture/cdc_and_dual_writes/pa_pattern_incremental_loading_intermediate.md` (562 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/cdc_and_dual_writes/pa_pattern_incremental_loading_intermediate.md` (562 lines). Read just the line range you need (Read offset/limit).
 
 ## Full Refresh or Incremental? (L27-114)
 

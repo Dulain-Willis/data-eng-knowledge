@@ -17,7 +17,7 @@ from pathlib import Path
 from mcp.server.mcpserver import MCPServer
 
 KNOWLEDGE_DIR = Path(
-    os.environ.get("DATA_ENG_KNOWLEDGE_DIR", Path(__file__).resolve().parent / "lesson_preview" / "interview" / "architecture")
+    os.environ.get("DATA_ENG_KNOWLEDGE_DIR", Path(__file__).resolve().parent / "lessons" / "interview" / "architecture")
 ).expanduser()
 MAX_READ_LINES = 400
 

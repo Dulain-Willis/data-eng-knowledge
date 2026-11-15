@@ -1,5 +1,5 @@
 # Index: pa_pattern_schema_evolution.md
-Source: `lesson_preview/interview/architecture/schema_evolution/pa_pattern_schema_evolution.md` (551 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/schema_evolution/pa_pattern_schema_evolution.md` (551 lines). Read just the line range you need (Read offset/limit).
 
 ## "What If a Source Adds a Column?" (L27-116)
 

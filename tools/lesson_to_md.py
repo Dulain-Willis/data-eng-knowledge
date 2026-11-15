@@ -9,7 +9,7 @@ site's custom blocks (code tables, stat callouts, tips, the pipeline diagram).
 --screenshots needs playwright (see screenshot_diagrams) and saves the
 pipeline diagram as an image next to the Markdown.
 
-For personal study use. Output defaults to ./lesson_preview/ (pass an out_dir such as lesson_preview/learn/architecture).
+For personal study use. Output defaults to ./lessons/ (pass an out_dir such as lessons/learn/architecture).
 """
 import base64
 import difflib
@@ -429,7 +429,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None):
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not
     # Tool logos are site-relative (/tool-marks/x.png); point them at the copies vendored in
-    # lesson_preview/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
+    # lessons/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
     for img in soup.find_all("img", src=re.compile(r"^/tool-marks/")):
         img["src"] = "../../" + img["src"].lstrip("/")
     md = markdownify(str(soup), heading_style="ATX", bullets="-", code_language="sql",
@@ -1128,7 +1128,7 @@ def main():
     if not args:
         sys.exit(__doc__)
     url = args[0] if args[0].startswith("http") else BASE + args[0]
-    out_dir = args[1] if len(args) > 1 else "lesson_preview"
+    out_dir = args[1] if len(args) > 1 else "lessons"
     req = urllib.request.Request(url, headers={"User-Agent": "lesson-to-md/1.0"})
     html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
     os.makedirs(out_dir, exist_ok=True)

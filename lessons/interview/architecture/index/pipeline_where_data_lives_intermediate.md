@@ -1,5 +1,5 @@
 # Index: pipeline_where_data_lives_intermediate.md
-Source: `lesson_preview/interview/architecture/where_data_lives/pipeline_where_data_lives_intermediate.md` (488 lines). Read just the line range you need (Read offset/limit).
+Source: `lessons/interview/architecture/where_data_lives/pipeline_where_data_lives_intermediate.md` (488 lines). Read just the line range you need (Read offset/limit).
 
 ## Encoding Types (L27-130)
 
