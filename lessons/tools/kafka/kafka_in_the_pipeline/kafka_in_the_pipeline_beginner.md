@@ -22,7 +22,7 @@ Every record in a topic came from somewhere, and most records are headed somewhe
 
 A source connector reads an external system and produces records into a topic. A sink connector consumes a topic and writes its records into an external system. Inside, a source task holds a Kafka producer and a sink task holds a consumer in a consumer group, so partitioning by key and acks behave as you learned them on the producer side, and offsets and lag on the consumer side. The connector owns the loop and the retry logic; you own the configuration.
 
-![Pipeline diagram 1](images/kafka_in_the_pipeline_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_in_the_pipeline_beginner_diagram_1.png)
 
 | Concern | Hand-written client | Connector |
 | --- | --- | --- |
@@ -48,11 +48,11 @@ Watch a connector pair built from the pieces you already know. The source task b
 
 **keyed by customer id**
 
-![keyed by customer id](images/kafka_in_the_pipeline_beginner_animation_1_keyed-by-customer-id.gif)
+![keyed by customer id](_images/kafka_in_the_pipeline_beginner_animation_1_keyed-by-customer-id.gif)
 
 **no key**
 
-![no key](images/kafka_in_the_pipeline_beginner_animation_1_no-key.gif)
+![no key](_images/kafka_in_the_pipeline_beginner_animation_1_no-key.gif)
 
 > **TIP**
 >
@@ -383,7 +383,7 @@ What a registry-aware serializer does
 | 1 to 4 | the id, 00 00 00 07 |
 | 5 to 21 | the 17 Avro bytes of the order |
 
-![Pipeline diagram 2](images/kafka_in_the_pipeline_beginner_diagram_2.png)
+![Pipeline diagram 2](_images/kafka_in_the_pipeline_beginner_diagram_2.png)
 
 
 <br>
@@ -451,7 +451,7 @@ value.converter.schema.registry.url=http://registry:8081
 
 A topic is a log on brokers; a lake or a warehouse reads files or tables. Landing is the sink that bridges them, and its unit of work is a file: a run of records from 1 partition, written as a whole, then the offset after its last record committed. The sink task buffers records as it reads a partition. When the buffer reaches a record count or a time limit, the task closes the file and uploads it, and only then commits. A crash before the commit means those records are read again.
 
-![Pipeline diagram 3](images/kafka_in_the_pipeline_beginner_diagram_3.png)
+![Pipeline diagram 3](_images/kafka_in_the_pipeline_beginner_diagram_3.png)
 
 
 <br>
@@ -506,11 +506,11 @@ A warehouse sink writes rows into a table rather than files, and the crash quest
 
 **insert mode**
 
-![insert mode](images/kafka_in_the_pipeline_beginner_animation_2_insert-mode.gif)
+![insert mode](_images/kafka_in_the_pipeline_beginner_animation_2_insert-mode.gif)
 
 **upsert by key**
 
-![upsert by key](images/kafka_in_the_pipeline_beginner_animation_2_upsert-by-key.gif)
+![upsert by key](_images/kafka_in_the_pipeline_beginner_animation_2_upsert-by-key.gif)
 
 > Commit only after the upload finishes
 >

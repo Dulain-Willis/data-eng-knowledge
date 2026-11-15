@@ -48,7 +48,7 @@ The command-line producer shipped with Kafka 4.4 wraps the same library: kafka-c
 
 The first 3 steps run on the thread that called `send()`, and they take microseconds. Nothing has crossed the network when `send()` returns: the record sits in a memory buffer inside the producer, and the call hands back a future that will hold the result. Step 4 belongs to a second thread the producer started on its own, the sender. It drains the buffer, groups the records headed for each partition, and writes one produce request per leader. The leader appends each record at the end of its partition's log, stamps it with the next offset, and the followers copy it as they do any other write. The reply travels back along the same connection, and the sender completes the future for every record the request carried.
 
-![Pipeline diagram 1](images/kafka_producers_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_producers_beginner_diagram_1.png)
 
 
 <br>
@@ -204,15 +204,15 @@ The word `all` means the replicas in the in-sync set at the moment of the write,
 
 **acks=1**
 
-![acks=1](images/kafka_producers_beginner_animation_1_acks-1.gif)
+![acks=1](_images/kafka_producers_beginner_animation_1_acks-1.gif)
 
 **acks=all**
 
-![acks=all](images/kafka_producers_beginner_animation_1_acks-all.gif)
+![acks=all](_images/kafka_producers_beginner_animation_1_acks-all.gif)
 
 **acks=0**
 
-![acks=0](images/kafka_producers_beginner_animation_1_acks-0.gif)
+![acks=0](_images/kafka_producers_beginner_animation_1_acks-0.gif)
 
 The animation plays 6 payments through a 3-broker cluster with the followers deliberately slow. Switch between `acks=1` and `acks=all` and watch when each record is marked acknowledged relative to the followers' copies; then strike the leader down after a couple of sends and compare what the surviving brokers hold against what the producer believed was done.
 
@@ -322,11 +322,11 @@ The application wrote `send()` once and received 1 callback with an offset, 338 
 
 **delivery.timeout.ms=120000**
 
-![delivery.timeout.ms=120000](images/kafka_producers_beginner_animation_2_delivery-timeout-ms-120000.gif)
+![delivery.timeout.ms=120000](_images/kafka_producers_beginner_animation_2_delivery-timeout-ms-120000.gif)
 
 **delivery.timeout.ms=1000**
 
-![delivery.timeout.ms=1000](images/kafka_producers_beginner_animation_2_delivery-timeout-ms-1000.gif)
+![delivery.timeout.ms=1000](_images/kafka_producers_beginner_animation_2_delivery-timeout-ms-1000.gif)
 
 The animation sends 8 inventory updates through a partition whose only replica goes down for 1.5 seconds partway through; the single replica keeps anything else from taking over, so the gap stands in for a leader election of that length. Under the default delivery timeout the producer holds the records caught in the gap and lands every one when the broker returns. Switch to a 1 second delivery timeout and the same outage turns those records into errors delivered to the application.
 

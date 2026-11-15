@@ -89,7 +89,7 @@ A deferral carries a timeout when the operator passes one, and sensors pass thei
 
 A task instance crosses 2 gates on its way from `scheduled` to `running`, and a different process keeps each one. The scheduler keeps the first: it moves a task to `queued` only when the pool has a free slot, the DAG is under `max_active_tasks`, the task is under `max_active_tis_per_dag`, and the deployment is under `core.parallelism`. The executor keeps the second: it moves a queued task to `running` only when something can run it, which for the Celery executor means a worker consuming the task's queue with spare concurrency, and for the Kubernetes executor a pod the cluster agrees to start. A task that never starts is held at exactly 1 of the 2 gates, and its state names which.
 
-![Pipeline diagram 1](images/airflow_execution_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_execution_intermediate_diagram_1.png)
 
 
 <br>
@@ -207,7 +207,7 @@ The table gives what the scheduler stores for each task when every task carries 
 
 ### A pool of 1 slot, 3 tasks waiting
 
-![Animation](images/airflow_execution_intermediate_animation_1.gif)
+![Animation](_images/airflow_execution_intermediate_animation_1.gif)
 
 With 1 slot in `warehouse` and 3 tasks ready at the same instant, the slot goes to `load_revenue` at weight 10, then to `refresh_dim` at 5, then to `archive_logs` at 1. While `archive_logs` waits, the reason it reports is the pool: the weight set its place in the line, and the 1-slot pool is why there is a line at all.
 
@@ -240,7 +240,7 @@ A `priority_weight` set in `default_args` lifts a whole DAG at once, and `weight
 
 The Kubernetes executor runs no long-lived workers. For each task instance it moves to `queued`, the scheduler asks the cluster for a pod built from a template, with that task's run command as the container's command. The pod starts, runs its 1 task, reports the task's state to the API server, which records it in the metadata database, and is deleted. The next task gets a fresh pod. A deployment with nothing to do has 0 worker pods, and a night with 400 tasks ready at once asks the cluster for as many pods as it will grant.
 
-![Pipeline diagram 2](images/airflow_execution_intermediate_diagram_2.png)
+![Pipeline diagram 2](_images/airflow_execution_intermediate_diagram_2.png)
 
 
 <br>

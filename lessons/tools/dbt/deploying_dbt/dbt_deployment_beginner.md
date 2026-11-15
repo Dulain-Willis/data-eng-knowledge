@@ -51,7 +51,7 @@ Notice what the table does not list: the SQL. ref('stg_orders') resolves to dbt_
 
 Jinja can see the target a run is on through target.name and target.schema. The common use is keeping dev builds small: a developer checking a join does not need 3 years of orders, so the model drops older rows when, and only when, the target is dev. The animation pins the cutoff to a fixed date so its rows are the same each time you play it; a real project writes current_date - interval '30' day in its place.
 
-![Animation](images/dbt_deployment_beginner_animation_1.gif)
+![Animation](_images/dbt_deployment_beginner_animation_1.gif)
 
 *$ dbt run --target dev*
 
@@ -81,7 +81,7 @@ dbt build with no arguments builds every node in the project in DAG order. On a 
 
 The plus sign extends a name along the DAG. Placed before the name, it adds everything upstream of it, walking back through parents to the sources; placed after the name, it adds everything downstream; on both sides, it adds both directions. --exclude takes the same forms and removes nodes from whatever --select chose, so --select +daily_revenue --exclude stg_customers builds the lineage of daily_revenue with 1 parent left out. Several names separated by spaces select each of them, --select stg_orders stg_customers, with no walk along the DAG unless a name carries its own plus.
 
-![Pipeline diagram 1](images/dbt_deployment_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_deployment_beginner_diagram_1.png)
 
 | Command | Nodes dbt runs, in order |
 | --- | --- |
@@ -101,7 +101,7 @@ Inside a selection dbt keeps DAG order and keeps the parallelism from threads. -
 
 A node left out of a selection keeps whatever its table held before the command. That sounds harmless until a new row arrives in a source. The animation starts with a full run, then inserts an order and runs only fct_orders, then widens the selection in each direction. Watch the row counts of the 2 tables after each step.
 
-![Animation](images/dbt_deployment_beginner_animation_2.gif)
+![Animation](_images/dbt_deployment_beginner_animation_2.gif)
 
 *$ dbt run*
 
@@ -262,7 +262,7 @@ A nightly build of 40 models runs for 25 minutes. At minute 12 a not_null test d
 
 Running dbt build again rebuilds all 40 models, 37 of which are already correct, and takes another 25 minutes. dbt retry instead reads target/run_results.json and collects the nodes marked fail or error along with those marked skipped. It runs the same command with the same arguments on that list only. Here that is 4 nodes: the test, then the 3 skipped models in DAG order, because the test passing is what releases them. The 37 successes stay as they are, and the terminal counts 4 of 4.
 
-![Animation](images/dbt_deployment_beginner_animation_3.gif)
+![Animation](_images/dbt_deployment_beginner_animation_3.gif)
 
 *$ dbt build*
 
@@ -315,7 +315,7 @@ on_failure:
 
 The first command checks each source against the freshness rule declared in its YAML: a loaded_at_field and thresholds such as error_after of 12 hours on raw.orders. A source past error_after makes the command exit with an error and stops the job, so the build never runs on yesterday's rows to publish them under today's date. A source past only warn_after prints a warning and the build goes ahead. The second command builds every model and its tests on prod in one step rather than dbt run followed by dbt test, because only build stops a child when its parent's test fails; a separate run would have published every model before the first test looked at any of them. A failure stops the job, keeps the artifacts so a retry can resume, and tells someone. The hour is chosen from the loaders: orders finish loading at 4 am, so 5 am leaves an hour of margin and still has tables ready before the first dashboard opens at 7.
 
-![Pipeline diagram 2](images/dbt_deployment_beginner_diagram_2.png)
+![Pipeline diagram 2](_images/dbt_deployment_beginner_diagram_2.png)
 
 
 <br>

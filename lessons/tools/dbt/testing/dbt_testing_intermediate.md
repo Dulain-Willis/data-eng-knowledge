@@ -70,11 +70,11 @@ The animation below builds `stg_orders` and `fct_orders` from the same 5 raw row
 
 **severity: warn**
 
-![severity: warn](images/dbt_testing_intermediate_animation_1_severity-warn.gif)
+![severity: warn](_images/dbt_testing_intermediate_animation_1_severity-warn.gif)
 
 **severity: error**
 
-![severity: error](images/dbt_testing_intermediate_animation_1_severity-error.gif)
+![severity: error](_images/dbt_testing_intermediate_animation_1_severity-error.gif)
 
 *$ dbt build*
 

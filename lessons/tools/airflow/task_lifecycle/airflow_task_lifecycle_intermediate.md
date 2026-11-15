@@ -176,11 +176,11 @@ publish under none_failed_min_one_success
 
 **publish under all_success**
 
-![publish under all_success](images/airflow_task_lifecycle_intermediate_animation_1_publish-under-all-success.gif)
+![publish under all_success](_images/airflow_task_lifecycle_intermediate_animation_1_publish-under-all-success.gif)
 
 **publish under none_failed_min_one_success**
 
-![publish under none_failed_min_one_success](images/airflow_task_lifecycle_intermediate_animation_1_publish-under-none-failed-min-one-success.gif)
+![publish under none_failed_min_one_success](_images/airflow_task_lifecycle_intermediate_animation_1_publish-under-none-failed-min-one-success.gif)
 
 
 <br>
@@ -380,7 +380,7 @@ A callback is the right place for a side effect that needs the failure's details
 > - Fire twice for 1 try: a failed try gets on_retry_callback or on_failure_callback, never both
 > - Fire for a run that was never marked failed: a green badge with a buried failure stays silent
 
-![Pipeline diagram 1](images/airflow_task_lifecycle_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_task_lifecycle_intermediate_diagram_1.png)
 
 > **TIP**
 >
@@ -441,11 +441,11 @@ hourly_sessions()
 
 **pull_sessions with execution_timeout**
 
-![pull_sessions with execution_timeout](images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-with-execution-timeout.gif)
+![pull_sessions with execution_timeout](_images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-with-execution-timeout.gif)
 
 **pull_sessions without execution_timeout**
 
-![pull_sessions without execution_timeout](images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-without-execution-timeout.gif)
+![pull_sessions without execution_timeout](_images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-without-execution-timeout.gif)
 
 
 <br>

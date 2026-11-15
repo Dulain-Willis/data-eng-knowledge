@@ -33,7 +33,7 @@ Airflow takes over the decision the timer could never make: whether a piece of w
 
 The rest of this lesson uses 3 words. A **DAG** is one described workflow: the tasks and the order between them, defined in one Python file. A **task** is one unit of work in it, such as running a shell command. A **run** is one execution of the whole DAG for one scheduled time, so the DAG for the nightly report has one run per night.
 
-![Pipeline diagram 1](images/airflow_dag_anatomy_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_dag_anatomy_beginner_diagram_1.png)
 
 
 <br>
@@ -68,7 +68,7 @@ Airflow is an orchestrator. It starts work on other systems and waits for the re
 
 Follow the nightly report end to end to see where the line between what Airflow owns and what its systems own falls. Bookings and reviews are written by the app into a transactional database. The exports land as files in object storage. A warehouse loads the files and runs the SQL that aggregates them into a daily table. A dashboard tool reads that table at 09:00. Each of those 4 systems stores data or computes on it. Every arrow between them is a command an Airflow task issues.
 
-![Pipeline diagram 2](images/airflow_dag_anatomy_beginner_diagram_2.png)
+![Pipeline diagram 2](_images/airflow_dag_anatomy_beginner_diagram_2.png)
 
 | Step | System that does the work | What Airflow does |
 | --- | --- | --- |
@@ -374,11 +374,11 @@ The bar over a column carries the run's own state: lime while any task is still 
 
 **Exports side by side**
 
-![Exports side by side](images/airflow_dag_anatomy_beginner_animation_1_exports-side-by-side.gif)
+![Exports side by side](_images/airflow_dag_anatomy_beginner_animation_1_exports-side-by-side.gif)
 
 **Exports chained**
 
-![Exports chained](images/airflow_dag_anatomy_beginner_animation_1_exports-chained.gif)
+![Exports chained](_images/airflow_dag_anatomy_beginner_animation_1_exports-chained.gif)
 
 Play the night above. At 00:00 on March 2 the first column appears and `get_bookings` and `get_reviews` turn lime together. `build_report` stays blank: the cell has no state until both tasks above it finish. At 00:10 `get_reviews` turns green and `build_report` still waits, because one of its 2 edges is unmet. At 00:20 the second edge is met, `build_report` passes through scheduled and queued and runs, and the column is all green at 00:35. On the night of March 3 `build_report` turns red at 00:35 and the bar over that column turns red with it: a run fails when a task at the end of its graph fails. Switch the dependencies to the serial file and `get_reviews` stays blank until `get_bookings` finishes at 00:20, then runs from 00:20 to 00:30; `build_report` starts at 00:30 instead of 00:20, so every column finishes 10 minutes later, at 00:45.
 
