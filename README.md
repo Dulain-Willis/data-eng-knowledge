@@ -4,6 +4,8 @@ Data engineering lessons in Markdown, with diagrams and animations, plus the too
 
 <br>
 
+<p align="center"><img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"></p>
+
 ![Scrolling through a lesson on GitHub](assets/demo-dark.gif)
 
 
