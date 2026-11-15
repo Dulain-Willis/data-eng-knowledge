@@ -22,7 +22,7 @@ A company's data starts as events: a customer places an order, a page loads, a p
 
 Connecting each system that produces events to each system that wants them works for 2 systems and fails at 10. Every pair needs its own pipe, its own format, its own retry logic and its own on-call owner. 5 producing systems and 6 wanting systems make 30 pipes. Adding a 7th reader means asking 5 teams to build a pipe to it, and when the fraud model goes down for an hour, the order service either holds its events for it or drops them.
 
-![Pipeline diagram 1](images/kafka_the_log_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_the_log_beginner_diagram_1.png)
 
 
 <br>
@@ -77,7 +77,7 @@ The rest of the lesson takes these 3 claims in turn. The next section places the
 
 Trace one order at an online store. A customer pays, and the checkout service writes the order to its own database, which keeps the current state the storefront needs: the order exists, it is paid, it hasn't shipped. In the same request the checkout service produces a record to the orders topic. From that moment the order is in 2 places, and the 2 places serve different readers. The database serves the storefront's next page load. The topic serves everyone else.
 
-![Pipeline diagram 2](images/kafka_the_log_beginner_diagram_2.png)
+![Pipeline diagram 2](_images/kafka_the_log_beginner_diagram_2.png)
 
 Kafka sits between the systems that record what is happening and the systems that act on it or analyze it. On the left are services that answer user requests in milliseconds, so they write the event and move on. On the right are systems with their own clocks: a fraud scorer that wants each order within a second, a search index that updates within a minute, a warehouse load that runs every hour, and a report that runs once a night. The log lets each side keep its own clock.
 
@@ -175,7 +175,7 @@ orders partition 1 offset 2 is cart-4: shipped for a reader on the fraud team an
 
 Offsets are also how a reader keeps its place. A reader does not read a topic as a whole; it reads each partition from an offset, and after each record it has handled, its position in that partition is the offset of the next one. That position belongs to the reader, and reading never changes the log. A reader may ask the broker to store the number for it, which a later lesson covers, and the records stay as they were either way. 2 readers of the same partition hold 2 different numbers.
 
-![Animation](images/kafka_the_log_beginner_animation_1.gif)
+![Animation](_images/kafka_the_log_beginner_animation_1.gif)
 
 
 <br>
@@ -317,7 +317,7 @@ A position belongs to the reader, and moving it changes nothing in the log. A fr
 
 Position means the next offset the reader will ask for. At 09:00 the scorer has handled offsets 0 to 3 and will ask for 4. At 10:00 the loader wakes for its hourly run, reads offsets 2 to 6 in one request and moves to 7, records the scorer finished half an hour earlier. The audit reader starts at 0 and by 10:05 has read all 9 records, 7 of which were on disk before it existed. The log column only grows, and the 3 position columns move at 3 different rates.
 
-![Animation](images/kafka_the_log_beginner_animation_2.gif)
+![Animation](_images/kafka_the_log_beginner_animation_2.gif)
 
 
 <br>

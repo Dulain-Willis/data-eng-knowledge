@@ -70,11 +70,11 @@ Order 1002 matches, so its status becomes shipped and its `updated_at` moves to 
 
 **+incremental_strategy: append**
 
-![+incremental_strategy: append](images/dbt_incremental_models_intermediate_animation_1_incremental-strategy-append.gif)
+![+incremental_strategy: append](_images/dbt_incremental_models_intermediate_animation_1_incremental-strategy-append.gif)
 
 **+unique_key: order_id**
 
-![+unique_key: order_id](images/dbt_incremental_models_intermediate_animation_1_unique-key-order-id.gif)
+![+unique_key: order_id](_images/dbt_incremental_models_intermediate_animation_1_unique-key-order-id.gif)
 
 *$ dbt run*
 

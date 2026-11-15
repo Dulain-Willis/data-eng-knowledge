@@ -223,7 +223,7 @@ Run it on a schedule. A DAG with 1 task that calls the command weekly with a 90-
 
 Some tasks have to run where the scheduler cannot go: a database inside a factory's network that accepts no inbound connections, a machine in another region holding a dataset that may not leave it, a GPU box on a desk. A Celery worker needs a route to the message broker and a Kubernetes executor needs a cluster; a machine behind a firewall that allows outbound HTTPS and nothing else can be neither. The edge executor, from the `apache-airflow-providers-edge3` provider, is built for that machine: the worker dials out over HTTP to the api-server, and every other part stays home.
 
-![Pipeline diagram 1](images/airflow_execution_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_execution_advanced_diagram_1.png)
 
 
 <br>
@@ -330,11 +330,11 @@ The smallest case shows the shape every undersized cap produces. A DAG runs 4 in
 
 **warehouse pool: 2 slots**
 
-![warehouse pool: 2 slots](images/airflow_execution_advanced_animation_1_warehouse-pool-2-slots.gif)
+![warehouse pool: 2 slots](_images/airflow_execution_advanced_animation_1_warehouse-pool-2-slots.gif)
 
 **warehouse pool: 4 slots**
 
-![warehouse pool: 4 slots](images/airflow_execution_advanced_animation_1_warehouse-pool-4-slots.gif)
+![warehouse pool: 4 slots](_images/airflow_execution_advanced_animation_1_warehouse-pool-4-slots.gif)
 
 The Kubernetes executor is sized differently, because it has no worker fleet: each task is a pod, and the cap is the cluster's spare capacity, with `[kubernetes_executor] worker_pods_creation_batch_size` setting how many pods 1 loop may launch. A burst of 200 heavy tasks against a cluster with room for 40 pods leaves 160 pods pending and 160 tasks queued, in whatever order the cluster admits them. A pool of 40 on every task pinned to that executor turns that into a queue Airflow orders by priority weight and shows on the pool page.
 

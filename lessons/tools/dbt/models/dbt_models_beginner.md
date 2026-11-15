@@ -68,7 +68,7 @@ The word model is dbt's name for one of these files, and this lesson takes model
 
 Follow one order from the shop's checkout page to the revenue dashboard. The order is written to the application's transactional database. A loading tool copies that row, with the rest of the table, into the warehouse's `analytics` database each night, into a schema the team calls `raw`, with the columns exactly as the application stored them. dbt reads `raw.orders`, joins and aggregates the filtered rows into tables the business can use, and writes those tables to a schema called `prod` in the same database. The dashboard tool queries `analytics.prod.daily_revenue` and draws a chart.
 
-![Pipeline diagram 1](images/dbt_models_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_models_beginner_diagram_1.png)
 
 
 <br>
@@ -146,7 +146,7 @@ sources:
 
 The source `shop` names the loader's landing area. Inside it are the tables `orders` and `customers`. A model reads a source table with `{{ source('shop', 'orders') }}` in its FROM clause. The double braces mark a region dbt fills in before any SQL leaves your machine. dbt looks up `shop` to find `analytics.raw`, then appends `orders` and writes `analytics.raw.orders` into the statement. When the landing schema moves, one line in the YAML changes and every model follows.
 
-![Schema diagram 2](images/dbt_models_beginner_diagram_2.png)
+![Schema diagram 2](_images/dbt_models_beginner_diagram_2.png)
 
 ```sql
 select
@@ -283,11 +283,11 @@ Storage is the quieter difference. A view occupies a row in the warehouse's cata
 
 **materialized='view'**
 
-![materialized='view'](images/dbt_models_beginner_animation_1_materialized-view.gif)
+![materialized='view'](_images/dbt_models_beginner_animation_1_materialized-view.gif)
 
 **materialized='table'**
 
-![materialized='table'](images/dbt_models_beginner_animation_1_materialized-table.gif)
+![materialized='table'](_images/dbt_models_beginner_animation_1_materialized-table.gif)
 
 *$ dbt run*
 
@@ -352,7 +352,7 @@ With more than 1 thread, dbt builds nodes that have no path between them at the 
 
 The graph also answers the question the folder of saved queries could not: what reads this? Every edge out of a model is a model that will break if its columns change, and dbt can list them from the files alone, before anything is run.
 
-![Animation](images/dbt_models_beginner_animation_2.gif)
+![Animation](_images/dbt_models_beginner_animation_2.gif)
 
 *$ dbt run*
 

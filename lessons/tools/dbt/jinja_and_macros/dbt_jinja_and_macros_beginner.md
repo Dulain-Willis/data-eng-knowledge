@@ -79,7 +79,7 @@ GROUP BY project_id
 
 config() sits inside expression braces, so by the table above it should print. It returns an empty string on purpose. Its work happens inside dbt: it records that this model is a table, and dbt later wraps the rendered SELECT in a create table statement because of that record. The warehouse receives the wrapper and the SELECT. It never learns that a configuration existed, and the blank lines at the top are the only trace the call leaves behind.
 
-![Pipeline diagram 1](images/dbt_jinja_and_macros_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_jinja_and_macros_beginner_diagram_1.png)
 
 
 > **TIP**
@@ -284,11 +284,11 @@ With the flag false, the compiled file has 2 columns and a blank gap where the b
 
 **['opened', 'merged', 'closed']**
 
-![['opened', 'merged', 'closed']](images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed.gif)
+![['opened', 'merged', 'closed']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed.gif)
 
 **['opened', 'merged', 'closed', 'locked']**
 
-![['opened', 'merged', 'closed', 'locked']](images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed-locked.gif)
+![['opened', 'merged', 'closed', 'locked']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed-locked.gif)
 
 *$ dbt run*
 

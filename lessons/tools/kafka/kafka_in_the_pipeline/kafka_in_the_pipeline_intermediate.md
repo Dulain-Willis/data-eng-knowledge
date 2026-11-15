@@ -68,7 +68,7 @@ An event names the row's state before the change, its state after, the kind of c
 
 The record's key is the primary key, {"id": 1042} for a JSON key. Keys pick partitions, so every change to row 1042 lands on 1 partition and is read in the order it was committed: price 120, then 96, never the reverse. Send the events with no key and the 2 updates may land on 2 partitions, where 2 sink tasks apply them in whichever order they happen to poll, and the table can finish on the old price with no error anywhere. The animation plays both.
 
-![Animation](images/kafka_in_the_pipeline_intermediate_animation_1.gif)
+![Animation](_images/kafka_in_the_pipeline_intermediate_animation_1.gif)
 
 
 <br>
@@ -281,7 +281,7 @@ The reason is shape. A transform holds nothing between records and sees nothing 
 
 ### 3 stages where a record can fail
 
-![Pipeline diagram 1](images/kafka_in_the_pipeline_intermediate_diagram_1.png)
+![Pipeline diagram 1](_images/kafka_in_the_pipeline_intermediate_diagram_1.png)
 
 A sink task reads a batch of records, decodes each one with the key and value converters and the header converter, runs it through the transform chain, and hands the batch to the connector's put. The converter can throw on bytes it cannot parse or a schema id the registry does not know. A transform can throw when it asks for a field the record lacks. The default, errors.tolerance=none, fails the task on the first such exception. Its state goes to FAILED and its consumer leaves the group, so a rebalance hands its partitions to the tasks still running. The first to reach the bad record fails on it too, and the failure walks from task to task: lag climbs, then more tasks go FAILED, under a connector whose status still says RUNNING.
 
@@ -397,7 +397,7 @@ A new sink connector, which is a new consumer group named connect-<name>, starts
 
 The sink must apply each record as an upsert on the key and must delete the row on a tombstone. An insert-only sink replayed once over a table it already filled holds every row twice, and a sink that skips tombstones keeps rows the source deleted a year ago.
 
-![Animation](images/kafka_in_the_pipeline_intermediate_animation_2.gif)
+![Animation](_images/kafka_in_the_pipeline_intermediate_animation_2.gif)
 
 The crash in the animation lands after the sink writes and before the offset commits, the blind spot from the consumer lessons. On restart the task reads the same records again and writes the same rows again. Upsert absorbs that: writing c-1 as Ana gold a second time leaves c-1 as Ana gold. The insert variant shows the alternative, 1 extra row for every record replayed and a table that is wrong without any task having failed.
 

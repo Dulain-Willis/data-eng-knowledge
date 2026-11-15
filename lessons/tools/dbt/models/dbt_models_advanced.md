@@ -45,15 +45,15 @@ Before the model runs, dbt compiles the SELECT and asks the warehouse which colu
 
 **customer_id, country, signup_date**
 
-![customer_id, country, signup_date](images/dbt_models_advanced_animation_1_customer-id-country-signup-date.gif)
+![customer_id, country, signup_date](_images/dbt_models_advanced_animation_1_customer-id-country-signup-date.gif)
 
 **cast(customer_id as varchar)**
 
-![cast(customer_id as varchar)](images/dbt_models_advanced_animation_1_cast-customer-id-as-varchar.gif)
+![cast(customer_id as varchar)](_images/dbt_models_advanced_animation_1_cast-customer-id-as-varchar.gif)
 
 **plan added to the select**
 
-![plan added to the select](images/dbt_models_advanced_animation_1_plan-added-to-the-select.gif)
+![plan added to the select](_images/dbt_models_advanced_animation_1_plan-added-to-the-select.gif)
 
 *$ dbt run*
 
@@ -240,7 +240,7 @@ With `strategy: timestamp`, a source row counts as changed when its `updated_at`
 
 With `strategy: check`, dbt compares each column in `check_cols` between the source row and the snapshot's latest row for the same key, counting 2 nulls as equal. A difference in any listed column records a new version. A difference in a column outside the list records nothing. `check_cols: all` compares every column, at the price of comparing every column on every row. The timeline is dbt's own: `dbt_valid_from` is the run's timestamp, so a row that changed twice between 2 nightly runs yields 1 version holding the final values, and the history is as fine as the schedule.
 
-![Animation](images/dbt_models_advanced_animation_2.gif)
+![Animation](_images/dbt_models_advanced_animation_2.gif)
 
 *$ dbt snapshot*
 
@@ -407,7 +407,7 @@ Start from the tables the query reads, then follow its joins and its grain. 3 ra
 
 A subquery with a `GROUP BY` is a grain of its own and becomes a model. An expression repeated in 2 places, such as `date_trunc('month', o.created)` in the select and the group by, becomes 1 column, `revenue_month`, computed once in `int_order_payments`. A hard-coded list of ids becomes a seed, so the finance team edits a CSV when a new test account appears, and the staging model joins against it.
 
-![Pipeline diagram 1](images/dbt_models_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_models_advanced_diagram_1.png)
 
 ```sql
 select

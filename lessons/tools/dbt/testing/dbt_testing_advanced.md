@@ -198,11 +198,11 @@ dbt test --select "test_type:unit" runs every unit test and nothing else. In dbt
 
 **when score >= 70 then 'pass'**
 
-![when score >= 70 then 'pass'](images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+![when score >= 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
 
 **when score > 70 then 'pass'**
 
-![when score > 70 then 'pass'](images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+![when score > 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
 
 *$ dbt build*
 
@@ -536,7 +536,7 @@ Staging has 1 kind of logic, a cast or a mapping per column, and 1 unit test per
 
 A mart's readers are dashboards and other teams, so the tests here guard what they read. A contract fixes the columns and types, relationships from each fact key to its dimension proves every row can be joined, and 1 singular test per measure reconciles it back to staging with fail_calc measuring drift rather than counting rows. Row-level rules stay out: a mart that re-tests not_null on a key proves only that staging's test already ran, and costs a scan of the largest table in the project to prove it.
 
-![Pipeline diagram 1](images/dbt_testing_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_testing_advanced_diagram_1.png)
 
 What the first failure says, by layer
 

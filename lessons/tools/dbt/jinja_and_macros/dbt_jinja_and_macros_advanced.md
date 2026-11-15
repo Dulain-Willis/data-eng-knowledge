@@ -110,7 +110,7 @@ A payments feed carries a `method` column that holds card and bank today, and la
 {% endmacro %}
 ```
 
-![Animation](images/dbt_jinja_and_macros_advanced_animation_1.gif)
+![Animation](_images/dbt_jinja_and_macros_advanced_animation_1.gif)
 
 *$ dbt run*
 
@@ -172,7 +172,7 @@ A model is a SELECT with a materialization around it. Some SQL fits neither: a g
 | `on-run-start` | `dbt_project.yml` | once per invocation, after the parse, before the first node | `target`, `var()`; no node has run |
 | `on-run-end` | `dbt_project.yml` | once per invocation, after the last node, even when nodes failed | `results`: one record per node, with `status` and `execution_time` |
 
-![Pipeline diagram 1](images/dbt_jinja_and_macros_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/dbt_jinja_and_macros_advanced_diagram_1.png)
 
 Model hooks run on the model's connection and as part of the model's node: a `pre_hook` that errors fails the node, and its children skip exactly as they would behind a failed test (Testing: Beginner). The choice among the 5 is about timing. Use a model hook for work tied to one table and its build, a project hook for work tied to the invocation, and an operation, covered below, for work a person decides to run on demand.
 

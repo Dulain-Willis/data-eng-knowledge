@@ -69,11 +69,11 @@ The animation plays the eager protocol under the range assignor: c1 reads 3 part
 
 **c2 joins at 3 s**
 
-![c2 joins at 3 s](images/kafka_consumer_groups_advanced_animation_1_c2-joins-at-3-s.gif)
+![c2 joins at 3 s](_images/kafka_consumer_groups_advanced_animation_1_c2-joins-at-3-s.gif)
 
 **c1 alone**
 
-![c1 alone](images/kafka_consumer_groups_advanced_animation_1_c1-alone.gif)
+![c1 alone](_images/kafka_consumer_groups_advanced_animation_1_c1-alone.gif)
 
 
 <br>
@@ -213,11 +213,11 @@ Both variants run c1 and c2 as static members with a 6 s session timeout, and bo
 
 **back at 5 s**
 
-![back at 5 s](images/kafka_consumer_groups_advanced_animation_2_back-at-5-s.gif)
+![back at 5 s](_images/kafka_consumer_groups_advanced_animation_2_back-at-5-s.gif)
 
 **never back**
 
-![never back](images/kafka_consumer_groups_advanced_animation_2_never-back.gif)
+![never back](_images/kafka_consumer_groups_advanced_animation_2_never-back.gif)
 
 
 <br>

@@ -68,11 +68,11 @@ The override is written at the call, in the one model whose column needs it, so 
 
 **places=2**
 
-![places=2](images/dbt_jinja_and_macros_intermediate_animation_1_places-2.gif)
+![places=2](_images/dbt_jinja_and_macros_intermediate_animation_1_places-2.gif)
 
 **places=0**
 
-![places=0](images/dbt_jinja_and_macros_intermediate_animation_1_places-0.gif)
+![places=0](_images/dbt_jinja_and_macros_intermediate_animation_1_places-0.gif)
 
 *$ dbt run*
 

@@ -301,7 +301,7 @@ Reading this back from the UI takes 2 clicks. The run's detail names the version
 
 Airflow 3 draws a line between the parts that own the metadata database and the parts that run your code. The scheduler and the DAG processor hold database credentials, and so does the API server; they sit on one side. Workers sit on the other with none. A worker's only route to Airflow's state is HTTP to the API server, through a set of endpoints called the Execution API, and every request carries a token issued for 1 task instance and 1 try. The Task SDK, the `airflow.sdk` package, is the code that lives on the worker side: the names a DAG file imports, plus the machinery that runs a task and talks to the API on its behalf.
 
-![Pipeline diagram 1](images/airflow_dag_anatomy_advanced_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_dag_anatomy_advanced_diagram_1.png)
 
 
 <br>

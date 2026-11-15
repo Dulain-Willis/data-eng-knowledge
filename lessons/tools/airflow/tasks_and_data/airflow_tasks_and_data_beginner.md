@@ -68,7 +68,7 @@ The difference shows up again when a try fails halfway. The commanding task retr
 
 What Airflow stores is small and about the work rather than the data: which runs exist and what state each task is in, plus the task logs and the few values that tasks hand each other. That division decides what the rest of this lesson has to cover. For a task to command another system, it needs the address and credentials of that system, the settings that tune the command, the window of time the run covers, and a way to pass a small result to the next task. Those 4 needs map onto the 4 sections that follow. XCom carries the result and connections hold the credentials. The settings come from variables and params, and the window comes from templated fields.
 
-![Pipeline diagram 1](images/airflow_tasks_and_data_beginner_diagram_1.png)
+![Pipeline diagram 1](_images/airflow_tasks_and_data_beginner_diagram_1.png)
 
 > **TIP**
 >
@@ -371,11 +371,11 @@ report("{{ ds }}")
 
 **Scheduled runs only**
 
-![Scheduled runs only](images/airflow_tasks_and_data_beginner_animation_1_scheduled-runs-only.gif)
+![Scheduled runs only](_images/airflow_tasks_and_data_beginner_animation_1_scheduled-runs-only.gif)
 
 **Plus a manual run for fr**
 
-![Plus a manual run for fr](images/airflow_tasks_and_data_beginner_animation_1_plus-a-manual-run-for-fr.gif)
+![Plus a manual run for fr](_images/airflow_tasks_and_data_beginner_animation_1_plus-a-manual-run-for-fr.gif)
 
 The UI keeps the result. Open a task instance and pick Rendered Templates: it shows every templated field with the string the worker produced for that run, which is the fastest check that `{{ params.region }}` rendered to `fr` rather than `all`, or that the XCom pull found a number rather than `None`.
 
