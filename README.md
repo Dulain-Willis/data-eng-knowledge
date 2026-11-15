@@ -11,10 +11,8 @@ Data engineering lessons in Markdown, with diagrams and animations, plus the too
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/Dulain-Willis/data-eng-knowledge">
 </p>
 
-<p align="center">
-  <img alt="Scrolling through a lesson on GitHub" src="assets/demo-dark.webp" width="900">
-  <br>
-  <sub><a href="assets/demo-dark.mp4">Watch the full-quality video</a></sub>
-</p>
+https://github.com/user-attachments/assets/9647a564-275a-423a-b192-8d2cc67f057f
+
+
 
 
