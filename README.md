@@ -4,7 +4,12 @@ Data engineering lessons in Markdown, with diagrams and animations, plus the too
 
 <br>
 
-<p align="center"><img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white"></p>
+<p align="center">
+  <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
+  <img alt="Markdown" src="https://img.shields.io/badge/Markdown-000000?logo=markdown&logoColor=white">
+  <img alt="MCP server" src="https://img.shields.io/badge/MCP-server-6E56CF">
+  <img alt="Last commit" src="https://img.shields.io/github/last-commit/Dulain-Willis/data-eng-knowledge">
+</p>
 
 ![Scrolling through a lesson on GitHub](assets/demo-dark.gif)
 
