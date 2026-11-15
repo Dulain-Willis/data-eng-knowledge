@@ -1,8 +1,6 @@
 <h1 align="center">data-eng-knowledge</h1>
 
-<p align="center">
-Data engineering lessons for people and agents
-</p>
+<h3 align="center">Data engineering lessons for people and agents</h3>
 
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
