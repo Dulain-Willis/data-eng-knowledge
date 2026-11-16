@@ -1,4 +1,6 @@
-<img width="2172" height="724" alt="70938197-849e-4194-97e4-d4630f5b196f" src="https://github.com/user-attachments/assets/47741e93-59b8-4ba1-85de-00029e44b5ec" />
+<p align="center">
+  <img alt="data-eng-knowledge" width="100%" src="assets/banner.png">
+</p>
 
 
 <h1 align="center">data-eng-knowledge</h1>
