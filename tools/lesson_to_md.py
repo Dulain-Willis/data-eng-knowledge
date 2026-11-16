@@ -43,6 +43,7 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
+    "executable_spark",
 }
 # Interactive exercise with no answers in the page, so what's left is a dangling question.
 # Dropped. (multiple_choice used to be here; its answers ARE in the page's embedded JSON.)
@@ -212,7 +213,7 @@ def diagram(soup, block, image_name, number):
     label = DIAGRAM_LABELS[block_type(block)]
     if image_name:
         p = soup.new_tag("p")
-        p.append(soup.new_tag("img", src=f"images/{image_name}", alt=f"{label} {number}"))
+        p.append(soup.new_tag("img", src=f"_images/{image_name}", alt=f"{label} {number}"))
         block.replace_with(p)
     else:
         note = soup.new_tag("p")
@@ -311,6 +312,23 @@ def tick_cross(soup, block, tokens):
     block.replace_with(marker)
 
 
+def spark_cell(soup, block, tokens, image_name, number):
+    """A runnable PySpark cell: a screenshot of the cell after Run (tables, code and output), then the
+    code as a ```python fence. The page draws the editor and result with JavaScript, so the image
+    can only be a screenshot (see record_cells); the fence keeps the code as text, because long
+    lines scroll sideways in the screenshot. Built as Markdown and swapped in after markdownify.
+    """
+    pre = block.find("pre")
+    code = (pre.get_text() if pre else block.get_text()).strip("\n")
+    shot = (f"![Run output {number}](_images/{image_name})" if image_name
+            else f"[Run output {number}: not captured. Re-run with --screenshots]")
+    token = f"@@SPARK-CELL-{len(tokens)}@@"
+    tokens[token] = f"{shot}\n\n```python\n{code}\n```"
+    marker = soup.new_tag("p")
+    marker.string = token
+    block.replace_with(marker)
+
+
 def animation_info(html):
     """Each animation block in page order: its mode labels and the caption under the player.
 
@@ -339,7 +357,7 @@ def animation(soup, block, tokens, info, files):
     """
     parts = []
     for label, name in files or []:
-        parts.append((f"**{label}**\n\n" if label else "") + f"![{label or 'Animation'}](images/{name})")
+        parts.append((f"**{label}**\n\n" if label else "") + f"![{label or 'Animation'}](_images/{name})")
     if not parts:
         parts.append("[Animation: not captured. Re-run with --screenshots]")
     if info.get("caption"):
@@ -351,11 +369,13 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=()):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
     drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
+    cells: file names of the run-output screenshots, one per executable_spark block in page order
+    (record_cells); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
     dropped = set()
@@ -373,7 +393,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         p.string = EXERCISE_TOKEN.format(i)
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
-    diagrams_seen = animations_seen = 0
+    diagrams_seen = animations_seen = cells_seen = 0
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
@@ -400,6 +420,10 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             new = soup.new_tag("p")
             new.string = token
             block.replace_with(new)
+        elif kind == "executable_spark":
+            name = cells[cells_seen] if cells_seen < len(cells) else None
+            cells_seen += 1
+            spark_cell(soup, block, tokens, name, cells_seen)
         elif kind == "static_code":
             code_block(soup, block)
         elif kind == "big_number":
@@ -649,7 +673,7 @@ def solution_block(b, image=None):
             items.append(f"{i}. {q['question']}" + (f"\\\n   *{q['context']}*" if q.get("context") else ""))
         return "**Follow-up questions**\n\n" + "\n".join(items)
     if kind == "schema_diagram":  # tables and relationships: drawn by the site, so it is a screenshot
-        out = (f"![Schema diagram](images/{image})" if image
+        out = (f"![Schema diagram](_images/{image})" if image
                else "[Schema diagram: not captured. Re-run with --screenshots]")
         return out + (f"\n\n*{b['caption']}*" if b.get("caption") else "")
     if kind == "code":
@@ -699,7 +723,7 @@ INCLUDE_AIRFLOW_EXERCISES = False
 # The dbt and Kafka exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark"}
 
 
 def challenge_path(c):
@@ -731,7 +755,7 @@ def airflow_widgets(url, out_dir, slug, shoot):
     except ImportError:
         print("playwright not installed; Airflow exercises go at the end", file=sys.stderr)
         return []
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     widgets = []
     with sync_playwright() as p:
@@ -877,7 +901,7 @@ def airflow_exercise_markdown(c, n, total, shots):
     starter = (cfg.get("starter") or {}).get("source") or (files[0]["source"] if files else "")
     out.append(f"**Starter** — `{challenge_path(c)}`\n\n```python\n{starter}\n```")
     if shots:  # panes the page really shows, as the page draws them
-        out += [f'**{shots[k][0]}**\n\n<img src="images/{shots[k][1]}" alt="{shots[k][0]}" width="{shots[k][2]}">'
+        out += [f'**{shots[k][0]}**\n\n<img src="_images/{shots[k][1]}" alt="{shots[k][0]}" width="{shots[k][2]}">'
                 for k in SHOT_ORDER if k in shots]
     out.append("<details>\n<summary><strong>Solution</strong></summary>")
     # The site only draws the graph after a correct fix once the code is Run, and Run needs a
@@ -952,7 +976,7 @@ def screenshot_schema_diagrams(url, out_dir, slug, challenges):
     except ImportError:
         print("playwright not installed", file=sys.stderr)
         return {}
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     saved = {}
     with sync_playwright() as p:
@@ -1046,7 +1070,7 @@ def record_animations(url, out_dir, slug, info):
     except ImportError:
         print("playwright not installed", file=sys.stderr)
         return {}
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     saved = {}
     with sync_playwright() as p:
@@ -1060,12 +1084,32 @@ def record_animations(url, out_dir, slug, info):
                     page.wait_for_timeout(3000)
                     block = page.locator('[data-note-block-type$="_animation"]').nth(k)
                     block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
+                    try:  # Spark animations mount their controls only once in view
+                        block.locator("button").first.wait_for(state="attached", timeout=10000)
+                    except Exception:
+                        pass
+                    page.evaluate(_HIDE_FIXED)  # the pinned "Ask AI" button would sit on top of the player
                     if m > 0:
                         page.wait_for_timeout(300)
                     box = block.evaluate(_PLAYER_BOX)
                     if not box:
+                        # Seen once (spark_partitioning_file_layout_advanced, 3rd animation): the site never
+                        # mounts the player and leaves the code and seed table on screen. Keep that
+                        # as a still image rather than losing the block.
+                        page.wait_for_timeout(5000)
+                        box = block.evaluate(_PLAYER_BOX)
+                    if not box:
+                        name = f"{slug}_animation_{k + 1}.png"
+                        bb = block.bounding_box()
+                        shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
+                            "format": "png", "captureBeyondViewport": True, "clip": {
+                                "x": bb["x"], "y": bb["y"] + page.evaluate("scrollY"),
+                                "width": bb["width"], "height": bb["height"], "scale": 2}})
+                        with open(os.path.join(img_dir, name), "wb") as fh:
+                            fh.write(base64.b64decode(shot["data"]))
                         ctx.close()
-                        print(f"warning: animation {k + 1} has no player controls; not captured", file=sys.stderr)
+                        print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
+                        saved.setdefault(k, []).append((None, name))
                         break
                     # Each frame is a 2x screenshot of the player alone, taken as fast as the browser
                     # allows (about 14 per second). Playwright's recorded video is compressed and
@@ -1117,6 +1161,69 @@ def record_animations(url, out_dir, slug, info):
     return saved
 
 
+# Run-output cells are screenshotted whole after clicking Run; a cell has finished when the text
+# inside it stops changing. The site pins an "Ask AI" button to the viewport, which would sit on top
+# of the shot, so fixed-position elements are hidden first.
+_HIDE_FIXED = """() => { for (const e of document.querySelectorAll('body *'))
+  if (getComputedStyle(e).position === 'fixed') e.style.visibility = 'hidden'; }"""
+_CELL_ERROR = re.compile(r"Traceback|Error\b|Exception\b", re.I)
+
+
+def record_cells(url, out_dir, slug, count):
+    """Click Run on every executable_spark cell and save the whole cell as <slug>_cell_<n>.png.
+
+    Returns the file names in page order (None for a cell that could not be captured). Warns
+    about cells that show no output or an error.
+    """
+    if not count:
+        return []
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("playwright not installed; run-output cells not captured", file=sys.stderr)
+        return []
+    img_dir = os.path.join(out_dir, "_images")
+    os.makedirs(img_dir, exist_ok=True)
+    names = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="executable_spark"]')
+        if blocks.count() != count:
+            print(f"warning: page has {blocks.count()} runnable cells, the HTML has {count}", file=sys.stderr)
+        for i in range(min(count, blocks.count())):
+            block = blocks.nth(i)
+            block.scroll_into_view_if_needed()
+            page.wait_for_timeout(800)
+            before = block.inner_text()
+            block.get_by_role("button", name="Run", exact=True).click()
+            began = time.monotonic()
+            last, stable_since = before, None
+            while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
+                page.wait_for_timeout(300)
+                now = block.inner_text()
+                if now != last:
+                    last, stable_since = now, time.monotonic()
+                elif stable_since and time.monotonic() - stable_since >= 1.5:
+                    break
+            result = last[len(before):] if last.startswith(before) else last
+            if last == before:
+                print(f"warning: cell {i + 1} showed no output after Run", file=sys.stderr)
+            elif _CELL_ERROR.search(result):
+                print(f"warning: cell {i + 1} output looks like an error: {result.strip()[:120]!r}",
+                      file=sys.stderr)
+            page.evaluate(_HIDE_FIXED)
+            name = f"{slug}_cell_{i + 1}.png"
+            block.screenshot(path=os.path.join(img_dir, name))
+            names.append(name)
+        names += [None] * (count - len(names))
+        browser.close()
+    return names
+
+
 def screenshot_diagrams(url, out_dir, slug):
     """Save every pipeline diagram block as <slug>_diagram_<n>.png.
 
@@ -1129,7 +1236,7 @@ def screenshot_diagrams(url, out_dir, slug):
         print("playwright not installed: .venv/bin/pip install playwright && "
               ".venv/bin/playwright install chromium", file=sys.stderr)
         return []
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     names = []
     with sync_playwright() as p:
@@ -1174,6 +1281,8 @@ def main():
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
                   if "--screenshots" in sys.argv else {})
+    n_cells = len(BeautifulSoup(html, "html.parser").find_all(attrs={"data-note-block-type": "executable_spark"}))
+    cells = record_cells(url, out_dir, slug, n_cells) if "--screenshots" in sys.argv else []
     path = os.path.join(out_dir, slug + ".md")
     with open(path, "w", encoding="utf-8") as f:
         challenges = fetch_challenges(slug)
@@ -1204,7 +1313,7 @@ def main():
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
-                       load_drops(slug)))
+                       load_drops(slug), cells))
     print(path)
 
 
