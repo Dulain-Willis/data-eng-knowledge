@@ -29,9 +29,9 @@ https://github.com/user-attachments/assets/9647a564-275a-423a-b192-8d2cc67f057f
 
 ## What is data-eng-knowledge?
 
-A collection of 120 data engineering lessons, plus the tools that build and serve them:
+A collection of 165 data engineering lessons, plus the tools that build and serve them:
 
-1. The lessons cover pipeline architecture, data modeling, Airflow, dbt and Kafka, written for learning and for interview prep, with diagrams, schema screenshots and animations that render right on GitHub.
+1. The lessons cover pipeline architecture, data modeling, Spark, Airflow, dbt and Kafka, written for learning and for interview prep, with diagrams, schema screenshots and animations that render right on GitHub.
 2. `tools/lesson_to_md.py` converts a lesson page into clean Markdown, screenshots and animation frames included.
 3. An MCP server (`server.py`) lets an agent search the lessons, read only the section it needs and cite the exact lines, instead of answering from training data.
 
@@ -42,6 +42,7 @@ A collection of 120 data engineering lessons, plus the tools that build and serv
 |---|---|
 | [Learn: architecture](lessons/learn/architecture) | 30 |
 | [Learn: data modeling](lessons/learn/data_modeling) | 11 |
+| [Learn: Spark](lessons/learn/spark) | 45 |
 | [Interview: architecture](lessons/interview/architecture) | 26 |
 | [Interview: data modeling](lessons/interview/data_modeling) | 8 |
 | [Airflow](lessons/tools/airflow) | 15 |
