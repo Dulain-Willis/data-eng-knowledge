@@ -10,7 +10,7 @@
 </p>
 
 
-<h1 align="center">data-eng-knowledge</h1>
+<h1 align="center">Data Engineering Knowledge</h1>
 
 <h3 align="center">Data engineering lessons for people and agents</h3>
 
