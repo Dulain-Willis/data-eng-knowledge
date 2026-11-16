@@ -33,7 +33,7 @@ Layout now on main: `lessons/<learn|interview|tools>/<area>/<card_folder>/<slug>
 - **PR #6** (open, never merged yet): `docs/skipped-blocks.md`, documents which exercises/blocks are skipped per area with counts. IT MUST BE EXTENDED for every new category (Spark/Python/SQL) in that category's PR, because the user wants a place to find skipped exercises to do later.
 - **PR #5** (open, the user's own README header edit). Not yours.
 - **Spark agent** (id `ac25001e87b43cf65`, a fresh agent, still running when this was written): working in the MAIN checkout `~/projects/data-eng-knowledge` on local branch `learn-spark-lessons` with uncommitted changes. It converts all 45 Learn Spark lessons, adds `executable_spark` handling, adds `spark` to `SKIPPED_TOOL_EXERCISES`, adds 2 drops.json entries, switches the converter to write `_images/`, fixes the animation recorder for lazily mounted `spark_animation` controls, and will push a branch + open a PR (not merged). DO NOT touch the main checkout's working tree or switch its branch until that agent is finished; check `git status` and `gh pr list` first. Use `git worktree add <path> -b <branch> origin/main` for your own work.
-- **Review-screenshots PR**: REVIEW_PR_LINK_PLACEHOLDER (a never-merge draft PR showing screenshots of every Learn Python place the user must look at; see section 7).
+- **Review-screenshots PR**: https://github.com/Dulain-Willis/data-eng-knowledge/pull/7 (a never-merge draft PR showing screenshots of every Learn Python place the user must look at; see section 7).
 
 ## 4. Where things stand per category (the user thinks in these categories)
 
