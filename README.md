@@ -1,3 +1,6 @@
+<img width="2172" height="724" alt="70938197-849e-4194-97e4-d4630f5b196f" src="https://github.com/user-attachments/assets/47741e93-59b8-4ba1-85de-00029e44b5ec" />
+
+
 <h1 align="center">data-eng-knowledge</h1>
 
 <h3 align="center">Data engineering lessons for people and agents</h3>
