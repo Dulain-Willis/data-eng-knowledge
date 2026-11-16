@@ -1,11 +1,6 @@
 <p align="center">
-  <img alt="data-eng-knowledge" width="100%" src="assets/banner.png">
+  <img alt="Data Engineering Knowledge" width="100%" src="assets/banner.png">
 </p>
-
-
-<h1 align="center">data-eng-knowledge</h1>
-
-<h3 align="center">Data engineering lessons for people and agents</h3>
 
 <p align="center">
   <img alt="Python" src="https://img.shields.io/badge/Python-3776AB?logo=python&logoColor=white">
@@ -13,6 +8,10 @@
   <img alt="MCP server" src="https://img.shields.io/badge/MCP-server-6E56CF">
   <img alt="Last commit" src="https://img.shields.io/github/last-commit/Dulain-Willis/data-eng-knowledge">
 </p>
+
+<h1 align="center">Data Engineering Knowledge</h1>
+
+<h3 align="center">Data engineering lessons for people and agents</h3>
 
 <div align="center">
 
