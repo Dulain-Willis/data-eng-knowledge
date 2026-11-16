@@ -10,7 +10,7 @@
 </p>
 
 
-<h1 align="center">data-eng-knowledge</h1>
+<h1 align="center">Data Engineering Knowledge</h1>
 
 <h3 align="center">Data engineering lessons for people and agents</h3>
 
@@ -23,6 +23,10 @@
 
 **Data engineering lessons from DataDriven as Markdown, with diagrams, animations, and an MCP server so an agent can answer from them.**
 
+Everything is plain files. Read the lessons here, grep them, open them in any editor, or point an agent at them. The interview architecture lessons also have section indexes with line ranges, which is what lets the agent jump straight to the right passage.
+
+https://github.com/user-attachments/assets/9647a564-275a-423a-b192-8d2cc67f057f
+
 ## What is data-eng-knowledge?
 
 A collection of 120 data engineering lessons, plus the tools that build and serve them:
@@ -31,9 +35,6 @@ A collection of 120 data engineering lessons, plus the tools that build and serv
 2. `tools/lesson_to_md.py` converts a lesson page into clean Markdown, screenshots and animation frames included.
 3. An MCP server (`server.py`) lets an agent search the lessons, read only the section it needs and cite the exact lines, instead of answering from training data.
 
-Everything is plain files. Read the lessons here, grep them, open them in any editor, or point an agent at them. The interview architecture lessons also have section indexes with line ranges, which is what lets the agent jump straight to the right passage.
-
-https://github.com/user-attachments/assets/9647a564-275a-423a-b192-8d2cc67f057f
 
 ## Lessons
 
