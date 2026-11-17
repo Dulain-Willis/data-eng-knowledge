@@ -111,7 +111,7 @@ F.udf() returns an object for DataFrame code only. spark.udf.register("clean_nam
 
 Applying a UDF is a narrow transformation. Each output row depends on 1 input row, so Spark calls the function inside the task that reads the partition, on the executor holding it, and no rows move between executors. The animation labels 8 sales `bulk` when the quantity is 10 or more and `single` otherwise, then totals revenue per label.
 
-https://github.com/user-attachments/assets/a45ea768-e812-4e1b-adc6-092480286b40
+https://github.com/user-attachments/assets/cdaccd35-ce5a-4c98-9e21-ed715352289f
 
 The labels appear inside the 2 read tasks, before any row leaves its partition. The only shuffle belongs to `groupBy`, which brings each label's rows together for the final sum. The driver collects 2 rows: `bulk` with revenue 281.0 and `single` with 107.0. A UDF adds work to every task it runs in and adds no shuffle of its own, so you count the shuffles in a UDF job exactly as you would without it.
 

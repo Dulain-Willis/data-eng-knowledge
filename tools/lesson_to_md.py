@@ -358,7 +358,7 @@ def animation(soup, block, tokens, info, files):
     parts = []
     for label, name in files or []:
         if name.endswith(".mp4"):  # uploaded (upload_animation); a bare URL on its own line renders as a video
-            shown = upload_animation(name) if "--screenshots" in sys.argv else name
+            shown = json.load(open(URLS_FILE)).get(name, name)  # already uploaded by main() before the Markdown is written
         else:
             shown = f"![{label or 'Animation'}](_images/{name})"
         parts.append((f"**{label}**\n\n" if label else "") + shown)
@@ -1117,6 +1117,28 @@ def _wait_idle(block, page, began, cap=150):
     return changed + 1.5
 
 
+def _first_player_frame(webm, x, y, lo, span, fps=30):
+    """Time (s) of the first frame in [lo, lo+span] where the player's title-bar dots (red and green) show
+    at the top-left of the crop corner (x, y); None if never."""
+    cw, ch = 320, 120
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{lo:.2f}", "-t", str(span), "-i", webm,
+                          "-vf", f"fps={fps},crop={cw}:{ch}:{x}:{y}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                         capture_output=True).stdout
+    size = cw * ch * 3
+    for i in range(len(raw) // size):
+        f = raw[i * size:(i + 1) * size]
+        red = green = 0
+        for j in range(0, size, 3):
+            r, g, b = f[j], f[j + 1], f[j + 2]
+            if r > 200 and g < 120 and b < 110:
+                red += 1
+            elif g > 160 and r < 100 and b < 120:
+                green += 1
+        if red >= 10 and green >= 10:
+            return lo + i / fps
+    return None
+
+
 def record_animation(browser, url, k, m, label, dest, box_css):
     """Record animation block k in mode m (label) to the MP4 `dest`; returns its stats, or None if the
     player's controls never mounted.
@@ -1139,24 +1161,36 @@ def record_animation(browser, url, k, m, label, dest, box_css):
         page.evaluate("document.documentElement.style.zoom = 2")
         page.wait_for_timeout(1000)
         block = page.locator('[data-note-block-type$="_animation"]').nth(k)
-        block.scroll_into_view_if_needed()
-        block.locator("button").first.wait_for(state="attached", timeout=15000)
+        # All setup happens while the player is still below the fold: the site starts playing the moment
+        # the player scrolls into view, so that jump is the start of the recording (nothing of step 1 is lost).
         page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
         page.wait_for_timeout(300)
-        page.evaluate("y => window.scrollBy(0, y)", block.evaluate(_PLAYER_BOX)["y"] - 10 - page.evaluate("scrollY"))
-        page.wait_for_timeout(500)
-        if m > 0:
+        gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})", gap)  # block top well below the viewport (the site loads a bit ahead of the fold)
+        page.wait_for_timeout(1500)
+        if m > 0:  # pick the mode while out of view; a switched mode starts paused (Airflow animations)
             block.locator("button[role=radio]").nth(m).click()
-            page.wait_for_timeout(300)
+            page.wait_for_timeout(500)
+        before = _STEP.findall(block.inner_text()) if block.locator("button").count() else []
+        restart = bool(before) and int(before[-1][0]) > 1  # a player in the first screen at page load has played on already
+        jump_mark = mark = time.monotonic()
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
+                      block.evaluate("b => b.getBoundingClientRect().top") - 10)  # instant: the site may smooth-scroll
+        block.locator("button").first.wait_for(state="attached", timeout=15000)
+        if m > 0:
             play = block.locator('button[aria-label="Play"]')
-            if play.count():  # a switched mode starts paused (Airflow animations)
+            if play.count():
                 play.first.click()
+        if restart:  # play it again from step 1; the recording starts at this click
+            page.wait_for_timeout(700)
+            block.locator('button[aria-label="Restart"]').first.click()
+            mark = time.monotonic()
+        page.wait_for_timeout(300)
         box = block.evaluate(_PLAYER_BOX)
         box = {"x": box["x"] - page.evaluate("scrollX"), "y": box["y"] - page.evaluate("scrollY"),
                "w": box["w"], "h": box["h"]}  # _PLAYER_BOX adds the scroll offset; the crop wants screen position
-        start = time.monotonic() - t0
         first_seen = last_seen = None
-        began = time.monotonic()
+        began = mark
         while time.monotonic() - began < 170:
             steps = _STEP.findall(block.inner_text())
             now = time.monotonic()
@@ -1170,20 +1204,32 @@ def record_animation(browser, url, k, m, label, dest, box_css):
                 last_seen = _wait_idle(block, page, began)
                 first_seen = began
                 break
-            page.wait_for_timeout(250)
+            page.wait_for_timeout(100)
         end = time.monotonic() - t0
+        if first_seen and first_seen - mark > 0.4:  # the player showed "Preparing the animation" first: step 1 starts when the counter appears
+            mark = first_seen - 0.1
         ctx.close()
         vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
         x, y, w, h = (int(round(box[c])) for c in "xywh")
         h -= h % 2
         if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
+        # The video clock is offset from the script clock by a varying amount (up to seconds on heavy pages), so
+        # find the jump in the video itself: the first frame whose top-left corner shows the player's red and
+        # green window dots (the player's title bar) is the first frame of the player.
+        mark_t = jump_mark - t0
+        lo = max(0.0, mark_t - 6)
+        jump = _first_player_frame(os.path.join(tmp, vids[0]), x, y, lo, 14)
+        if jump is None:
+            jump = mark_t
+        start = max(0.0, jump + (mark - jump_mark))  # a restarted player starts at the click, not at the jump
+        end += jump - mark_t  # same shift for the end, so the length stays the live playback time
         os.makedirs(os.path.dirname(dest), exist_ok=True)
         subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.2f}", "-to", f"{end:.2f}",
                         "-i", os.path.join(tmp, vids[0]),
                         "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
                         "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
-    live = (last_seen - first_seen) if first_seen and last_seen else None
+    live = (last_seen - mark) if first_seen and last_seen else None
     return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2)}
 
 
@@ -1260,7 +1306,7 @@ def record_animations(url, out_dir, slug, info):
                         continue
                     dur, fps = _media_stats(dest)
                     st.update(name=name, dur=dur, fps=fps)
-                    ok = fps >= 10 and (st["live"] is None or abs(dur - (st["live"] + 2)) <= 0.2 * dur + 2)
+                    ok = fps >= 10 and (st["live"] is None or abs(dur - (st["live"] + 2)) <= 0.3)
                     if ok:
                         ANIM_STATS[name] = st
                         break
@@ -1393,10 +1439,15 @@ def main():
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
                   if "--screenshots" in sys.argv else {})
+    for entries in animations.values():  # upload now: a failure here must not leave a half-written lesson file
+        for _, name in entries:
+            if name.endswith(".mp4"):
+                upload_animation(name)
     n_cells = len(BeautifulSoup(html, "html.parser").find_all(attrs={"data-note-block-type": "executable_spark"}))
     cells = record_cells(url, out_dir, slug, n_cells) if "--screenshots" in sys.argv else []
     path = os.path.join(out_dir, slug + ".md")
-    with open(path, "w", encoding="utf-8") as f:
+    tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
+    with open(tmp_path, "w", encoding="utf-8") as f:
         challenges = fetch_challenges(slug)
         drop_refs = False
         airflow = bool(challenges) and challenges[0].get("challenge_type") == "airflow"
@@ -1426,6 +1477,7 @@ def main():
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
                        load_drops(slug), cells))
+    os.replace(tmp_path, path)
     print(path)
 
 

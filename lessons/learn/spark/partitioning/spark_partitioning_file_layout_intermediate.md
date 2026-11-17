@@ -20,7 +20,7 @@ Both `repartition(n)` and `coalesce(n)` change how many partitions a DataFrame h
 
 Below, 9 orders arrive in 2 input partitions and `repartition(4)` spreads them over 4. Each task of the first stage writes its rows to shuffle files, then the 4 tasks of the second stage each fetch a share. With no column given, Spark deals rows out round-robin, so the 4 outputs end up close to equal in size.
 
-https://github.com/user-attachments/assets/0a7bec75-fec4-48bb-848d-98b173e478bb
+https://github.com/user-attachments/assets/2f0ee170-add1-493f-8d82-3314651e8c86
 
 The physical plan shows this as `Exchange RoundRobinPartitioning(4)`. The price is that of any shuffle: every row is serialized, written to local disk and fetched over the network by the next stage. In return, `repartition` can raise the count as well as lower it, and the pieces come out balanced however lopsided the inputs were.
 
@@ -31,7 +31,7 @@ The physical plan shows this as `Exchange RoundRobinPartitioning(4)`. The price 
 
 Here the same 9 orders start in 4 partitions and `coalesce(2)` brings them to 2. No row touches a shuffle file. Each of the 2 tasks reads 2 of the original partitions back to back, inside the same stage that read them from storage.
 
-https://github.com/user-attachments/assets/9ff21a63-7a55-4039-82bf-e6015c24acf7
+https://github.com/user-attachments/assets/cacd39f0-4f5e-495f-87e9-1341bba05e2a
 
 The plan shows a `Coalesce 2` node with no Exchange between it and the scan. That has 2 consequences. `coalesce` only lowers the count: `coalesce(10)` on a 4-partition DataFrame leaves 4. And each merged partition is the sum of the inputs it absorbed, so lopsided inputs stay lopsided.
 
@@ -50,7 +50,7 @@ The plan shows a `Coalesce 2` node with no Exchange between it and the scan. Tha
 
 `repartition("region")` hashes on `region`, so every row with the same region lands in the same partition. Without a count it uses `spark.sql.shuffle.partitions`, and `repartition(3, "region")` sets the count directly. The plan shows `Exchange hashpartitioning(region, 3)`. A `groupBy("region")` right after needs exactly that arrangement, so the planner adds no second Exchange. The run below has 1 shuffle, and the aggregation happens inside the tasks that received the rows.
 
-https://github.com/user-attachments/assets/ba5e4d72-8f2c-4dcc-89f6-5b189d63d118
+https://github.com/user-attachments/assets/9cb071fc-3e75-4b30-a4ac-6c84cc03a15d
 
 <br>
 
@@ -434,7 +434,7 @@ Every Exchange that `groupBy`, `distinct`, `orderBy` or a count-less `repartitio
 
 Below, the program sets the count to 2 before grouping 9 orders by region. Each of the 3 input partitions combines its own rows first, then hashes the partial counts into 2 reduce tasks, and the region totals come out of those 2. The board draws the plan as set, with no runtime merging, so the count you set is the task count you see.
 
-https://github.com/user-attachments/assets/96dfe169-f7aa-4208-9f49-a2b8f3c05955
+https://github.com/user-attachments/assets/e5ae3336-72b7-44c1-aa96-2c11947083de
 
 <br>
 

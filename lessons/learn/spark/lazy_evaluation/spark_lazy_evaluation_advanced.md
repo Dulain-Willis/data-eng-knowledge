@@ -87,7 +87,7 @@ On the Jobs tab, planning shows up as a gap. A job's clock starts when the DAGSc
 
 The animation runs the same growth on a loop small enough to watch. It starts from Monday's events, adds another day per round with `union`, and ends in a single `collect()`.
 
-https://github.com/user-attachments/assets/53b2de32-56d3-427f-81e3-5dd6fe9a65c6
+https://github.com/user-attachments/assets/b4c17425-7a34-4c84-bfa1-c23eadf8ef91
 
 The loop's 3 rounds launch nothing. When `collect()` runs, 1 job with 1 stage starts: each day's table brings its 2 partitions along, so the stage runs 8 tasks, and the driver gathers all 12 rows. Every round left its operators, and here its partitions too, in the job that finally ran.
 

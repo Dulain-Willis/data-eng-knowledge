@@ -20,7 +20,7 @@ Data skew means the partitions coming out of a shuffle differ wildly in size: mo
 
 The program below joins 6 orders to 3 customers on customer_id. Customer c7 placed 4 of the 6 orders. The first line sets spark.sql.autoBroadcastJoinThreshold to -1, which turns broadcasting off, so both tables are shuffled by key the way 2 large tables would be. Each table is read as 2 input partitions, and the shuffle writes 2 output partitions.
 
-https://github.com/user-attachments/assets/2fef8b02-844b-4c8c-af07-46957d6fddb7
+https://github.com/user-attachments/assets/a3eccfa4-ce68-4254-9685-879bfa193fea
 
 Before the shuffle, the orders sit in 2 input partitions of 3 rows each, an even split. After it, every c7 row has moved to whichever task c7 hashed to: 4 orders plus Dee's customer row, which is 5 of the 9 rows in the job. The c2 and c3 rows go wherever their own hashes send them, which may be the other task or the same crowded one. The input split was balanced and the shuffle undid it, because the shuffle places rows by key and c7 owns most of the orders.
 
@@ -310,7 +310,7 @@ A hot key does damage only at a step that sends rows to partitions by that key. 
 
 Narrow steps like filter and withColumn run on each input partition where it sits, so key frequencies never come into play. A broadcast join is narrow on its large side: every executor receives a full copy of the small table, and each task joins the large-side rows it already holds. Here is the orders and customers join from the first section without the conf line. Deleting that line does not undo a setting that already ran: the threshold is back at its 10MB default only in a fresh session or after spark.conf.unset("spark.sql.autoBroadcastJoinThreshold"). At the default, the customers table is far under the threshold, so Spark broadcasts it.
 
-https://github.com/user-attachments/assets/0ef6c560-5310-42e1-885b-27be5a13ce77
+https://github.com/user-attachments/assets/4f3bd2fe-6f75-402e-9490-01e461670d24
 
 No order rows move. Each of the 2 input tasks holds 2 of the c7 orders and matches them against its own copy of customers, so c7's popularity stays spread exactly as the input split spread it. Writing the join as `orders.join(F.broadcast(customers), "customer_id")` asks for the broadcast by name, whatever the threshold is set to. A hot key in a broadcast join costs nothing extra, which is one more reason to broadcast whenever the small side fits.
 

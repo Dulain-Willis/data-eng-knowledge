@@ -15,7 +15,7 @@ A stateful operator needs rows from earlier micro-batches to answer the current 
 
 The operator sits after a shuffle, so its state is split exactly like the shuffle output. The animation runs the batch form of a per-city count on 2 input partitions and 3 shuffle partitions. Track where each city lands: in a streaming query, the reducer task that receives a key is also the task that owns that key's state.
 
-https://github.com/user-attachments/assets/2a4d299a-ff51-474f-8da7-87cb64df29d3
+https://github.com/user-attachments/assets/ce7c6905-dc0a-4f9d-823f-45d5f21aadda
 
 In the streaming plan, 2 operators wrap that shuffle's reducer side. Call `query.explain()` on a running aggregation and you find `StateStoreRestore`, which reads each key's old count from the store, and `StateStoreSave`, which writes the new one. In batch 41, the task for partition 2 loads version 41 of the store for operator 0, partition 2, applies the batch's updates, and commits version 42. A coordinator on the driver tracks which executor has each store loaded, and the scheduler treats that executor as the preferred location for the partition's next task. If the task waits out the locality timeout and runs elsewhere, the new executor reloads the store from the checkpoint.
 

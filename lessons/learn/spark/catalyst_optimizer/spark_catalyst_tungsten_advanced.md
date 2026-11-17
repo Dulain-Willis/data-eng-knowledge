@@ -291,7 +291,7 @@ A generated function lives inside a stage, so every shuffle ends one: the Exchan
 
 The animation runs this query on 12 orders read as 3 partitions. Each map task runs function 1 over its partition and keeps one partial sum per region it saw, so the rows that cross the shuffle are partial sums. Each reduce task then runs function 2 to merge the partials for its regions.
 
-https://github.com/user-attachments/assets/76abaa85-b3d5-4e5e-a818-f3116abae858
+https://github.com/user-attachments/assets/13f25345-379b-417e-8544-4c7bf1fbe753
 
 On a real job, open the query in the SQL tab of the Spark UI. In its graph, each generated function is a box with its own duration metric. The first is labeled WholeStageCodegen (1) and the next WholeStageCodegen (2), and any operator outside codegen gets a box of its own. To read the Java source itself, call df.explain(mode="codegen").
 

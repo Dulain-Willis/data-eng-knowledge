@@ -15,7 +15,7 @@ Every action you call runs the full chain of transformations behind its DataFram
 
 The board below plays 1 action on 7 orders split across 2 partitions. The filter keeps the 5 completed orders, the `groupBy` shuffles them by region across 3 tasks, and `collect()` returns 3 totals: West 210, East 120, North 60. Run `kept.count()` after it and Spark reads all 7 rows and filters them a second time, because nothing from the first run was kept.
 
-https://github.com/user-attachments/assets/dc060c74-02b9-4041-aec8-dcaf9c420ebb
+https://github.com/user-attachments/assets/c9e7e02c-b44f-4c54-b064-c98225367620
 
 <br>
 

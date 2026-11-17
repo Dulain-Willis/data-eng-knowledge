@@ -31,7 +31,7 @@ When you call spark.read on a directory, Spark lists the files and cuts them int
 
 The count depends only on file sizes and the core count, so you can predict it from a directory listing and the cluster size before a single row is read. That matters because the count is also the number of tasks the first stage launches, and nothing in a narrow transformation changes it.
 
-https://github.com/user-attachments/assets/83e1e0ad-57c4-468d-89b4-34d737588d6d
+https://github.com/user-attachments/assets/0b3277f1-d02c-43ac-b0ab-fec95e7f1e0a
 
 The program above reads a 12-row `orders` table as 4 partitions and filters it down to the 2 refunded rows. Follow the task count: 4 tasks launch, each scans its 3 rows, and 4 result sets travel back to the driver even though at least 2 of them carry nothing. The filter removed 83% of the rows and left the partition count alone.
 
@@ -100,7 +100,7 @@ Read the last row again. The driver works through its task queue from one schedu
 
 ### Empty reducers after a shuffle
 
-https://github.com/user-attachments/assets/6b1b8228-037f-4443-ac7c-488324562413
+https://github.com/user-attachments/assets/28c720cd-a691-4f53-9f96-1ae79f2c1f60
 
 Here 9 orders in 3 regions are summed by region with the shuffle partition count set to 6. The map side runs 3 tasks, one per input partition, and each hashes its rows by region. The reduce side launches 6 tasks for 3 keys, so at least 3 of them receive no rows at all; they run anyway and return an empty result. East sums to 120. West and North come to 105 and 95, and at least half of the reduce tasks contributed nothing but overhead. At the default of 200, at least 197 partitions would hold nothing, and with adaptive execution off each would still run as a task.
 

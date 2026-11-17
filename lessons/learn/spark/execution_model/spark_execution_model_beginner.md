@@ -85,7 +85,7 @@ A table never arrives at an executor whole. When Spark reads a dataset it cuts t
 
 The animation below runs the smallest version of this. The order_items table holds 8 rows and is read as 4 partitions, so each partition carries 2 rows. The program adds a line_total column, quantity times unit price, and collects the result.
 
-https://github.com/user-attachments/assets/210c7728-3087-48c9-8bc4-2d4ff6741442
+https://github.com/user-attachments/assets/a7373ee7-8f7f-48e6-8cca-419f34dad7e6
 
 Four tasks ran, 1 per partition, and all 4 ran at the same moment. Each task computed its 2 line totals from the rows it already held: the first partition produced 30 and 40 for order 1, the second produced 24 for order 2 and 120 for order 3, the third 20 and 50 for orders 4 and 5, and the fourth 60 and 15 for orders 6 and 7. No row left its partition, because a line total needs nothing from any other row, and a transformation with that property is called narrow. At the end the driver collected 8 rows, the 1 moment data crossed from executors to the driver. Multiply the table by 1 million and the job keeps its shape: 8 million rows in 4 partitions still run as 4 tasks, each a million times longer.
 
@@ -280,7 +280,7 @@ The program below sums profit per region and collects the result, 3 lines that t
 
 The animation runs it on 6 orders rows read as 2 partitions of 3 rows, across the regions EU, US and APAC, with the shuffle set to 2 output partitions. The first partition holds orders 1 to 3 and the second orders 4 to 6, so the 2 US rows sit in different partitions.
 
-https://github.com/user-attachments/assets/8fe57e54-c15e-413a-a959-92f549cbea8f
+https://github.com/user-attachments/assets/89f2cecb-e413-4c6f-89ae-1b225ffb0f5f
 
 Two things happened before any row moved. Each of the 2 map tasks first computed a partial sum per region from its own rows, so the partition holding both EU orders sent 1 EU row of 55 instead of 2 rows, alongside a US row of 25; the other partition sent US 35 and APAC 30. Then each task wrote its partial rows to local disk, grouped by destination, and that is the moment the first set of tasks finished. The 2 reduce tasks each fetched their rows across the network and added the partials together, which is where the 2 halves of US, 25 and 35, met to make 60 while EU stayed at 55 and APAC at 30. The driver collected 3 rows. That redistribution of rows by key is a shuffle, and it splits a job into 2 sets of tasks, the ones before it and the ones after, which the next tier of this topic takes apart as stages.
 
