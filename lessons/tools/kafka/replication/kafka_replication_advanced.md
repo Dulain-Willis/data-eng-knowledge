@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 7 challenges
-
 # Replication: Advanced
 
 It is 3:14 am at LinkedIn, and a rack in one datacenter has lost power. The partition holding members' feed events has no in-sync replica left. The on-call engineer can wait for the rack to come back, or hand leadership to a replica that stopped 40 seconds ago and lose those records. The settings in this lesson decide which she picks, and what the feed shows next.

@@ -84,6 +84,12 @@ def clean(soup):
         panel.decompose()
     for t in soup.select(".sr-only"):
         t.decompose()
+    # the row above the title (level, minutes, challenge count, tool logo): the level is in the
+    # title, the exercises live in their own folders, so the lesson starts at its title
+    for h1 in soup.find_all("h1"):
+        row = h1.find_previous_sibling("div")
+        if row is not None and row.select_one(".mini-bars"):
+            row.decompose()
     # decorative "//" that sits beside some headings
     for span in soup.find_all("span"):
         if span.get_text(strip=True) == "//" and not span.find_parent("td"):
@@ -478,10 +484,6 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
     # escape_underscores=False keeps names like fare_amount readable
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not
-    # Tool logos are site-relative (/tool-marks/x.png); point them at the copies vendored in
-    # lessons/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
-    for img in soup.find_all("img", src=re.compile(r"^/tool-marks/")):
-        img["src"] = "../../" + img["src"].lstrip("/")
     md = markdownify(str(soup), heading_style="ATX", bullets="-", code_language="sql",
                      escape_underscores=False, newline_style="BACKSLASH")
     for token, text in tokens.items():

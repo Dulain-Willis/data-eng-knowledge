@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 14 challenges
-
 # The Spark UI: Intermediate
 
 It is 6am at Netflix, and the nightly job that ranks viewing by title has blown its deadline by 2 hours. The on-call data engineer opens the Spark UI and finds 3 suspects at once: a 205 GB shuffle, one task running 34 times longer than the median, and an executor flagged red for garbage collection. Chasing the wrong suspect first burns the whole morning.

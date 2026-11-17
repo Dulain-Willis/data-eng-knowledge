@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 13 challenges
-
 # UDFs and Serialization: Advanced
 
 Two Sigma's engineers proposed vectorized pandas UDFs for Spark in 2017, and the problem they target looks like this: a Python UDF scores 2 billion trade rows overnight, and the executor profile shows most of the time spent turning rows into pickles and back. Whether the job is rewritten per batch, gets one config flipped, or changes serializer decides if it finishes before markets open.

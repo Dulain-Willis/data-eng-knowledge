@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 9 challenges
-
 # Batch vs Streaming: Beginner
 
 It is 11:58 pm on New Year's Eve and riders across Manhattan open the Uber app at once. Surge pricing has to reflect that demand within seconds or drivers never head toward Times Square. The same night, every driver's weekly pay summary waits to be produced once, after the week closes. Same trips, same company, 2 rhythms, and this lesson is about telling them apart.

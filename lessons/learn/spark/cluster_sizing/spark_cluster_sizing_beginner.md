@@ -1,5 +1,3 @@
-Beginner·Spark · 12 min · 11 challenges
-
 # Cluster Sizing: Beginner
 
 At Netflix, a data engineer's nightly Spark job rolls a day of playback events, about 200GB, into watch minutes per title. On its tuned cluster the rollup took a few minutes. Copied into a fresh notebook that sets no resources, it is still running at breakfast, with 2 tasks moving out of 1,600. The whole gap comes down to 3 settings, chosen before the session starts.

@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 6 challenges
-
 # Pipeline Anatomy: Beginner
 
 At 8:00 every weekday a finance lead opens a dashboard and reads yesterday's sales, already summed by category, without anyone having run a job by hand. The orders sat in a checkout database at midnight, and by morning they were in a different system, in a different shape, with the test purchases removed. The machinery that did that overnight is what this lesson takes apart, one box at a time.

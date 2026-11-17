@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Delivery Semantics: Advanced
 
 Dalia is in the final system design round at Stripe, where an API request can carry an idempotency key so a retried charge is applied once. The interviewer draws 3 boxes on the whiteboard, a payment events log feeding a consumer that writes to a ledger table. "This consumer crashed at 02:14 and restarted," she says. "Finance reports 312 charges recorded twice. Walk me through what happened, and what guarantee you would build instead." Dalia knows the vocabulary: at-least-once, at-most-once, exactly-once. What the interviewer wants is the mechanism under the words: where the consumer saved its progress relative to its write, why the duplicates numbered 312, and what exactly-once would cost in latency and coordination. This lesson builds that answer, for every form the question takes.

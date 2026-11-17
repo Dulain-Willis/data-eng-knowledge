@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 15 min · 12 challenges
-
 # Normalization
 
 Suppose each album row in Spotify's catalog carried its own copy of the artist name. When a band renamed itself, the rename would have to reach every album, and a script that missed 3 of them would leave search showing the old name. One fact, stored in 2 places, would disagree with itself. Normalization is the discipline that prevents that split.

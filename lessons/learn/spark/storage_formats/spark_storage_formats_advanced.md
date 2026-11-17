@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 14 challenges
-
 # Storage Formats: Advanced
 
 Take a Netflix data engineer whose nightly job rewrites a week of viewing history while analysts are mid-query. When a table is only a directory of Parquet files, a query that lists it during the rewrite can count rows twice or miss them. Netflix built Iceberg so a rewrite like that lands as 1 atomic commit.

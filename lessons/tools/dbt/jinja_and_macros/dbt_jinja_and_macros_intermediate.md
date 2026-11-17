@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 11 challenges
-
 # Jinja and Macros: Intermediate
 
 GitLab publishes its whole dbt project in the open, macros folder included. Picture a week there in which 2 revenue reports disagree by cents on the same orders, because 6 models each convert cents to dollars with their own rounding. One macro gives all 6 the same arithmetic, a test written once guards every amount column, and a variable picks the quarter to rebuild.

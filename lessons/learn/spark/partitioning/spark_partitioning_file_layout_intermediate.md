@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 16 challenges
-
 # Partitioning: Intermediate
 
 On the night a new season drops at Netflix, analysts want playback errors from the last 6 hours, and the playback events table holds a year of history. Laid out by date and hour, the query opens 6 directories and returns in seconds. Laid out by user ID, it lists millions of tiny files and the dashboard times out.

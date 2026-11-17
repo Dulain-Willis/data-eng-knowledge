@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 11 challenges
-
 # UDFs and Serialization: Beginner
 
 Take a nightly job on Spotify's data team that builds a table of podcast episodes whose titles mention 'live'. A teammate wraps a 3-line Python title cleaner as a UDF, and the job that finished before breakfast now runs past lunch: every title is converted into a Python string and back, row after row. 2 built-in functions do the same cleanup without leaving Spark's engine.

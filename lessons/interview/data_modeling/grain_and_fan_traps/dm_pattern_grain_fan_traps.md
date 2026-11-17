@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 4 challenges
-
 # Grain and Fan Traps: Advanced
 
 You are 25 minutes into a modelling round at an e-commerce company. The interviewer has fact_order_line and fact_shipment on the board, both hanging off dim_customer.

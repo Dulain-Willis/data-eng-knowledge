@@ -1,5 +1,3 @@
-Beginner·Spark · 12 min · 11 challenges
-
 # Execution Model: Beginner
 
 A `GROUP BY` over 2 TB of Parquet finishes in 4 minutes on a 100-machine cluster. The identical code on the identical cluster can also take 90 minutes with 96 machines idle, and the Spark UI shows exactly why. Reading that screen takes 4 pieces of vocabulary: driver, executor, partition and slot. The first section starts with the processes every Spark program runs as.

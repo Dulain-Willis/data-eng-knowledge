@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 11 challenges
-
 # Scheduling: Intermediate
 
 The example this lesson follows is a finance DAG at Airbnb, where Airflow was first written, that totals host payouts once a day at 06:00 Pacific. On the Sunday the clocks spring forward, the total comes in short, and a request lands to rerun the last 3 weeks. Whether that rerun reads the right hours depends on what each run's logical date names.

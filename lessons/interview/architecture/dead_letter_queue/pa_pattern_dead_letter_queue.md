@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Dead Letter Queue: Advanced
 
 A candidate is in a final loop at Amazon. Order and shipment events there move through queues at a scale that makes a single malformed record a certainty rather than a risk. The interviewer draws a consumer reading from a stream and writing to a table, then says: an upstream team deploys on Friday evening and 2 percent of events arrive with a missing `order_id`. What does your pipeline do in the next 10 minutes, and what do you do on Monday? The candidate who answers 'it fails and we fix it' has described an outage. The candidate who answers 'we drop them' has described silent data loss. The complete answer names a diversion point, an envelope that preserves evidence, a retry policy that separates transient faults from poison records, a replay path with idempotent writes, and a dashboard that turns the queue into a quality signal.

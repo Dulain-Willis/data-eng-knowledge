@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 16 challenges
-
 # Partitioning: Beginner
 
 Take the Netflix job that computes yesterday's top 10 titles: it reads a day of playback events and usually finishes in 20 minutes. This Friday it is at 3 hours and climbing. The bytes have not changed, but their shape has: 400,000 files of 300KB instead of 1,000 files of 128MB, and the job is paying for every one of them.

@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 14 challenges
-
 # Catalyst Optimizer: Intermediate
 
 A Netflix engineer's Spark job totals viewing hours per country and title, then keeps only Brazil. Read literally, it shuffles viewing data from every country. In practice only Brazil's data crosses the network, because Spark rewrote the query before any task started. Whether a rewrite like that happens, and where each shuffle lands, is what this lesson teaches you to read from the plan.

@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Consumer Groups: Intermediate
 
 At Uber, a consumer group reads completed trips from a topic and writes each driver's earnings to a ledger. One night a deploy restarts every member of the group at once. By morning, 1,400 drivers are missing a trip and 300 others were paid twice. Which trips vanished, which repeated, and which setting decided each outcome is what this lesson works out.

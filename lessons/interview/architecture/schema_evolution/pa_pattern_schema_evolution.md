@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Schema Evolution: Advanced
 
 Ines is in the last onsite loop at LinkedIn, and the interviewer sketches a pipeline on the whiteboard: a mobile app emitting a profile_view event, an event stream, a raw table, then 3 jobs downstream. One feeds a feed-ranking model; the other 2 build an analytics dashboard and a nightly partner export. The question comes next. The app team ships a release that adds a field to profile_view. What happens at each hop, and what would you have built so that nobody gets paged? Ines answers that the column lands as nullable and everything keeps working. The interviewer keeps pushing, with follow-ups about the half of users who never update the app, a new field that changes what an old field means, and a rename the team wants next quarter. Each follow-up moves the question from a single table to the whole system around it.

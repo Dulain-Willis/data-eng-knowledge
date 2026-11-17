@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 3 challenges
-
 # Backpressure and Scaling: Advanced
 
 Renata is 40 minutes into an onsite loop at Uber when the interviewer draws a pipeline on the whiteboard. Rider and driver apps publish trip events to a partitioned queue, a fleet of consumers enriches each event with driver profile data, and a writer lands the result in the table behind driver earnings. Then comes the question: "Next quarter this traffic doubles. Walk me through what happens." Renata lists fixes: more consumers, bigger machines, autoscaling. The interviewer stops her. "The queue has 24 partitions. Which of those fixes still works? And if the consumers go down for 30 minutes at peak, when is the table current again?" She has been guessing at a question with a computable answer. Each stage has a capacity, the doubled load either fits or it does not, and the recovery time falls out of the same numbers.

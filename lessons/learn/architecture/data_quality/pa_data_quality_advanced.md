@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 11 challenges
-
 # Data Quality: Advanced
 
 PayPal published an open-source template for data contracts, and a Friday release on a checkout team shows what one is for. A checkout engineer renames `amount_cents` to `amount` and switches it to dollars. With a contract check in the build, the merge fails within minutes and gets fixed before lunch. Without one, Monday's revenue dashboard shows zero for every market, and finance spends the morning finding out why.

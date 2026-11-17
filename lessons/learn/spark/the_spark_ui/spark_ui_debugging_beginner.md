@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 10 challenges
-
 # The Spark UI: Beginner
 
 Netflix's overnight Spark job that rebuilds each profile's Continue Watching row used to finish in 12 minutes. This morning it took 59, and the on-call engineer has a proposal to double the executors. Before approving it, you open the Spark UI and find one task in a 200-task stage that ran for 50 minutes. Which fix works depends on why that task ran so long.

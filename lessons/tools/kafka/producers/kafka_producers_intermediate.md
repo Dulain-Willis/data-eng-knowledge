@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 9 challenges
-
 # Producers: Intermediate
 
 Midnight at Netflix: a new season drops and devices in every time zone send play events at once, along with pauses and scrubs. One viewer's play event times out waiting on a slow broker. The producer retries, and the viewing-history topic now counts that episode as started twice. Whether that duplicate lands, and whether an acknowledged event can vanish when a broker dies, comes down to producer settings.

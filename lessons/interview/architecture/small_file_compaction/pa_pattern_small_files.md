@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Small Files and Compaction: Advanced
 
 Ines is in her final-round system design interview at Uber. The interviewer sketches a pipeline: trip events arrive on a message queue, and a job appends them to an hourly-partitioned lake table using 200 writer tasks. Last quarter the team cut the append interval from 1 hour to 1 minute for fresher dashboards. Volume has stayed flat at around 30 GB a day, yet the dashboard query over yesterday has slowed from about 5 seconds to over 2 minutes, and the storage request bill keeps climbing. 'Walk me through what is happening, and what you would change,' he says. Ines knows compaction exists. The interviewer wants more: the arithmetic proving file count is the culprit, a fix that stops the files being created, a compaction design that survives retries and late events and keeps working after a new column is added, and the price of each choice.

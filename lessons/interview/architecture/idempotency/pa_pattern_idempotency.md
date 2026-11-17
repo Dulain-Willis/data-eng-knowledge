@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Idempotency: Advanced
 
 Ines is in the final round of a data engineering interview at Stripe, whose public API accepts an `Idempotency-Key` header so that a client retrying a payment request still creates exactly 1 charge. The interviewer sketches a nightly job that loads charge events into a revenue table, then adds a twist: the orchestrator timed out the task at 02:40 and launched a second attempt, although the first had already finished writing. What does finance see in the morning? Ines says she would deduplicate downstream, and the interviewer keeps pressing. Which write makes the second attempt harmless? How does it know to read the rows the first attempt read? What changes if the job is a stream? And how would she prove any of it before shipping? This lesson builds the answer to each of those questions.

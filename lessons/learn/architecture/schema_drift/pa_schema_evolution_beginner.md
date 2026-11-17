@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 11 challenges
-
 # Schema Drift: Beginner
 
 This lesson follows launch week for tipping in the Uber rider app. The trip service starts sending a new `tip_usd` field on Monday, and nobody warns the warehouse team. That same night, riders who finished trips in subway tunnels upload them days late. By Wednesday, finance wants to know why tips are missing and why Monday's trip count keeps moving.

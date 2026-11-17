@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Executors and Capacity: Intermediate
 
 Here is a night that could happen at Airbnb, where Airflow was first written. At midnight, 300 sensors on Celery workers wait for partner payout files in poke mode, each holding a worker slot while it sleeps. The booking loads queue behind them, and the warehouse sits idle. By 03:00 no load has started, and the morning's booking numbers arrive hours late.

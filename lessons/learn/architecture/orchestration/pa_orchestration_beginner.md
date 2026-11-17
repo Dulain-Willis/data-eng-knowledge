@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 11 challenges
-
 # Orchestration: Beginner
 
 At Airbnb, a nightly cron chain turns yesterday's bookings into the host payouts report finance reads at 8am. Tonight the bookings extract runs 50 minutes long. Every downstream job still fires on its clock time and reads a bookings table the extract has not refreshed. The report lands on time and looks complete, and it is wrong. Whether anyone notices depends on one design choice: clock or dependency.

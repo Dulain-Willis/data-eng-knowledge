@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Task Lifecycle: Advanced
 
 Airflow began at Airbnb in 2014. This lesson follows a hypothetical nightly pricing run there: it spins up a scratch cluster, pulls listings from a rate-limited service, waits for an analyst to sign off, and must publish before a 07:00 dashboard. Tonight the pull hits its limit at 03:10 and a worker pod dies mid-load. Each event leaves a different trace in the grid, and this lesson reads each one.

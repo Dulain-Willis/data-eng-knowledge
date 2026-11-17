@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 14 challenges
-
 # The Spark UI: Advanced
 
 The on-call data engineer at Netflix gets paged at 2 a.m.: the nightly job turning a day of viewing history into recommendation inputs has lost 6 executors, and the driver log holds 40,000 fetch-failure lines. One earlier line names the real cause. Finding it, then confirming it in GC logs, a flame graph and the worker's kernel, decides whether tonight's fix is memory, code or hardware.

@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Kafka in the Pipeline: Advanced
 
 At Uber, a completed trip becomes a record on a topic, and several readers consume it: one consumer writes the fare into a ledger database, another lands trips as hourly files, and a stream processor keeps each driver's running earnings. If the ledger consumer crashes mid-batch and replays a few hundred trips, whether each rider sees 1 charge or 2 comes down to how that write was designed.

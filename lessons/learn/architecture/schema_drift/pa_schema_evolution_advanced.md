@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 40 min · 11 challenges
-
 # Schema Drift: Advanced
 
 This lesson follows a busy Thursday afternoon at Robinhood. At 2:12 p.m., a database migration renames a column on the trades table, and buying power for 1,900 customers stops updating. The app must stay live for everyone else, and the settlement ledger, closed once those trades settle the next business day, must be exact to the cent. Which pipeline choices let both hold?

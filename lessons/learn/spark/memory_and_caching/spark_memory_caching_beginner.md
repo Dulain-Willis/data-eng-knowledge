@@ -1,5 +1,3 @@
-Beginner·Spark · 20 min · 16 challenges
-
 # Memory and Caching: Beginner
 
 Picture a Netflix data engineer whose morning Spark job joins a day of viewing events to member profiles, then feeds the joined table to 4 reports. Each report is an action, so the join runs 4 times. One `.cache()` in the right place cuts that to once. A missing `unpersist()` leaves the result holding executor memory long after the last report has read it.
