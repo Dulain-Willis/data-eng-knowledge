@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Deploying dbt: Advanced
 
 Picture a night at GitLab, whose data team runs its dbt project as a set of scheduled jobs. The first job fires at 02:00 before every source has landed: the Salesforce extract is in, the Zuora extract is 3 hours late, and a finance dashboard reads a mart built from both. Tonight's build has to decide what to run, how fast, and when anyone gets to see the result.

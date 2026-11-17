@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 10 challenges
-
 # Pipeline Operations: Beginner
 
 An engineer is 3 weeks into a Google SRE on-call rotation. At 06:00 UTC her pager fires: yesterday's rows are missing from a revenue rollup she has never opened, and finance reads it at 08:00. Its author is asleep. Whether those 2 hours are enough depends on choices made months earlier: which signals the job emits, which alert paged her, and whether a runbook says what to try first.

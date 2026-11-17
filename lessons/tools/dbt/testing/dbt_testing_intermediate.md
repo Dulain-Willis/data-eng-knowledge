@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Testing: Intermediate
 
 Shopify pays its merchants through Shopify Payments, which sends each one a regular payout. Take the dbt project behind a payouts model like `fct_payouts`. In one nightly build, a test finds 14 order lines whose refund exceeds the line's total. Stop the build and every merchant's payout runs late; let it finish and 14 merchants are paid the wrong amount. The test's severity decides which.

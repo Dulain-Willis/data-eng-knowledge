@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 25 min · 3 challenges
-
 # Keeping Data Fresh: Intermediate
 
 Odile is an hour into her onsite at Uber when the interviewer sketches a trips table in the operational database and its copy in the analytics lake, reloaded every night. The product team now wants that copy no more than 15 minutes behind. Tips and fare adjustments, meanwhile, land on trips up to 3 days after the ride. Odile proposes an hourly upsert. The interviewer keeps pulling threads. Which files does each upsert rewrite? How would you prove the copy is 40 minutes stale rather than 15? When a rider moves cities, which city gets last month's revenue? Engineering renames `fare` to `fare_cents`. A bug wrote wrong fares for every trip in March. Every one of these follow-ups asks how to keep a copy current without breaking it.

@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Task Lifecycle: Beginner
 
 Airflow began at Airbnb, so picture a nightly host payout refresh there: 2 pull tasks, a compute step and a publish to the host dashboard. At 00:08 the compute task raises because the warehouse dropped its connection, after both pulls finished. Whether that cell waits 5 minutes and tries again, or goes red and takes the publish task down with it, decides what hosts see in the morning.

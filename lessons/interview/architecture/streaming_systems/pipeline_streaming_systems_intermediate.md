@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 25 min · 4 challenges
-
 # Streaming Systems: Intermediate
 
 Renata is in the final round at Uber. The interviewer draws a box labelled ride requests and a second labelled surge pricing, then asks her to build the path between them: every city gets a request count each minute, and she must explain what happens when a worker dies halfway through a batch. She starts with partitions and a group of readers. The follow-ups keep coming. Finance wants any trip's fare history replayable; what is stored? A phone in a tunnel uploads its request 90 seconds late; does that minute get recounted? A deploy ships a parser bug and 40,000 events fail; where do they go, and how do they come back? Micro-batch engine or record-at-a-time? Each answer leans on the one before it, and this lesson walks the chain in the interviewer's order, with the actual offsets and timestamps at each step and actual failure counts where things break.

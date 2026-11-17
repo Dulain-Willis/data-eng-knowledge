@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 11 challenges
-
 # Data Quality: Beginner
 
 Picture Airbnb's nightly bookings pipeline finishing at 04:00 with every task green. By 09:00 a product manager is celebrating a 40% jump in Paris reservations. The jump came from a retried load that wrote each booking twice. Nothing failed, nothing paged anyone, and the chart was wrong. This lesson is about the check that would have stopped that run at 04:01, before the chart ever drew.

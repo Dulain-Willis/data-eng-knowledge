@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 11 challenges
-
 # Catalyst Optimizer: Advanced
 
 A Netflix engineer runs 2 jobs on viewing history. Both read 3 columns and filter them, then shuffle once to aggregate by title. One finishes in 6 minutes. Its twin swaps a count for a list of profile IDs and takes 25. The list version shuffles and holds every ID instead of one number per title, and its aggregate also drops out of Spark's generated code.

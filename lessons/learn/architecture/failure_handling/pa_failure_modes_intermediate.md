@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 12 challenges
-
 # Failure Handling: Intermediate
 
 Friday, 18:00, at Uber. A fare-adjustment event arrives with its amount written as `12,50`, a German-locale decimal. The payments consumer can't parse it. Because it retries the event forever, every trip receipt behind it stalls. At 18:10 the currency service stops answering and 200 workers retry in lockstep. Whether dinner rides get paid tonight depends on where each failure is sent.

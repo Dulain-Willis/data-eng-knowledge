@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 4 challenges
-
 # Additive Measures: Advanced
 
 Ilse is 40 minutes into a Stripe onsite when the interviewer shares a schema: a payments fact, a daily merchant balance table and a dashboard spec. The spec wants monthly payment volume and end-of-month balance on it, along with authorization rate and unique cardholders, all rolled up by country and by quarter. "Which of these can the dashboard SUM?" the interviewer asks. Ilse says volume sums along every dimension. Then she pauses on balance: adding 30 daily balances reports about 30 times the money any merchant holds. Authorization rate is worse, because averaging per-merchant rates gives a corner shop the same weight as a marketplace. The interviewer pushes again: payments arrive in dozens of currencies, so does volume really sum everywhere? This lesson rebuilds her answer from how each measure behaves along each dimension, then turns that into fact tables whose totals stay correct at every rollup.

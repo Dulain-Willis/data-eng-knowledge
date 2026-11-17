@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 5 challenges
-
 # DAG Anatomy: Beginner
 
 It is 3 a.m. at Airbnb and the job that recomputes every host's Superhost status for the quarter is due to start. It needs yesterday's bookings and reviews loaded first, and last night the review load ran 40 minutes long. Whether the Superhost job waits, or judges hosts while the newest reviews are still loading, comes down to how its tasks are wired into a DAG.

@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Incremental Models: Intermediate
 
 A DoorDash order moves from placed to picked up to delivered, and each change lands in an orders feed as a new version of the same order_id. Tonight an incremental fct_orders model loads them. Appended, that order counts 3 times in the day's revenue. Merged on its key, it counts once, carrying its latest status.

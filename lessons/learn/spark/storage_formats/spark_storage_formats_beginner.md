@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 10 challenges
-
 # Storage Formats: Beginner
 
 Parquet 1.0 came out of Twitter and Cloudera in 2013. It's a file format that stores a table column by column. A Twitter analyst counting how many tweets went out in each language yesterday needs only the language field, even though every tweet record carries dozens of fields. Whether Spark pulls every field off disk or that single column decides whether the job finishes before lunch.

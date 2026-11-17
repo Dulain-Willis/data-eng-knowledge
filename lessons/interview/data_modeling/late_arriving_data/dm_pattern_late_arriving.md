@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 2 challenges
-
 # Late-Arriving Data: Advanced
 
 The interviewer at Netflix slides a schema across the table: a `fact_playback` table partitioned by `event_date`, loaded once a night, feeding the hours-watched report that product teams read every morning. Then the question. A member downloads 3 episodes, watches them on a 9-hour flight in airplane mode, and gets home 2 days later. Those playback events reach the pipeline on Thursday carrying Tuesday's timestamps. Tuesday's partition closed on Wednesday morning and the report already went out. What happens to those plays, and what should? The candidate who answers 'append them to Tuesday' has named one option. The candidate who asks how late the rows run, what the report promised its readers, and who pays for a rewrite is reasoning about the pattern. This lesson builds that second answer. It starts with late facts and late dimension members, moves on to corrections, and ends on the design that lets any of them be replayed without fear.

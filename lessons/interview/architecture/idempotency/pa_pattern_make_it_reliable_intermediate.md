@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 35 min · 2 challenges
-
 # Make It Reliable: Intermediate
 
 Priya has 45 minutes with an engineer from Netflix's data platform team, which has described how it audits data before publishing it. The question arrives without a diagram: 'Every morning a batch job loads yesterday's viewing sessions into a table that 40 teams read by 08:00. Last week it ran twice and doubled the counts. The week before, a bad deploy wrote garbage and nobody noticed until a vice president asked. Design it so neither happens again, and tell me what you do when something slips through anyway.' Nothing in that prompt says idempotency, quality layers or rollback, yet those are the 3 pieces being graded. This lesson covers the engineering under the question: where checks sit and when they block, how a re-run leaves the table unchanged, which row wins among duplicates, which monitors fire, and how a bad publish gets undone before anyone reads it.

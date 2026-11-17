@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 12 challenges
-
 # Schema Drift: Intermediate
 
 At Uber, a driver's phone climbs out of an underground garage at 09:34 and uploads a fare from a trip that ended at 09:02. The earnings pipeline published its 09:00 to 09:05 revenue total 28 minutes earlier. Reopen that total, drop the fare, or park it? The same app release also renamed the fare field. Two kinds of promise settle both: one about schema, one about time.

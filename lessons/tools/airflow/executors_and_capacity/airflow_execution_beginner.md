@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Executors and Capacity: Beginner
 
 Suppose it is 06:00 on a Monday at Airbnb, the company where Airflow was written. 40 listing DAGs want their hourly run at once, every one loads into a warehouse that accepts 4 connections, and a sensor has waited on a partner feed since midnight. Which tasks start, which sit in `queued`, which wait in `scheduled`, and which process makes that call?

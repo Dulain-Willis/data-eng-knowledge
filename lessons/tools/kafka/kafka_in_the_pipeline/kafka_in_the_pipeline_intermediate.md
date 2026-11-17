@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Kafka in the Pipeline: Intermediate
 
 A Shopify merchant cuts a jacket's price from $120 to $96 at 9:00 on Black Friday morning. Before the first shopper checks out, that 1 row update has to be in the storefront search index and the analytics warehouse, and in the ads feed as well. This lesson follows it out of the database log, through a schema check and a connector, into a table you can rebuild.

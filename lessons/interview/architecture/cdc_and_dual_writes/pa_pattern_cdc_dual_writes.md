@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # CDC and Dual Writes: Advanced
 
 Priya is 40 minutes into a data engineering loop at Netflix when the interviewer sketches 2 boxes on the whiteboard: an orders database and a search index. 'Today the service writes to both. Twice a week the index shows orders that the database says were cancelled. Redesign it.' Priya starts toward a retry queue, then stops. A retry would hide the symptom, she realizes, because the drift comes from 2 systems each believing it holds the truth. The interviewer pushes further: how would the warehouse get those orders within a minute, how would deletes arrive, what happens when the change reader crashes mid-batch, and what breaks when someone renames a column? Each follow-up probes the same choice: which component records each change to a row, and what that record promises about order, completeness and duplicates. This lesson builds that reasoning from the transaction log outward.

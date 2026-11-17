@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 11 challenges
-
 # Storage Layers: Intermediate
 
 At Netflix, an analyst wants to know how many members in Germany started a new series in its first week. The viewing-history table behind the answer holds years of plays. Written one way, her query reads every byte; written another, it reads a small slice of the table and returns quickly. The difference is how the table is stored.

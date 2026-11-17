@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # The Log: Beginner
 
 Every page view at LinkedIn is activity data, and so is every search. Monitoring dashboards and the search team tuning relevance both want each event, and so do the overnight jobs that load the data warehouse. Building a separate pipe from every source to every reader stopped scaling, so LinkedIn built Kafka: one log each event is written to once, which every system reads at its own pace.

@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 15 challenges
-
 # Adaptive Query Execution: Advanced
 
 A nightly Netflix job joins a week of viewing events to the title catalog. Adaptive execution is on, and the job still dies at 2 a.m.: the broadcast it picked from 90MB of shuffle files decompressed into a hash table too big for its executors, and its slowest stage ran before the first shuffle, where nothing adapts. This lesson maps those blind spots.

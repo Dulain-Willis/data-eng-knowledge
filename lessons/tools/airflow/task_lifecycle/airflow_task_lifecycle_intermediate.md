@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Task Lifecycle: Intermediate
 
 Take a nightly pricing DAG at Airbnb, where Airflow was first written. At 02:14 it finishes with a green badge. A feed task failed at 01:50, the merge behind it went orange, and the cleanup after the merge ran anyway. That cleanup is the DAG's only leaf task, so the run reports success and nobody is paged. Trigger rules and the leaf tasks decided each of those outcomes.

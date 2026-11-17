@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 30 min · 12 challenges
-
 # Star Schemas
 
 Ridgeline Outfitters sells hiking gear through a website and 14 stores. Every Monday finance asks for last week's revenue by product category and region. Against the operational database the query joins 12 tables and runs for 9 minutes. The warehouse answers it from 840 million rows in under 2 seconds, with 3 joins. The difference is the shape of the tables, and that shape has a name.

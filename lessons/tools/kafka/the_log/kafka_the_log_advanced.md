@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 8 challenges
-
 # The Log: Advanced
 
 At Uber, whose engineers wrote Kafka's tiered storage design, a trip-events topic set to keep 7 days has grown to 40. The disk graph climbs, the retention config is correct, and nothing is deleting. One partition holds 1 record stamped 3 years from now, and retention, segment rolling, lookups by time and the compaction lags all trust it. Tiered segments and oversized records stretch the same log further.

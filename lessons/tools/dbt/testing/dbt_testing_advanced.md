@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 7 challenges
-
 # Testing: Advanced
 
 Picture Duolingo's data team rewriting the SQL that decides whether a day counts toward a learner's streak, so a day covered by a streak freeze stops registering as a miss. Nobody wants to find a bug by resetting a learner's 1,000-day streak to 0, so the rewrite ships only after a test on 6 rows written by hand shows the new logic keeps every streak the old rules kept.

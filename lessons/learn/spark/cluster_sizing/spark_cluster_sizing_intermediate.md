@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 12 challenges
-
 # Cluster Sizing: Intermediate
 
 Picture a nightly Spark job at Netflix that rolls up a day of viewing events before the morning dashboards refresh. It runs on 2 executors with 30 cores each, and when one of them dies, half the running work dies with it. The fix could be more executors, bigger ones, or a different shape. This lesson gives you the arithmetic to choose before the next run.

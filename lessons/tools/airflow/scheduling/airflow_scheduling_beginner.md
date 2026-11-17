@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Scheduling: Beginner
 
 Airbnb built Airflow in 2014 for its data warehouse jobs. An engineer there who deploys a weekly bookings DAG on Wednesday 4 November 2026, with a start date of that same day and a schedule of Sundays at midnight, and promises the pricing team a report by the weekend, will miss the weekend: the scheduler creates the first run on Sunday 15 November, once the first whole week has closed.

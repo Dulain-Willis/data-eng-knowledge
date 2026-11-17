@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 7 challenges
-
 # Replication: Intermediate
 
 At Netflix, every play, pause and scrub lands as an event in Kafka clusters spread across 3 availability zones. On a Tuesday evening one zone loses power during the finale of a hit series. Whether millions of viewers keep streaming, and whether the playback events from the last 2 seconds survive, comes down to where each partition's copies sit and how many of them were in sync.

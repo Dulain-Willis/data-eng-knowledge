@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 6 challenges
-
 # Incremental Models: Advanced
 
 A Spotify analyst flags that stream counts for March 5 to 13 are low. The model that counts plays over 30 seconds had a wrong threshold, fixed on March 15, and the incremental build keeps the bad rows. A full refresh would reprocess every day since January 1. This lesson is about rebuilding those 9 days alone, and knowing the result matches a rebuild.

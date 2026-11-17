@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 6 challenges
-
 # Distributed Compute: Beginner
 
 Ines is in the third round of a data engineering loop at Netflix. The interviewer shares a nightly job that rolls up a day of viewing events into watch time for each member and title in each country, and asks a single question: 'This used to finish in 40 minutes. Now it takes 3 hours and sometimes dies with an out-of-memory error, and the team reading its output says their queries crawl. Walk me through how it runs and where you would look.' Ines knows the DataFrame calls by heart. The interviewer wants the machinery under them: which process plans the work, how a folder of input files turns into tasks, which step moves rows across the network, why a single task can exhaust its memory, and why the output now holds 50,000 tiny files. This lesson builds that picture around the same job, with its real numbers.

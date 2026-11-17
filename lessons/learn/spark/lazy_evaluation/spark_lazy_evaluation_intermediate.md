@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 11 challenges
-
 # Lazy Evaluation: Intermediate
 
 At Netflix, an engineer patches the nightly viewing-hours table: read it, pass its rows through a Python fix, overwrite the same path. Every line before the write finishes in seconds, because no work has run. Then the write starts, deletes the old files, and launches tasks that look for those files. Knowing what Spark builds before it runs, and when it reads, decides whether that table survives the night.

@@ -1,5 +1,3 @@
-Beginner·Spark · 12 min · 11 challenges
-
 # Adaptive Query Execution: Beginner
 
 A Netflix engineer's nightly Spark job joins a huge table of viewing events to the titles catalog, filtered to this week's 40 new releases. The plan, fixed before a single row is read, sized that filtered catalog as if it were the whole file and chose to shuffle both sides. Whether the job finishes by breakfast depends on whether Spark can change its mind mid-run.
