@@ -204,7 +204,7 @@ Coalescing reads a single number per reducer partition, its shuffle bytes, and m
 
 Every reducer partition, even an empty one, launches a task and reports back to the driver, and coalescing merges neighbours to save that overhead. The board shows the plan before the runtime merge, so every reducer is drawn.
 
-https://github.com/user-attachments/assets/7eee6e7f-e2a4-4ef5-868f-652dc10f835f
+https://github.com/user-attachments/assets/64192726-3439-4604-97eb-bdfa3f23575b
 
 With 6 reducers on 3 regions, at least 3 of them are empty, and merging those saves 3 launches. Merging all 6 into a single task saves 2 more and puts the whole stage on 1 core while the other cores the job holds wait. Coalescing pays only while the merged task count stays at or above the cores free to run it. Below that line, each merge buys milliseconds of overhead with a core's worth of wall time, which is the trade the next table prices.
 

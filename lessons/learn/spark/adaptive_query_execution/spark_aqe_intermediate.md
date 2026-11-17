@@ -433,7 +433,7 @@ Because the split follows map tasks, a single hot key gets divided too: its rows
 
 The board plays a sort-merge join in which customer 1 owns 9 of the 12 orders. Watch the task that receives customer 1 after the shuffle: that is the partition AQE would split. The `customers` block that lands beside it is the one each piece would need a copy of.
 
-https://github.com/user-attachments/assets/f3aa57c8-9452-46f9-bc57-a3f03a2b158e
+https://github.com/user-attachments/assets/0a924b33-fb27-4e74-96b5-8cc752514569
 
 <br>
 

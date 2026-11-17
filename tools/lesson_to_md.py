@@ -1064,12 +1064,12 @@ _PLAYER_BOX = """(block) => { const bs = [...block.querySelectorAll('button')]; 
     const r = a.getBoundingClientRect(); return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
 
 
-def upload_animation(name):
+def upload_animation(name, force=False):
     """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
     in tools/animation_urls.json and return it. Needs `gh auth login`. The token goes to curl through a
     mode-600 config file (never on the command line, where `ps` could show it) that is deleted afterwards."""
     urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
-    if name not in urls:
+    if force or name not in urls:  # force: upload a re-recorded file as a NEW asset
         tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
         rid = subprocess.run(["gh", "api", f"repos/{REPO}", "--jq", ".id"], capture_output=True, text=True,
                              check=True).stdout.strip()
@@ -1117,26 +1117,215 @@ def _wait_idle(block, page, began, cap=150):
     return changed + 1.5
 
 
-def _first_player_frame(webm, x, y, lo, span, fps=30):
-    """Time (s) of the first frame in [lo, lo+span] where the player's title-bar dots (red and green) show
-    at the top-left of the crop corner (x, y); None if never."""
-    cw, ch = 320, 120
+# The START CHECK. A video must open on the first frame where the player is really on screen: its own
+# title-bar dots (red, yellow, green) at the exact spot the DOM puts them inside the player box, and its
+# step counter reading "1/N". Dots elsewhere in the frame (a code block of the article has the same
+# three dots) do not count. Geometry comes from the DOM while recording (_GEOM_JS); every number in it
+# is relative to the player box and scales with the box width, so it works at any video size.
+_GEOM_JS = """(block) => {
+  const bs = [...block.querySelectorAll('button')]; if (!bs.length) return null;
+  let a = bs[0]; while (a && !bs.every(b => a.contains(b))) a = a.parentElement;
+  const r = a.getBoundingClientRect();
+  const want = {red: 'rgb(255, 95, 87)', yellow: 'rgb(255, 189, 46)', green: 'rgb(40, 201, 64)'};
+  const dots = {};
+  for (const e of a.querySelectorAll('span')) {
+    const q = e.getBoundingClientRect(), c = getComputedStyle(e).backgroundColor;
+    for (const k in want) if (c === want[k] && q.width >= 6 && q.width <= 32 && !dots[k])
+      dots[k] = [q.x - r.x + q.width / 2, q.y - r.y + q.height / 2, q.width];
+  }
+  let counter = null;
+  for (const e of a.querySelectorAll('*')) {
+    if (e.children.length) continue;
+    const t = e.textContent.trim();
+    if (/^\\d+\\s*\\/\\s*\\d+$/.test(t)) {
+      const n = e.firstChild, i = n.textContent.indexOf(t[0]), rg = document.createRange();
+      rg.setStart(n, i); rg.setEnd(n, i + 1);
+      const c = rg.getBoundingClientRect();
+      const q = e.getBoundingClientRect();
+      counter = {text: t, first: [c.x - r.x, c.y - r.y, c.width, c.height],
+                 rect: [q.x - r.x, q.y - r.y, q.right - r.x, q.bottom - r.y]};
+    }
+  }
+  return {x: r.x, y: r.y, w: r.width, h: r.height, dots, counter};
+}"""
+_DOT_RGB = {"red": (255, 95, 87), "yellow": (255, 189, 46), "green": (40, 201, 64)}
+DOT_TOL = 90  # max colour distance of a title-bar dot (fade-in frames are a little dim)
+_ONE_W, _ONE_H = 12, 18
+# Template of the digit "1" in the step counter (mean of the counters of the first 75 reviewed videos),
+# 0..1 luminance, rows top to bottom.
+_ONE = [
+    [.10,.10,.10,.11,.11,.10,.10,.10,.10,.10,.10,.10],
+    [.10,.10,.10,.09,.08,.24,.41,.18,.09,.11,.10,.10],
+    [.10,.10,.13,.30,.32,.57,.73,.21,.10,.11,.10,.11],
+    [.09,.09,.19,.56,.62,.76,.77,.21,.10,.12,.10,.10],
+    [.10,.10,.15,.33,.33,.58,.75,.21,.10,.11,.10,.09],
+    [.10,.10,.10,.14,.11,.46,.78,.21,.08,.11,.11,.11],
+    [.10,.10,.10,.11,.09,.43,.76,.21,.09,.11,.11,.11],
+    [.10,.10,.10,.12,.10,.43,.75,.20,.10,.12,.10,.11],
+    [.10,.10,.11,.12,.08,.42,.75,.20,.09,.12,.10,.11],
+    [.11,.11,.14,.18,.14,.44,.76,.25,.15,.13,.10,.11],
+    [.10,.10,.39,.65,.63,.77,.90,.67,.62,.33,.10,.09],
+    [.10,.10,.36,.54,.54,.56,.58,.54,.54,.28,.09,.12],
+    [.10,.11,.17,.20,.20,.18,.19,.19,.19,.15,.08,.21],
+    [.10,.11,.11,.11,.10,.10,.10,.10,.10,.10,.10,.16],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.11],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.11],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10],
+]
+
+
+def _video_size(path):
+    w, h = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                           "-of", "csv=p=0", path], capture_output=True, text=True, check=True).stdout.strip().split(",")
+    return int(w), int(h)
+
+
+def _read_frames(path, count, start=0.0, native=True):
+    """First `count` frames of a video from `start` as rgb24 bytes (no frame dropping or duplication)."""
+    w, h = _video_size(path)
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{start:.3f}", "-i", path, "-frames:v", str(count),
+                          "-vsync", "0", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    size = w * h * 3
+    return [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)], w, h
+
+
+def _px(frame, w, x, y):
+    i = (int(y) * w + int(x)) * 3
+    return frame[i], frame[i + 1], frame[i + 2]
+
+
+def dots_distance(frame, w, h, geom, ox=0.0, oy=0.0, scale=None):
+    """Largest colour distance of the three title-bar dots from their expected colours when the player box
+    has its top-left corner at (ox, oy) in the frame; 999 if a dot would fall outside the frame."""
+    s = scale or (w / geom["w"])
+    worst = 0
+    for name, rgb in _DOT_RGB.items():
+        d = geom["dots"].get(name)
+        if not d:
+            return 999
+        cx, cy = ox + d[0] * s, oy + d[1] * s
+        if cx < 2 or cy < 2 or cx >= w - 2 or cy >= h - 2:
+            return 999
+        pts = [_px(frame, w, cx + i, cy + j) for i in (-1, 0, 1) for j in (-1, 0, 1)]
+        avg = [sum(p[c] for p in pts) / 9 for c in range(3)]
+        worst = max(worst, max(abs(avg[c] - rgb[c]) for c in range(3)))
+    return worst
+
+
+def _counter_patch(frame, w, h, geom, ox=0.0, oy=0.0, scale=None):
+    """Luminance patch (rows of floats, _ONE_H x _ONE_W) around the counter's first character, normalised
+    to 0..1 by its own min and max; None when the counter has no readable spot in the frame."""
+    c = geom.get("counter")
+    if not c:
+        return None
+    s = scale or (w / geom["w"])
+    fx, fy, fw, fh = c["first"]
+    x0 = int(round(ox + (fx + fw / 2) * s - _ONE_W / 2))
+    y0 = int(round(oy + (fy + fh / 2) * s - _ONE_H / 2))
+    if x0 < 0 or y0 < 0 or x0 + _ONE_W > w or y0 + _ONE_H > h:
+        return None
+    rows = [[sum(_px(frame, w, x0 + i, y0 + j)) / 3 for i in range(_ONE_W)] for j in range(_ONE_H)]
+    lo = min(min(r) for r in rows)
+    hi = max(max(r) for r in rows)
+    if hi - lo < 25:  # nothing drawn there (yet)
+        return None
+    return [[(v - lo) / (hi - lo) for v in r] for r in rows]
+
+
+def _corr(a, b):
+    xs = [v for r in a for v in r]
+    ys = [v for r in b for v in r]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+    sxx = sum((x - mx) ** 2 for x in xs)
+    syy = sum((y - my) ** 2 for y in ys)
+    return sxy / ((sxx * syy) ** 0.5 or 1)
+
+
+def counter_is_one(patch):
+    """Does the patch show the digit "1"? Best correlation with the template of a "1" over small shifts
+    (where the glyph sits inside the counter's box differs a few px between layouts)."""
+    if patch is None or _ONE is None:
+        return None
+    best = -1
+    for dy in range(-4, 5):
+        for dx in (-2, -1, 0, 1, 2):
+            shifted = [[patch[min(max(j + dy, 0), _ONE_H - 1)][min(max(i + dx, 0), _ONE_W - 1)]
+                        for i in range(_ONE_W)] for j in range(_ONE_H)]
+            best = max(best, _corr(shifted, _ONE))
+    return best
+
+
+def start_check(path, geom, ox=0.0, oy=0.0, scale=None, frames=None):
+    """START CHECK of a finished video (or of `frames`, a (frames, w, h) tuple, for tests). Returns
+    (ok, problems). The first frame must show the player's own dots at their exact spot and a step
+    counter that reads "1"; the first 3 frames must keep showing the player (no page text coming
+    back), and the counter must still read "1" in them."""
+    fr, w, h = frames or _read_frames(path, 8)
+    problems = []
+    if len(fr) < 3:
+        return False, ["video has fewer than 3 frames"]
+    d0 = dots_distance(fr[0], w, h, geom, ox, oy, scale)
+    if d0 > DOT_TOL:
+        problems.append(f"first frame is not the player: its title-bar dots are missing at the expected spot (off by {d0:.0f})")
+    for i in (1, 2):
+        di = dots_distance(fr[i], w, h, geom, ox, oy, scale)
+        if di > DOT_TOL:
+            problems.append(f"frame {i} lost the player's dots (off by {di:.0f})")
+    for i in range(3):
+        p = _counter_patch(fr[i], w, h, geom, ox, oy, scale)
+        c = counter_is_one(p)
+        if p is None and i == 0 and d0 <= DOT_TOL:
+            problems.append("first frame: no step counter drawn (placeholder or blank player)")
+        elif c is not None and c < 0.7:
+            problems.append(f"frame {i}: step counter does not read 1 (match {c:.2f}): the player is past step 1")
+    return not problems, problems
+
+
+def end_check(path, geom):
+    """Bottom control bar present: the last frame has the step counter drawn where the DOM had it (counted
+    from the bottom of the crop, since the player can grow while it plays). `geom["counter_bottom"]`
+    is that distance, taken in the DOM at the end of the playback."""
+    c, cb = geom.get("counter"), geom.get("counter_bottom")
+    if not c or cb is None:
+        return False, ["no counter geometry to check the control bar with"]
+    w, h = _video_size(path)
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                               capture_output=True, text=True, check=True).stdout)
+    fr, _, _ = _read_frames(path, 20, start=max(0.0, dur - 0.5))
+    s = w / geom["w"]
+    l, t, r, b = c["rect"]
+    x0, x1 = int(l * s), int(r * s)
+    y1 = int(h - cb * s)
+    y0 = int(y1 - (b - t) * s)
+    if x0 < 0 or y0 < 0 or x1 > w or y1 > h or not fr:
+        return False, ["control bar region is outside the video (crop cut off the bottom of the player)"]
+    vals = [sum(_px(fr[-1], w, x, y)) / 3 for y in range(y0, y1) for x in range(x0, x1)]
+    if max(vals) - min(vals) < 25:
+        return False, ["last frame: the step counter is not visible (bottom control bar cut off?)"]
+    return True, []
+
+
+def _player_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
+    """Time (s) of the first frame in [lo, lo+span] of the raw recording where the player is on screen:
+    cropped to the player box (x, y, w, h) and scaled like the final video, its three title-bar dots are in
+    their colours at the exact spot the DOM gave and its step counter reads 1. Raises if there is none (the
+    caller retries the recording; no guessing from the script clock)."""
+    vf = f"fps={fps},crop={w}:{h}:{x}:{y},scale=1600:-2:flags=lanczos"
     raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{lo:.2f}", "-t", str(span), "-i", webm,
-                          "-vf", f"fps={fps},crop={cw}:{ch}:{x}:{y}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
-                         capture_output=True).stdout
-    size = cw * ch * 3
+                          "-vf", vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    vw = 1600
+    vh = int(round(h * 1600 / w / 2)) * 2
+    size = vw * vh * 3
     for i in range(len(raw) // size):
-        f = raw[i * size:(i + 1) * size]
-        red = green = 0
-        for j in range(0, size, 3):
-            r, g, b = f[j], f[j + 1], f[j + 2]
-            if r > 200 and g < 120 and b < 110:
-                red += 1
-            elif g > 160 and r < 100 and b < 120:
-                green += 1
-        if red >= 10 and green >= 10:
+        fr = raw[i * size:(i + 1) * size]
+        if dots_distance(fr, vw, vh, geom) > DOT_TOL:
+            continue
+        c = counter_is_one(_counter_patch(fr, vw, vh, geom))
+        if c is not None and c >= 0.7:  # the placeholder ("Preparing the animation") has the dots but no counter
             return lo + i / fps
-    return None
+    raise RuntimeError("the player's title-bar dots and a step counter reading 1 never showed at their expected spot in the recording")
 
 
 def record_animation(browser, url, k, m, label, dest, box_css):
@@ -1177,6 +1366,17 @@ def record_animation(browser, url, k, m, label, dest, box_css):
         page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
                       block.evaluate("b => b.getBoundingClientRect().top") - 10)  # instant: the site may smooth-scroll
         block.locator("button").first.wait_for(state="attached", timeout=15000)
+        # When does the step counter first show? A player that is mounted at once shows it within a moment;
+        # one that shows "Preparing the animation" first shows it later, and step 1 starts only then.
+        counter_t = None
+        while time.monotonic() - jump_mark < 25:
+            if _STEP.findall(block.inner_text()):
+                counter_t = time.monotonic()
+                break
+            page.wait_for_timeout(50)
+        if counter_t is None:
+            raise RuntimeError("the step counter never appeared")
+        preparing = counter_t - jump_mark > 0.4
         if m > 0:
             play = block.locator('button[aria-label="Play"]')
             if play.count():
@@ -1185,15 +1385,22 @@ def record_animation(browser, url, k, m, label, dest, box_css):
             page.wait_for_timeout(700)
             block.locator('button[aria-label="Restart"]').first.click()
             mark = time.monotonic()
-        page.wait_for_timeout(300)
-        box = block.evaluate(_PLAYER_BOX)
-        box = {"x": box["x"] - page.evaluate("scrollX"), "y": box["y"] - page.evaluate("scrollY"),
-               "w": box["w"], "h": box["h"]}  # _PLAYER_BOX adds the scroll offset; the crop wants screen position
+        elif preparing:
+            mark = counter_t
         first_seen = last_seen = None
+        geom = last_geom = None  # the player's own geometry (DOM, screen pixels), first taken at step 1..9
+        h_max = 0
         began = mark
         while time.monotonic() - began < 170:
             steps = _STEP.findall(block.inner_text())
             now = time.monotonic()
+            g = block.evaluate(_GEOM_JS)
+            if g:
+                h_max = max(h_max, g["h"])
+                last_geom = g
+                if (geom is None and len(g["dots"]) == 3 and g["counter"] and steps
+                        and int(steps[-1][0]) < 10 and now - mark > 0.3):
+                    geom = g
             if steps:
                 first_seen = first_seen or now
                 if int(steps[-1][0]) >= int(steps[-1][1]):
@@ -1205,35 +1412,37 @@ def record_animation(browser, url, k, m, label, dest, box_css):
                 first_seen = began
                 break
             page.wait_for_timeout(100)
-        end = time.monotonic() - t0
-        if first_seen and first_seen - mark > 0.4:  # the player showed "Preparing the animation" first: step 1 starts when the counter appears
-            mark = first_seen - 0.1
         ctx.close()
+        if geom is None:
+            raise RuntimeError("never saw the player's title-bar dots and step counter in the DOM")
         vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
-        x, y, w, h = (int(round(box[c])) for c in "xywh")
+        x, y, w = (int(round(geom[c])) for c in "xyw")
+        h = int(round(max(h_max, geom["h"])))
         h -= h % 2
         if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
         # The video clock is offset from the script clock by a varying amount (up to seconds on heavy pages), so
-        # find the jump in the video itself: the first frame whose top-left corner shows the player's red and
-        # green window dots (the player's title bar) is the first frame of the player.
+        # find the start in the video itself: the first frame where the player is really on screen (its own
+        # title-bar dots at the exact spot the DOM gave, and a step counter that reads 1). There is no fallback
+        # to the script clock: no such frame means the recording is bad and is redone.
         mark_t = jump_mark - t0
-        lo = max(0.0, mark_t - 6)
-        jump = _first_player_frame(os.path.join(tmp, vids[0]), x, y, lo, 14)
-        if jump is None:
-            jump = mark_t
-        start = max(0.0, jump + (mark - jump_mark))  # a restarted player starts at the click, not at the jump
-        end += jump - mark_t  # same shift for the end, so the length stays the live playback time
+        jump = _player_start_frame(os.path.join(tmp, vids[0]), geom, x, y, w, h, max(0.0, mark_t - 6), 20)
+        start = jump + ((mark - jump_mark) if restart else 0)  # a restarted player starts at the click, not at the jump
+        live = (last_seen - mark) if first_seen and last_seen else None
+        end = start + live + 2 if live is not None else start + (time.monotonic() - mark)
         os.makedirs(os.path.dirname(dest), exist_ok=True)
-        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.2f}", "-to", f"{end:.2f}",
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.3f}", "-to", f"{end:.3f}",
                         "-i", os.path.join(tmp, vids[0]),
                         "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
                         "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
-    live = (last_seen - mark) if first_seen and last_seen else None
-    return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2)}
+    geom["h"] = h
+    if last_geom and last_geom["counter"]:
+        geom["counter_bottom"] = last_geom["h"] - last_geom["counter"]["rect"][3]
+    box = {"x": x, "y": y, "w": w, "h": h}
+    return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
 
 
-def record_animations(url, out_dir, slug, info):
+def record_animations(url, out_dir, slug, info, only=None):
     """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
     Returns {block number: [(mode label or None, file name)]}; ANIM_STATS holds per-file
@@ -1256,6 +1465,8 @@ def record_animations(url, out_dir, slug, info):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for k, entry in enumerate(info):
+            if only is not None and k not in only:
+                continue
             # Measure the player once in a throwaway window (no video, tall viewport): its size sets the
             # recording window, which must be taller than the player or the crop lands on the wrong region.
             ctx = browser.new_context(viewport={"width": 1150, "height": 1600}, color_scheme="light")
@@ -1294,24 +1505,33 @@ def record_animations(url, out_dir, slug, info):
                 name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
                                                       if label else "") + ".mp4"
                 dest = os.path.join(ANIM_DIR, name)
-                for attempt in range(4):
+                for attempt in range(3):
                     try:
                         st = record_animation(browser, url, k, m, label, dest, box_css)
                     except Exception as e:  # a navigation timeout: wait and retry this one
-                        print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}); retrying", file=sys.stderr)
+                        print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}); retrying", file=sys.stderr)
                         time.sleep(10)
                         continue
                     if "error" in st:
                         box_css["h"] = max(box_css["h"], st["need_h"])
                         continue
                     dur, fps = _media_stats(dest)
+                    vw, vh = _video_size(dest)
                     st.update(name=name, dur=dur, fps=fps)
-                    ok = fps >= 10 and (st["live"] is None or abs(dur - (st["live"] + 2)) <= 0.3)
-                    if ok:
+                    start_ok, start_problems = start_check(dest, st["geom"])
+                    end_ok, end_problems = end_check(dest, st["geom"])
+                    problems = start_problems + end_problems
+                    if fps < 10:
+                        problems.append(f"only {fps:.1f} distinct frames/s")
+                    if st["live"] is not None and abs(dur - (st["live"] + 2)) > 0.3:
+                        problems.append(f"duration {dur:.1f} s vs live {st['live']:.1f} s + 2 s")
+                    if vw != 1600 or vh % 2:
+                        problems.append(f"size {vw}x{vh}")
+                    st["problems"] = problems
+                    if not problems:
                         ANIM_STATS[name] = st
                         break
-                    print(f"  {name}: attempt {attempt + 1} failed checks (dur {dur:.1f}, live {st['live']}, fps {fps:.1f})",
-                          file=sys.stderr)
+                    print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
                 else:
                     raise RuntimeError(f"{name}: could not record a passing video")
                 saved.setdefault(k, []).append((label, name))

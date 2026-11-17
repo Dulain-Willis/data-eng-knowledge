@@ -47,7 +47,7 @@ The cost of a branch point is paid once per path that leaves it and reaches the 
 
 The scheduler takes the part of the graph an action needs and cuts it wherever rows must move between tasks, the stage boundary from the execution lessons. Everything between 2 cuts runs inside the same task, 1 partition per task. The animation plays a 6-row version of the `by_category` branch, with `products` read as 2 partitions and the count finished in 2 shuffle partitions.
 
-https://github.com/user-attachments/assets/5b308770-9b81-4046-905e-d4490338ff4b
+https://github.com/user-attachments/assets/67cbd490-885b-4ea1-be74-ba7ceaf9af27
 
 | Stage | Work inside it | Tasks | How it ends |
 | --- | --- | --- | --- |
@@ -361,7 +361,7 @@ Spark runs consecutive narrow transformations as 1 pass, which is called pipelin
 
 The animation plays a 3-step chain on 6 `order_items` rows split into 2 partitions: keep rows with `quantity >= 2`, compute `line_total`, keep 2 columns.
 
-https://github.com/user-attachments/assets/cce4d7bf-1b14-443a-900a-7664273e1aea
+https://github.com/user-attachments/assets/1b00d7bb-a442-4b36-9140-a6d70a053808
 
 The board shows 1 stage of 2 tasks and no shuffle. Each task carries its rows through all 3 steps, and the driver collects 4 rows: order 1 with 36, order 2 with 50, order 3 with 60 and order 5 with 80. The 2 rows with quantity 1 stop at the filter and never reach the multiplication.
 

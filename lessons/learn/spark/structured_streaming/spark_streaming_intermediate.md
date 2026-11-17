@@ -449,7 +449,7 @@ Where the state shows up in leaderboard.explain()
 
 The animation plays 1 micro-batch of the same shape as Spark runs it, trimmed to a count per driver: 9 trips in 2 input partitions, a filter that drops the 2 cancelled trips inside the tasks that read them, and a shuffle that sends each driver's rows to 1 of 3 reducer tasks. In the live stream, each of those reducers also owns the state for the drivers that hash to it, which is why a driver must land on the same partition in every batch.
 
-https://github.com/user-attachments/assets/f4a849d7-bafd-4889-b58d-eed07db61886
+https://github.com/user-attachments/assets/415116fa-2f98-4747-99bb-cfaa0a991b57
 
 That is 1 shuffle and 2 stages per batch, the plan a batch job would get. The streaming version adds a state read before the merge and a state write after it, in every reducer task, on every batch.
 

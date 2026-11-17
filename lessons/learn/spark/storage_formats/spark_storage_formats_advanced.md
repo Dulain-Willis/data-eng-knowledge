@@ -165,7 +165,7 @@ Nothing stops 2 writers from finishing their data files at the same moment and b
 
 A reader rebuilds the table's state by keeping, for each file path, its newest action across all commits: a path whose newest action is `add` is live, and one whose newest action is `remove` is gone. The Delta protocol calls this action reconciliation. The animation replays the 4 commits of the running example: a `groupBy` on `path` finds each file's newest version, and a join brings back the action recorded there.
 
-https://github.com/user-attachments/assets/dabda45a-adcc-49b3-aadb-a42f8bac12eb
+https://github.com/user-attachments/assets/61db922c-cc67-4d7f-a079-5e0876584d15
 
 The `groupBy` is the only shuffle, since every action for a path has to reach 1 task before its newest version is known. The join wraps `log_actions` in `F.broadcast`, a few rows here, so it adds no shuffle. On a table with millions of files that shuffle is real work, which is why the log gets checkpointed.
 
@@ -499,7 +499,7 @@ The tree also allows partition evolution. Iceberg partitions by transforms of a 
 
 Formats also split on how a row update is written. Copy-on-write rewrites every file holding an updated row: writes pay, and reads stay plain Parquet scans. Merge-on-read writes only the change, as delete markers or small log files beside the base files, and every read merges them in until a compaction folds them back. Either way, finding the files to touch is a job of its own. Delta's MERGE starts with an inner join of the updates against the table that collects the names of the files holding a match:
 
-https://github.com/user-attachments/assets/32be0f8c-f1ff-4652-a008-65bb46ab078c
+https://github.com/user-attachments/assets/73f700c8-39c2-42e7-82a4-ee6812deb988
 
 The join broadcasts `updates`, so the only shuffle is the `distinct` on `file`. The 4 changed rows hit 3 of the 4 files, and copy-on-write rewrites all 9 rows in them. Scaled up, 1,000 updated keys scattered over 200 files of 128MB each is 25.6GB rewritten for a few kilobytes of change, on every run.
 

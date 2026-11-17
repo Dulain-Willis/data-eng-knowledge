@@ -364,7 +364,7 @@ products.withColumn("price_tier", tier).groupBy("price_tier").agg(
 
 The animation plays the same chain over 8 products in 2 partitions. The tier is computed inside each map task, on rows already there, before the shuffle write for the `groupBy`. The aggregation's shuffle is the only data that moves; with the UDF, every row would also have gone to a Python worker and back inside each map task.
 
-https://github.com/user-attachments/assets/83232f5e-efdc-4e49-9f48-414245229193
+https://github.com/user-attachments/assets/186381c7-8620-4fc9-9ab9-a452a53cecb2
 
 <br>
 

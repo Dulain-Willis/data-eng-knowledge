@@ -328,7 +328,7 @@ Suppose the sample for 3 partitions yields cut points of 50 and 100. Rows then r
 
 The animation sorts 9 orders by `amount` into 3 reduce partitions, with cut points drawn from its own sample. Watch which amounts reach each reducer: low ones at the first, high ones at the last, and each reducer sorts only its own share. Collected in partition order, the result runs 15, 30, 45, 60, 70, 80, 95, 120, 140.
 
-https://github.com/user-attachments/assets/9bf3aad7-88d0-46b4-827f-020a98750e26
+https://github.com/user-attachments/assets/252c696e-f701-4fe7-83b6-4c81dfbd1762
 
 <br>
 

@@ -508,7 +508,7 @@ Shuffle Read means it fetched another stage's output, and Shuffle Write means it
 
 This animation joins 8 views to 4 profiles with broadcasting turned off. The scan tasks read 12 rows from the 2 tables, the stages' Input. They write all 12 into shuffle partitions, the Shuffle Write, and the join tasks fetch the same 12 back, the Shuffle Read. The 8 joined rows go to the driver through `collect()`, so Output stays empty. Delete the first line and Spark would broadcast `profiles`, and the run would have no shuffle at all.
 
-https://github.com/user-attachments/assets/ac9af68e-d1ec-45ad-8035-483924488e9b
+https://github.com/user-attachments/assets/6be47f41-f1a5-414e-b69d-c75263dd02e9
 
 **A job joins a 9.6 GiB orders table to a 4 MiB regions table with default settings and ends with collect(). What does the stage that runs the join show?**
 
