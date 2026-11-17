@@ -59,7 +59,7 @@ The files go under `spark.local.dir`, which is `/tmp` unless set, on the machine
 
 The animation shrinks the job to 9 orders read as 2 partitions and counted per region into 2 reduce partitions. Watch the end of the first stage: each map task arranges its output by target partition and writes it before any reduce task starts. The final counts are US 3, EU 3, APAC 2 and LATAM 1.
 
-https://github.com/user-attachments/assets/7f396811-17d2-4c32-91b0-9531a374f8f2
+https://github.com/user-attachments/assets/053a3dca-5d0e-49b8-ad38-587e4ed595e3
 
 <br>
 
@@ -158,7 +158,7 @@ The plan sets the reduce task count to `spark.sql.shuffle.partitions`, whatever 
 
 The animation sets the reduce count to 6 and sums 6 orders spread over 3 regions. Before you play it, predict how many of the 6 reduce tasks receive any rows. The totals it returns are US 260, EU 110 and APAC 60.
 
-https://github.com/user-attachments/assets/99c66148-a706-49d8-aea7-f222d063ea0e
+https://github.com/user-attachments/assets/e2c010b3-b397-4f32-98d4-745c24717c12
 
 **events is read as 120 partitions, and its country column holds 8 distinct values. If spark.sql.shuffle.partitions is 50, how many shuffle blocks belong to each reduce task of events.groupBy("country").count(), and how many reduce tasks can produce rows?**
 
@@ -328,7 +328,7 @@ Suppose the sample for 3 partitions yields cut points of 50 and 100. Rows then r
 
 The animation sorts 9 orders by `amount` into 3 reduce partitions, with cut points drawn from its own sample. Watch which amounts reach each reducer: low ones at the first, high ones at the last, and each reducer sorts only its own share. Collected in partition order, the result runs 15, 30, 45, 60, 70, 80, 95, 120, 140.
 
-https://github.com/user-attachments/assets/d96b5152-e808-4da6-a3f2-faeae75b1433
+https://github.com/user-attachments/assets/1ea8304f-0259-4f65-b4fb-3f35923d917c
 
 <br>
 
@@ -393,7 +393,7 @@ A `groupBy("region")` needs every row of a region in 1 partition. After `reparti
 
 The animation repartitions 9 orders by region into 3 partitions, then counts orders per region. Count the shuffles as it plays: there is 1, and each count is computed in the task where its region's rows landed.
 
-https://github.com/user-attachments/assets/6a745cc4-9349-40c0-9981-e6ad46e1991b
+https://github.com/user-attachments/assets/e4de6790-ff6f-4f84-a102-60c6e2482e5e
 
 <br>
 

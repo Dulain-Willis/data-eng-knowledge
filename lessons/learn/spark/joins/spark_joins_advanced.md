@@ -45,7 +45,7 @@ Each task in stage 3 holds 2 sorted iterators and treats them differently. The l
 
 Neither cursor moves backward, so the merge reads each input row once. The output size is a separate number: a key with 2 left rows and 3 right rows emits 6, which is the duplicate-key blowup produced inside this loop. The animation runs the plan on 4 clicks and 5 purchases with 2 shuffle partitions. Follow `u1`: its 2 clicks and 3 purchases meet on one reduce task.
 
-https://github.com/user-attachments/assets/b38efd64-6c51-413e-94d4-4293dc2b302a
+https://github.com/user-attachments/assets/408dbf26-76b0-47d3-bdee-de4812f5c1d0
 
 | user_id | clicks rows | purchases rows | joined rows |
 | --- | --- | --- | --- |
@@ -129,7 +129,7 @@ A hash or sort-merge join works because equal keys can be routed to one task. Ro
 
 The animation broadcasts 3 surge windows and runs 4 trips through them in 2 tasks, with start times in minutes. No shuffle happens. Each task tests each of its trips against all 3 windows: 12 comparisons to produce 4 rows.
 
-https://github.com/user-attachments/assets/682f707e-c1ab-4152-955d-01143e6d0899
+https://github.com/user-attachments/assets/99c00737-c626-4e8e-a2e7-e4ed1b725283
 
 <br>
 

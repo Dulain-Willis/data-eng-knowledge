@@ -168,7 +168,7 @@ The optimizer fired 4 rules. EliminateSubqueryAliases removed the SubqueryAlias 
 
 The run below plays that program on 12 orders spread over 3 regions, ending in `collect()`. Watch each map task drop its East and North rows before computing a partial sum, so the shuffle carries only West sums.
 
-https://github.com/user-attachments/assets/76f95650-0aa0-457d-b503-f48e08fce0d8
+https://github.com/user-attachments/assets/92aad802-a796-4b72-8939-c4208a2b1b0a
 
 <br>
 
@@ -261,7 +261,7 @@ The logical plan never contained a shuffle. Exchange, the physical operator that
 
 The 200 is spark.sql.shuffle.partitions, the default number of shuffle partitions, and the run below uses 3 so every task fits on screen. Before you play it, predict the Exchanges: the final aggregate needs each region clustered, and the global sort needs ranges of totals. The range shuffle also needs boundaries, so Spark samples the totals in a short job of its own, which your action triggers before the job that returns your rows.
 
-https://github.com/user-attachments/assets/d172d2a4-6826-4ab0-850e-327f7862cfdd
+https://github.com/user-attachments/assets/400c34d8-1996-4205-86ee-13de4fcde698
 
 <br>
 

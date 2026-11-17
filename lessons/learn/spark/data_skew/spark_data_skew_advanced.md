@@ -208,7 +208,7 @@ placed = sales.withColumn("slot", F.col("store_id") % 4)
 
 A two-phase aggregation computes each key's result in 2 rounds: a partial pass produces a small result per piece of the key, and a final pass per key combines the pieces. Before writing one by hand, check whether Spark already runs it. The animation below groups 7 orders by customer_id and sums amount. Five of the orders belong to c7, and the table is read as 2 partitions. Watch what each map task writes before the shuffle.
 
-https://github.com/user-attachments/assets/158a3eda-7f50-4cb0-a346-f39190d9d1ec
+https://github.com/user-attachments/assets/1c3ef37b-55d6-419b-a904-96fc54c041f2
 
 Each map task sums its own c7 rows before writing, so the reducer that owns c7 receives at most 2 rows for it, 1 per input partition, and adds them to 195. The physical plan shows the same split: a HashAggregate with partial_sum(amount) below the Exchange, and a final HashAggregate with sum(amount) above it. Scale it up: 40M rows of a hot key read by 2,000 map tasks reach their reducer as 2,000 partial sums. That task was never slow, so a hand-salted version of this query adds a second shuffle and a second aggregation and buys nothing. The same holds for count, min, max and avg, which carries a sum and a count through the shuffle.
 
@@ -420,7 +420,7 @@ salt_plan.show()
 
 Adaptive query execution (AQE) waits for a shuffle's map side to finish, reads the real size of every reduce partition it wrote, and re-plans the rest of the query with those sizes. It has been on by default since Spark 3.2, through spark.sql.adaptive.enabled. One of its rules, switched by spark.sql.adaptive.skewJoin.enabled (also on by default), targets the hot reduce task of a sort-merge join. The animation shows that task: the 7 orders from Two-Phase Aggregation join 3 customers on customer_id with broadcasting turned off, so both sides shuffle and every c7 row from both tables meets in 1 reduce task.
 
-https://github.com/user-attachments/assets/6571c3db-5e55-4ccf-b482-8ec8facf9bbb
+https://github.com/user-attachments/assets/0aeed120-37a2-43d3-bcb7-9579b869c772
 
 <br>
 

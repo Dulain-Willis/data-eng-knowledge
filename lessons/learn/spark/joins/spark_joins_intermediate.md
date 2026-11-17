@@ -137,7 +137,7 @@ The filter rule keeps the child's size, 60MB is over 10MB, and nothing else asks
 
 When you know the side is small and the planner does not, wrap it in `F.broadcast()`. The hint is a promise, and Spark takes it over its own estimate, up to the hard caps in the next section. Apply the filter first and broadcast the filtered DataFrame. On an inner join the optimizer would push a later filter on `products` columns below the broadcast anyway, so this order does not change the plan; it makes the code show which rows travel to every executor.
 
-https://github.com/user-attachments/assets/d983a48f-bbed-4e4e-8891-c802db78024a
+https://github.com/user-attachments/assets/a4f4cb00-92a0-4e18-aabf-c256f32b4b35
 
 The animation sets the threshold to -1 first. That value turns automatic broadcasting off entirely, which is how you make a plan take the sort-merge path in a test; with it off, only the hint can produce a broadcast. `products` has 4 rows and the filter drops the 1 inactive row, Fax machine, before the 3 survivors are copied to each of the 2 tasks reading `orders`. The 6 order rows stay in their 2 input partitions through the whole join; no row of `orders` moves.
 
@@ -349,7 +349,7 @@ Order a chain by these, top first
 
 Rule 4 comes from the shuffle lessons. `orders.join(order_items, "order_id").join(shipments, "order_id")` shuffles `orders` and `order_items` on `order_id` for the first join, and the result is already partitioned on `order_id`, so the second join shuffles only `shipments`. Put a sort-merge join on `product_id` between them and the `order_id` partitioning is gone; the third join shuffles the whole intermediate result again. A broadcast join on `product_id` in the same place keeps it, because the fact side never moves, so the third join still shuffles only `shipments`. The same reuse applies to a `groupBy` on the join key straight after the join.
 
-https://github.com/user-attachments/assets/7e1168b8-e0bf-4c57-a6e6-69bdaf79fcde
+https://github.com/user-attachments/assets/66e75fcf-40d6-4038-b2d6-df817a29a491
 
 The animation chains 2 broadcast joins. `orders`, 6 rows in 2 partitions, picks up `segment` from `customers` and then `category` from `products`; both dimensions have 3 rows and both arrive at every task whole. Watch the `orders` partitions: through 2 joins they never leave the task that read them, which is the shape to aim for in a dimension-heavy chain, every dimension broadcast and the fact table staying put or shrinking.
 

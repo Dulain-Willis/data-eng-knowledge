@@ -1047,17 +1047,14 @@ def screenshot_schema_diagrams(url, out_dir, slug, challenges):
 
 # Animations (sql_animation, kafka_animation, pipeline_animation ...): a player that plays by
 # itself once scrolled into view, with a step counter ("3/9") and sometimes mode toggles.
-# Each mode is recorded as a screen video of the player alone, cropped, and made into a GIF.
-# The recording is an MP4 (a GIF of these players was 5 to 10 MB), kept outside the repo in ANIM_DIR and
+# Each mode is recorded with Playwright's video recorder (real speed; see record_animation) as an MP4 of the
+# player alone (a GIF of these players was 5 to 10 MB), kept outside the repo in ANIM_DIR and
 # uploaded as a GitHub user-attachments asset; GitHub shows a bare asset URL on its own line as a video
 # player. tools/animation_urls.json maps each recording's name to its URL so a re-run reuses it.
 ANIM_DIR = os.environ.get("ANIM_DIR") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".animations")
 URLS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animation_urls.json")
 REPO = "Dulain-Willis/data-eng-knowledge"
-MP4_FILTER = "fps=15,scale=1600:-2:flags=lanczos,format=yuv420p"
-# A wide player (diagrams up to ~1100 px) is cut off at the sides in a 1000 px window, and a tall one
-# (770 px+) at the bottom in a 900 px one, so record in a big window and capture beyond the viewport.
-ANIM_VIEWPORT = {"width": 1400, "height": 1200}
+ANIM_STATS = {}
 _HIDE_PINNED = """() => { for (const e of document.querySelectorAll('body *')) {
     const p = getComputedStyle(e).position;
     if ((p === 'fixed' || p === 'sticky') && e.getBoundingClientRect().height < 140) e.style.visibility = 'hidden'; } }"""
@@ -1069,18 +1066,25 @@ _PLAYER_BOX = """(block) => { const bs = [...block.querySelectorAll('button')]; 
 
 def upload_animation(name):
     """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
-    in tools/animation_urls.json and return it. Needs `gh auth login`; the token only goes to github.com."""
+    in tools/animation_urls.json and return it. Needs `gh auth login`. The token goes to curl through a
+    mode-600 config file (never on the command line, where `ps` could show it) that is deleted afterwards."""
     urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
     if name not in urls:
         tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
         rid = subprocess.run(["gh", "api", f"repos/{REPO}", "--jq", ".id"], capture_output=True, text=True,
                              check=True).stdout.strip()
-        res = subprocess.run(["curl", "-s", "-X", "POST", "-H", f"Authorization: Bearer {tok}",
-                              "-H", "Accept: application/json", "-H", "Content-Type: video/mp4",
-                              "--data-binary", "@" + os.path.join(ANIM_DIR, name),
-                              f"https://uploads.github.com/user-attachments/assets?name={name}"
-                              f"&content_type=video/mp4&repository_id={rid}"],
-                             capture_output=True, text=True, check=True).stdout
+        fd, cfg = tempfile.mkstemp(suffix=".curlrc")  # mkstemp creates the file with mode 600
+        try:
+            with os.fdopen(fd, "w") as fh:
+                fh.write(f'header = "Authorization: Bearer {tok}"\n')
+            res = subprocess.run(["curl", "-s", "-K", cfg, "-X", "POST",
+                                  "-H", "Accept: application/json", "-H", "Content-Type: video/mp4",
+                                  "--data-binary", "@" + os.path.join(ANIM_DIR, name),
+                                  f"https://uploads.github.com/user-attachments/assets?name={name}"
+                                  f"&content_type=video/mp4&repository_id={rid}"],
+                                 capture_output=True, text=True, check=True).stdout
+        finally:
+            os.remove(cfg)
         urls[name] = json.loads(res)["url"]
         with open(URLS_FILE, "w") as fh:
             json.dump(dict(sorted(urls.items())), fh, indent=1)
@@ -1088,13 +1092,107 @@ def upload_animation(name):
     return urls[name]
 
 
+def _media_stats(path):
+    """(duration in seconds, distinct frames per second) of a video; distinct = frames mpdecimate keeps."""
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                               capture_output=True, text=True, check=True).stdout)
+    out = subprocess.run(["ffmpeg", "-i", path, "-vf", "mpdecimate,showinfo", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    return dur, out.count("pts_time") / dur
+
+
+def _wait_idle(block, page, began, cap=150):
+    """Finish detector for a player with no step counter: its markup has not changed for 4 seconds
+    (the cap is generous). Returns the time of the last change, plus nothing else to trim."""
+    last, changed = None, time.monotonic()
+    while time.monotonic() - began < cap:
+        sig = block.evaluate("b => b.innerHTML.length + ':' + b.querySelectorAll('*').length + ':' + "
+                             "[...b.querySelectorAll('[style]')].map(e => e.getAttribute('style')).join('|').length")
+        sig = hash(sig + block.inner_text())
+        if sig != last:
+            last, changed = sig, time.monotonic()
+        elif time.monotonic() - changed >= 4:
+            break
+        page.wait_for_timeout(250)
+    return changed + 1.5
+
+
+def record_animation(browser, url, k, m, label, dest, box_css):
+    """Record animation block k in mode m (label) to the MP4 `dest`; returns its stats, or None if the
+    player's controls never mounted.
+
+    Playwright's own video recorder captures the page at real speed (screenshots in a loop stall the page
+    and gave slow, choppy video). The window is the player's height plus 40 px, so the player is never cut
+    off; the video is 2x pixels (viewport and record size doubled, page zoom 2, so layout stays 1150 px
+    wide but small text is drawn sharp). The crop is the player box; the trim runs from the moment
+    the player is in view until the counter reaches its last step plus 2 seconds.
+    """
+    W = max(1150, int(box_css["w"]) + 48)
+    H = int(-(-box_css["h"] // 1)) + 40
+    with tempfile.TemporaryDirectory() as tmp:
+        ctx = browser.new_context(viewport={"width": W * 2, "height": H * 2}, color_scheme="light",
+                                  record_video_dir=tmp, record_video_size={"width": W * 2, "height": H * 2})
+        page = ctx.new_page()
+        t0 = time.monotonic()
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
+        page.evaluate("document.documentElement.style.zoom = 2")
+        page.wait_for_timeout(1000)
+        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        block.scroll_into_view_if_needed()
+        block.locator("button").first.wait_for(state="attached", timeout=15000)
+        page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
+        page.wait_for_timeout(300)
+        page.evaluate("y => window.scrollBy(0, y)", block.evaluate(_PLAYER_BOX)["y"] - 10 - page.evaluate("scrollY"))
+        page.wait_for_timeout(500)
+        if m > 0:
+            block.locator("button[role=radio]").nth(m).click()
+            page.wait_for_timeout(300)
+            play = block.locator('button[aria-label="Play"]')
+            if play.count():  # a switched mode starts paused (Airflow animations)
+                play.first.click()
+        box = block.evaluate(_PLAYER_BOX)
+        box = {"x": box["x"] - page.evaluate("scrollX"), "y": box["y"] - page.evaluate("scrollY"),
+               "w": box["w"], "h": box["h"]}  # _PLAYER_BOX adds the scroll offset; the crop wants screen position
+        start = time.monotonic() - t0
+        first_seen = last_seen = None
+        began = time.monotonic()
+        while time.monotonic() - began < 170:
+            steps = _STEP.findall(block.inner_text())
+            now = time.monotonic()
+            if steps:
+                first_seen = first_seen or now
+                if int(steps[-1][0]) >= int(steps[-1][1]):
+                    last_seen = last_seen or now
+                    if now - last_seen >= 2:
+                        break
+            elif first_seen is None and now - began > 8:  # no counter at all: wait for the markup to settle
+                last_seen = _wait_idle(block, page, began)
+                first_seen = began
+                break
+            page.wait_for_timeout(250)
+        end = time.monotonic() - t0
+        ctx.close()
+        vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
+        x, y, w, h = (int(round(box[c])) for c in "xywh")
+        h -= h % 2
+        if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
+            return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.2f}", "-to", f"{end:.2f}",
+                        "-i", os.path.join(tmp, vids[0]),
+                        "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
+                        "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
+    live = (last_seen - first_seen) if first_seen and last_seen else None
+    return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2)}
+
+
 def record_animations(url, out_dir, slug, info):
     """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
-    Returns {block number: [(mode label or None, file name)]}. The capture runs from the
-    moment the mode starts until the step counter reaches its last step (two seconds' grace),
-    so it needs no fixed length. The crop is the smallest box holding all the player's buttons,
-    which leaves out the caption paragraph that sits below it (that goes into the Markdown).
+    Returns {block number: [(mode label or None, file name)]}; ANIM_STATS holds per-file
+    numbers. Each recording is checked (duration against the live playback time, at least 10 distinct
+    frames per second) and redone up to 3 times if it fails, one at a time.
     """
     if not info:
         return {}
@@ -1112,89 +1210,65 @@ def record_animations(url, out_dir, slug, info):
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for k, entry in enumerate(info):
+            # Measure the player once in a throwaway window (no video, tall viewport): its size sets the
+            # recording window, which must be taller than the player or the crop lands on the wrong region.
+            ctx = browser.new_context(viewport={"width": 1150, "height": 1600}, color_scheme="light")
+            page = ctx.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_timeout(3000)
+            block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+            block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
+            try:  # Spark animations mount their controls only once in view
+                block.locator("button").first.wait_for(state="attached", timeout=10000)
+            except Exception:
+                pass
+            box = block.evaluate(_PLAYER_BOX)
+            if not box:
+                # Seen once per lesson (see the four still-image cases): the site never mounts the
+                # player and leaves the code and seed table on screen. Keep that as a still image.
+                page.wait_for_timeout(5000)
+                box = block.evaluate(_PLAYER_BOX)
+            if not box:
+                name = f"{slug}_animation_{k + 1}.png"
+                bb = block.bounding_box()
+                shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
+                    "format": "png", "captureBeyondViewport": True, "clip": {
+                        "x": bb["x"], "y": bb["y"] + page.evaluate("scrollY"),
+                        "width": bb["width"], "height": bb["height"], "scale": 2}})
+                with open(os.path.join(img_dir, name), "wb") as fh:
+                    fh.write(base64.b64decode(shot["data"]))
+                ctx.close()
+                print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
+                saved.setdefault(k, []).append((None, name))
+                continue
+            # the player can grow while it plays (captions, tables): take the largest size seen so far
+            box_css = {"w": box["w"], "h": box["h"]}
+            ctx.close()
             for m, label in enumerate(entry["labels"] or [None]):
-                with tempfile.TemporaryDirectory() as tmp:
-                    ctx = browser.new_context(viewport=ANIM_VIEWPORT, color_scheme="light")
-                    page = ctx.new_page()
-                    page.goto(url, wait_until="domcontentloaded")
-                    page.wait_for_timeout(3000)
-                    block = page.locator('[data-note-block-type$="_animation"]').nth(k)
-                    block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
-                    try:  # Spark animations mount their controls only once in view
-                        block.locator("button").first.wait_for(state="attached", timeout=10000)
-                    except Exception:
-                        pass
-                    page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
-                    if m > 0:
-                        page.wait_for_timeout(300)
-                    box = block.evaluate(_PLAYER_BOX)
-                    if not box:
-                        # Seen once (spark_partitioning_file_layout_advanced, 3rd animation): the site never
-                        # mounts the player and leaves the code and seed table on screen. Keep that
-                        # as a still image rather than losing the block.
-                        page.wait_for_timeout(5000)
-                        box = block.evaluate(_PLAYER_BOX)
-                    if not box:
-                        name = f"{slug}_animation_{k + 1}.png"
-                        bb = block.bounding_box()
-                        shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
-                            "format": "png", "captureBeyondViewport": True, "clip": {
-                                "x": bb["x"], "y": bb["y"] + page.evaluate("scrollY"),
-                                "width": bb["width"], "height": bb["height"], "scale": 2}})
-                        with open(os.path.join(img_dir, name), "wb") as fh:
-                            fh.write(base64.b64decode(shot["data"]))
-                        ctx.close()
-                        print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
-                        saved.setdefault(k, []).append((None, name))
+                name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
+                                                      if label else "") + ".mp4"
+                dest = os.path.join(ANIM_DIR, name)
+                for attempt in range(4):
+                    try:
+                        st = record_animation(browser, url, k, m, label, dest, box_css)
+                    except Exception as e:  # a navigation timeout: wait and retry this one
+                        print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}); retrying", file=sys.stderr)
+                        time.sleep(10)
+                        continue
+                    if "error" in st:
+                        box_css["h"] = max(box_css["h"], st["need_h"])
+                        continue
+                    dur, fps = _media_stats(dest)
+                    st.update(name=name, dur=dur, fps=fps)
+                    ok = fps >= 10 and (st["live"] is None or abs(dur - (st["live"] + 2)) <= 0.2 * dur + 2)
+                    if ok:
+                        ANIM_STATS[name] = st
                         break
-                    # Each frame is a 2x screenshot of the player alone, taken as fast as the browser
-                    # allows (about 14 per second). Playwright's recorded video is compressed and
-                    # its frames are 1x, so the small labels in the diagrams (down to 6.5 px) turned
-                    # fuzzy; at 2x they stay readable after the GIF is scaled down.
-                    cdp = ctx.new_cdp_session(page)
-                    clip = {"x": box["x"], "y": box["y"], "width": box["w"], "height": box["h"], "scale": 2}
-                    if m > 0:
-                        block.locator("button[role=radio]").nth(m).click()
-                        page.wait_for_timeout(300)
-                        play = block.locator('button[aria-label="Play"]')
-                        if play.count():  # a switched mode starts paused (Airflow animations)
-                            play.first.click()
-                    stamps, done_since, last_hash = [], None, None
-                    began = still_since = time.monotonic()
-                    while time.monotonic() - began < 150:
-                        stamp = time.monotonic() - began
-                        shot = cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 92, "clip": clip,
-                                                                   "captureBeyondViewport": True})
-                        with open(os.path.join(tmp, f"f{len(stamps):05d}.jpg"), "wb") as fh:
-                            fh.write(base64.b64decode(shot["data"]))
-                        stamps.append(stamp)
-                        steps = _STEP.findall(block.inner_text())
-                        if steps and int(steps[-1][0]) >= int(steps[-1][1]):
-                            done_since = done_since or time.monotonic()
-                            if time.monotonic() - done_since >= 2:
-                                break
-                        elif not steps:  # no counter: stop once nothing has moved for 3 seconds
-                            if hash(shot["data"]) != last_hash:
-                                last_hash, still_since = hash(shot["data"]), time.monotonic()
-                            elif time.monotonic() - still_since >= 3:
-                                break
-                    ctx.close()
-                    if len(stamps) < 2:
-                        print(f"warning: animation {k + 1} produced no frames; not captured", file=sys.stderr)
-                        break
-                    with open(os.path.join(tmp, "list.txt"), "w") as fh:  # each frame lasts until the next
-                        for i, stamp in enumerate(stamps):
-                            span = stamps[i + 1] - stamp if i + 1 < len(stamps) else 1.0
-                            fh.write(f"file 'f{i:05d}.jpg'\nduration {max(span, 0.001):.4f}\n")
-                        fh.write(f"file 'f{len(stamps) - 1:05d}.jpg'\n")
-                    name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
-                                                          if label else "") + ".mp4"
-                    os.makedirs(ANIM_DIR, exist_ok=True)
-                    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
-                                    "-i", os.path.join(tmp, "list.txt"), "-vf", MP4_FILTER,
-                                    "-movflags", "+faststart", "-c:v", "libx264", "-crf", "23",
-                                    os.path.join(ANIM_DIR, name)], check=True)
-                    saved.setdefault(k, []).append((label, name))
+                    print(f"  {name}: attempt {attempt + 1} failed checks (dur {dur:.1f}, live {st['live']}, fps {fps:.1f})",
+                          file=sys.stderr)
+                else:
+                    raise RuntimeError(f"{name}: could not record a passing video")
+                saved.setdefault(k, []).append((label, name))
         browser.close()
     return saved
 
