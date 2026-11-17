@@ -124,7 +124,7 @@ Fixing the range before reading turns an endless stream into a bounded input. Fr
 
 Take the zone count at batch 7, whose range held 9 rows read as 2 input partitions. Play the job and find its shuffle. The `where` runs inside the tasks that read each partition, and the `groupBy` moves rows so that each zone lands on one of 3 reduce tasks, the same exchange a nightly job over a year of requests would run.
 
-https://github.com/user-attachments/assets/843f9850-9286-4965-b283-efd3a9bfb3da
+https://github.com/user-attachments/assets/6cb091f4-e643-49ff-9a05-1c899bf0b59f
 
 Of batch 7's 7 requests, 4 come from SoMa and 2 from Mission, with Marina's 1 making up the rest. The 2 cancelled rides are dropped in the read tasks before anything crosses the network. Spark then adds those 3 counts to the totals carried over from batches 0 to 6. The job's shape does not depend on the batch's size: with 9 rows or 9 million, it runs as 2 stages with a shuffle between them.
 

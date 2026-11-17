@@ -231,7 +231,7 @@ A Parquet file is written once and never edited, so in plain files an upsert is 
 
 The animation runs that merge on a snapshot of 3 listings and 5 change rows. One change arrived twice because the upstream feed redelivered it.
 
-https://github.com/user-attachments/assets/a37a971c-2510-47e5-8481-7707026ac508
+https://github.com/user-attachments/assets/e716f0d5-80d9-4bca-a0ec-ef921377f979
 
 `Window.partitionBy("listing_ref")` hash-shuffles the union by key, so every version of `L2` lands on 1 task whichever input it came from. That task sorts its rows by `change_seq` descending, and `row_number` keeps the first. The redelivered change gives 2 identical `L2` rows at `change_seq` 7; either can take number 1 and the surviving row is the same. Feeding the output back in with the same changes returns the output unchanged.
 

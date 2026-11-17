@@ -172,7 +172,7 @@ Legs 1 and 2 do the work here: the checkpointed offsets make the replayed batch 
 
 A table with no partition to overwrite gets an insert-if-absent instead: keep only incoming rows whose key the table does not already hold. The animation replays a batch of 6 postings against a ledger that already holds 2 of them. Broadcasting is off so the price shows: both sides shuffle by `txn_ref`, so matching keys meet on one task.
 
-https://github.com/user-attachments/assets/82b74c87-7626-43b3-9317-10b128cf17f3
+https://github.com/user-attachments/assets/f994e36a-7ffe-4ea6-878e-653127862c2a
 
 The 2 replayed postings meet their ledger twins on one reducer and drop out; the 4 new ones pass. In production the ledger is large, so every write pays a scan of the ledger's keys and a shuffle of both sides.
 
@@ -430,7 +430,7 @@ Any pipeline fed by client retries therefore needs dedup by a record key somewhe
 
 Dedup by key needs every copy of a key on one task, so it costs a shuffle. In the animation, the 2 input partitions each hold copies whose twins sit in the other partition. Each task first drops repeats within its own rows, then the shuffle routes each `event_uuid` to one reducer, where the remaining copies meet and collapse.
 
-https://github.com/user-attachments/assets/a4153f49-8f52-4c99-bdc9-e068971c11c6
+https://github.com/user-attachments/assets/4f1a0e91-ce3c-4294-9561-db6f5449f977
 
 The 10 deliveries became 6 events. Look at which `received_ts` survived for `e-01`: `dropDuplicates` keeps whichever copy its aggregation meets first, and that depends on task and partition order. When copies differ in any column, rank them explicitly so a replay keeps the same row. Duplicates are rare on a real table, so nearly every row survives the per-task step, and deduping 500GB of events is roughly a 500GB shuffle: pay it once in a materialized table rather than in every query.
 

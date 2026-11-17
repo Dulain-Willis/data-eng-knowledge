@@ -347,7 +347,7 @@ A broadcast join collects the whole small table on the driver before sending a c
 
 The animation below rolls 12 view rows up into minutes per title and collects the result. Count the rows at each step: the groupBy shuffles them by title across 3 tasks, and the driver receives 1 row per title, 4 in all.
 
-https://github.com/user-attachments/assets/0989e0b7-194d-46d7-93ac-05314af71520
+https://github.com/user-attachments/assets/99dfa344-f639-45ff-81d1-bb3aeb6bcd82
 
 Every reduction placed before `collect()` runs on the executors and shrinks what crosses to the driver. Put the same `collect()` ahead of the groupBy and all 12 rows arrive; at production scale that is the gap between a few kilobytes and many gigabytes.
 
