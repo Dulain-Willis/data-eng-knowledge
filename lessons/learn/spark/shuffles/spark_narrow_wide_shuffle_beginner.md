@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 13 challenges
-
 # Shuffles: Beginner
 
 Every December, Spotify Wrapped tells hundreds of millions of listeners their top artist. The raw material is a year of play events spread across a cluster of machines, and no single machine holds all of one listener's plays. Before any top artist can be named, every play for a listener has to travel to the same place. That trip is the shuffle, and this lesson prices it.

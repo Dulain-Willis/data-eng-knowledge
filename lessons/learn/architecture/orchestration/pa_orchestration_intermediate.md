@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 30 min · 11 challenges
-
 # Orchestration: Intermediate
 
 One of the most widely used workflow orchestrators began as an internal project at Airbnb. Say a revenue job there is set for 03:00 because the exchange-rate load usually finishes by 02:40. Tonight that load finishes at 03:25. The revenue job runs anyway, prices a day of bookings at stale rates, and reports success. What should have told it to wait?

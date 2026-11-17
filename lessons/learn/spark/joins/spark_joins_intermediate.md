@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 19 challenges
-
 # Joins: Intermediate
 
 At Netflix, a nightly job joins a day of play events to the titles catalog and then to the profiles table. The catalog join finishes in minutes; the profiles join runs for an hour. An engineer raises the broadcast threshold so profiles broadcast too, and the driver dies before a single row is joined. All 3 outcomes come down to which join strategy Spark picked, and why.

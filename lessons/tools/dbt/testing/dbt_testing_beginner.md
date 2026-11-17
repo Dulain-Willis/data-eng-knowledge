@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Testing: Beginner
 
 Take a payouts model at Shopify, where Shopify Payments deposits each merchant's sales into their bank account. Suppose the order loader replays an hour of events overnight and a few thousand orders land twice. Without a test, the model doubles those merchants' payouts, and that is real money sent out. With a `unique` test on `order_id`, the build stops at the orders model and the payouts table keeps the previous day's correct rows.

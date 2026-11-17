@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 8 challenges
-
 # Replication: Beginner
 
 LinkedIn built Kafka to carry member activity events such as page views, and has written that its clusters handle more than 7 trillion messages a day. When 1 broker in those clusters loses power mid-afternoon, some partitions lose a copy and carry on, some lose their leader and stall, and whether any page view is lost depends on which surviving copy had kept up.

@@ -1,5 +1,3 @@
-Beginner·Spark · 12 min · 14 challenges
-
 # Data Skew: Beginner
 
 On the morning after a superstar drops an album on Spotify, the overnight Spark job that joins every play to its track's records shows 199 of 200 tasks finished in 2 minutes, while the last one is still grinding at minute 46. That last task holds every play of the album's lead single. Adding machines will not move it. This lesson shows why.

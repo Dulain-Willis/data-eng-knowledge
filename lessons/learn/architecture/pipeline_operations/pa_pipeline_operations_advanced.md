@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 40 min · 11 challenges
-
 # Pipeline Operations: Advanced
 
 At a quarterly review at Airbnb, finance asks the data platform team one question: why did the warehouse bill grow 3 times faster than the team that runs it? Somewhere in hundreds of pipelines, an hourly job feeds a dashboard nobody has opened since spring, and its owner left in June. Your answer decides whether next quarter's budget funds new work or old waste.

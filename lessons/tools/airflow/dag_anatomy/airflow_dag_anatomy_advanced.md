@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 6 challenges
-
 # DAG Anatomy: Advanced
 
 Airflow began at Airbnb, so take an overnight job there that pulls partner booking feeds. A Monday brings 4 files and a Friday 38. Over a holiday weekend, 112 arrive at once. The DAG file was written months ago and names none of them. This lesson decides whether tonight's run grows 112 loader cells, which code those cells execute after this afternoon's deploy, and what each one may touch.

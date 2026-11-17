@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 25 min · 2 challenges
-
 # Late Data and Watermarks: Advanced
 
 A candidate sits in a systems interview at Google, where the papers that gave watermarks their modern form were written. The interviewer sketches a mobile app: devices send a session event each minute, and the dashboard shows active users per 5 minute window. Then the twist: phones lose signal in subways, buffer events for 40 minutes, and flush them all at once when they reconnect. 'Your window for 10:00 to 10:05 has to appear on the dashboard. When do you decide it is done, and what happens to an event for 10:03 that shows up at 10:50?' No single cutoff is right; the answer is a tradeoff with a number attached. This lesson builds the reasoning behind the answer: what the two clocks measure, how a watermark estimates completeness, where allowed lateness and side outputs put events that miss it, and how production pipelines choose and monitor a strategy.

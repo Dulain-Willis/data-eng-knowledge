@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Deploying dbt: Intermediate
 
 GitLab's data team keeps its dbt project in a public repository, and every change arrives as a merge request. An analyst renames a column in 1 staging model with hundreds of models below it. The CI job has minutes, not an hour: it must build the changed model and its descendants, borrow everything else from production, and report back before the reviewer finishes reading the diff.

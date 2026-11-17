@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 9 challenges
-
 # Jinja and Macros: Beginner
 
 GitLab's data team runs its warehouse on dbt and publishes the project in its handbook. A mart counts merge requests per state, and the SELECT holds 3 near-identical CASE columns. A 4th state, locked, arrives. One engineer copies the merged column and changes only its alias. The quoted literal is untouched, so locked_mrs quietly counts merged requests. Jinja decides whether that bug can exist at all.

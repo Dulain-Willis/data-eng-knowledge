@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 12 challenges
-
 # UDFs and Serialization: Intermediate
 
 A Netflix data engineer's nightly Spark job tags 2 billion playback events with a device family, using a 10-line Python function. The job runs for hours. The team is weighing a request for more executors against another option: understanding where those hours go once each row leaves the JVM for a Python process and comes back.

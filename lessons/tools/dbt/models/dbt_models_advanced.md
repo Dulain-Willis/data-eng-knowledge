@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 6 challenges
-
 # Models: Advanced
 
 It is June 30 at Stripe, and a finance analyst notices the merchant revenue dashboard shows the total it showed on March 3. That morning an analytics engineer renamed the model behind it. dbt has built the new table nightly since and never touched the old one the dashboard still reads. No error fired anywhere. This lesson is about which changes fail loudly, and which fail like this.

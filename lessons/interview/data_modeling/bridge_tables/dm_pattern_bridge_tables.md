@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 7 challenges
-
 # Bridge Tables: Advanced
 
 Priya is 40 minutes into an onsite at Spotify when the interviewer draws 2 boxes on the whiteboard: a streams fact and a track dimension beside it. "Many tracks credit more than 1 artist," she says. "The royalties team wants streams per artist, and finance insists the artist totals add back up to the company total. Model it." Priya knows the join that answers the first request and the double count it causes for the second. The question turns on where the many-to-many relationship lives, how each artist's share is decided, and what happens when a credit changes after the fact. This lesson works through the bridge table pattern the way that interview expects it: the fan-out it prevents, the structure of the bridge, the weighting factor that makes totals reconcile, the array column that competes with it, and the way to defend the choice out loud.

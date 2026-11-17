@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 10 challenges
-
 # Producers: Advanced
 
 It is 2 a.m. on New Year's Day at Uber, and trips are closing as fast as riders step out of cars. A fare service closes each trip with 2 records on 2 topics: the fare charged to the rider and the payout owed to the driver. A producer that dies between those 2 sends charges a rider for a ride no driver is paid for.

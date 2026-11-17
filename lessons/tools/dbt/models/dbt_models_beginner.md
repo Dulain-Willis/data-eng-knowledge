@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 5 challenges
-
 # Models: Beginner
 
 GitLab publishes its whole analytics codebase, and most of it is dbt models that turn raw CRM and billing tables into the recurring revenue figures finance reports each month, with product usage tables feeding the same models. When an analyst there changes how a trial counts toward that revenue the week the quarter closes, the change is one SQL file, and dbt rebuilds every table that reads it.

@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 13 challenges
-
 # Shuffles: Advanced
 
 A reduce stage can crawl while the cluster sits half idle, because each reducer is pulling 10,000 blocks of about 10KB apiece from disks spread across the cluster. LinkedIn's engineers hit this problem in their nightly jobs at scale and built Magnet, the push-based shuffle that shipped in Spark 3.2. This lesson shows how to price that shuffle, then remove or tune it.

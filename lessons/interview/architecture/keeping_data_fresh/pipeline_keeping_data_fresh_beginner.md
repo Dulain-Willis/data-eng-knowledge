@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 4 challenges
-
 # Keeping Data Fresh: Beginner
 
 Ines is 40 minutes into a data engineering loop at Uber when the whiteboard question arrives. The interviewer sketches a trips table in the operational database: 2 billion rows, about 4 million edits a day as tips and corrections adjust fares and some trips get cancelled. Analysts want a dashboard that is never more than an hour behind. 'How do you keep the warehouse copy current?' Ines starts to say she would reload it every hour, then stops: copying 2 billion rows to pick up 4 million changes sounds wrong. But reading only the changes raises its own questions. How does the pipeline notice a cancelled trip that was deleted? What happens when a driver moves cities, when an engineer renames a column, or when a fare bug corrupts last month? Each follow-up is the same question in disguise: how does fresh data stay correct?

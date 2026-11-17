@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Tasks and Data: Intermediate
 
 At Airbnb, where Airflow was written, picture a nightly bookings pipeline whose Monday miscount was fixed on Thursday. The team wants to rewrite Monday alone, without touching Tuesday or Wednesday, without dragging 40 million rows through the metadata database, and with the fix hitting the production warehouse rather than the staging host one worker still points at. Every choice in this lesson decides whether that works.

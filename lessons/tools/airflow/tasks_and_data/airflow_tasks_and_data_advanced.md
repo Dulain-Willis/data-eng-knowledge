@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Tasks and Data: Advanced
 
 Airflow started at Airbnb in 2014, so picture a nightly pipeline there feeding a bookings dashboard. One night the loader writes a day's bookings twice, a check task counts 2 rows per booking and fails, and publish never runs: the dashboard shows the previous day, correct, rather than the new day, doubled. 5 pieces make that night uneventful: what tasks pass, report, remember, check and call.

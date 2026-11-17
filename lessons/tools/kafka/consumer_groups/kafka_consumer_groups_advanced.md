@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 7 challenges
-
 # Consumer Groups: Advanced
 
 Take one consumer group behind Shopify's checkout on Black Friday: 48 pods reading the orders topic, and a deploy restarts them 4 at a time. If every restart stops all 48 for a rebalance, orders back up at least 12 times before the rollout finishes. Whether each stop lasts seconds or never happens comes down to the rebalance protocol, how a restarted pod rejoins, and the timeouts around both.

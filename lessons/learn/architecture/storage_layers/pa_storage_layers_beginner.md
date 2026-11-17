@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 11 challenges
-
 # Storage Layers: Beginner
 
 At 6:40 pm, the dinner peak at DoorDash, an analyst is about to run last month's revenue-by-city query. The orders live in 3 places: the live database checkout writes to, raw event files in a lake, and a warehouse. Pick the live database and checkouts stall behind the scan; pick the warehouse and the answer arrives in seconds.

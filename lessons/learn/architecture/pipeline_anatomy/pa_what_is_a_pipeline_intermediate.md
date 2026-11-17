@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 20 min · 11 challenges
-
 # Pipeline Anatomy: Intermediate
 
 A retailer's order events start life in a single Kafka topic. Within a year finance, marketing and the recommendations team each want them, each with their own idea of what counts as an order, and the product catalog, ad spend and support tickets want joining in. The chain built for 1 source and 1 consumer has to become something with 4 of each, and its shape has to change.

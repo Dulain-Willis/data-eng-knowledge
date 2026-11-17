@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 10 challenges
-
 # Consumer Groups: Beginner
 
 A new team at LinkedIn ships a dashboard that reads the page-view topic. They start it on Friday and see 0 records, so they file a bug against the producer team. Monday brings the opposite: the dashboard is 40 million records behind and climbing. Both mysteries come down to 1 setting and 1 number this lesson teaches: where a group starts, and how lag is measured.

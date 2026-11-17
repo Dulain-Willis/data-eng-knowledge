@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 4 challenges
-
 # SCD Strategy: Advanced
 
 You are 40 minutes into a modeling round at a B2B subscription company.

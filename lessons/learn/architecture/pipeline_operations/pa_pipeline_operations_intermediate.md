@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 12 challenges
-
 # Pipeline Operations: Intermediate
 
 Say a pull request at Netflix changes `watch_time` in a playback table from seconds to minutes on a Monday. A forward lineage walk names the 140 downstream tables and dashboards and their owners, and a data diff in CI shows every row's `watch_time` divided by 60 before merge. Those steps keep Tuesday's Top 10 built on real viewing numbers, and this lesson works them on a small orders pipeline.

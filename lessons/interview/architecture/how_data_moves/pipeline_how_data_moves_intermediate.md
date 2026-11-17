@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 25 min · 3 challenges
-
 # How Data Moves: Intermediate
 
 Every December, Spotify ships Wrapped: a personalized recap of a year of listening, delivered to hundreds of millions of accounts within a few days of release. By October, the engineer who owns the plays table has a year of streaming events that landed through the real-time path, a nightly job reloading changed rows against a stored watermark, podcast metadata trickling in from a partner API that pages 100 items at a time, and everything in Parquet partitioned by day. Then a product manager asks: how many plays did we double count when the consumer restarted in March? Answering touches delivery guarantees, incremental loading, file layout and the boundary between the batch and streaming paths. Interviewers ask the same question in many versions, to learn whether you can trace a wrong number back to the mechanism that produced it.
