@@ -43,6 +43,7 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
+    "executable_spark",
 }
 # Interactive exercise with no answers in the page, so what's left is a dangling question.
 # Dropped. (multiple_choice used to be here; its answers ARE in the page's embedded JSON.)
@@ -212,7 +213,7 @@ def diagram(soup, block, image_name, number):
     label = DIAGRAM_LABELS[block_type(block)]
     if image_name:
         p = soup.new_tag("p")
-        p.append(soup.new_tag("img", src=f"images/{image_name}", alt=f"{label} {number}"))
+        p.append(soup.new_tag("img", src=f"_images/{image_name}", alt=f"{label} {number}"))
         block.replace_with(p)
     else:
         note = soup.new_tag("p")
@@ -311,6 +312,23 @@ def tick_cross(soup, block, tokens):
     block.replace_with(marker)
 
 
+def spark_cell(soup, block, tokens, image_name, number):
+    """A runnable PySpark cell: a screenshot of the cell after Run (tables, code and output), then the
+    code as a ```python fence. The page draws the editor and result with JavaScript, so the image
+    can only be a screenshot (see record_cells); the fence keeps the code as text, because long
+    lines scroll sideways in the screenshot. Built as Markdown and swapped in after markdownify.
+    """
+    pre = block.find("pre")
+    code = (pre.get_text() if pre else block.get_text()).strip("\n")
+    shot = (f"![Run output {number}](_images/{image_name})" if image_name
+            else f"[Run output {number}: not captured. Re-run with --screenshots]")
+    token = f"@@SPARK-CELL-{len(tokens)}@@"
+    tokens[token] = f"{shot}\n\n```python\n{code}\n```"
+    marker = soup.new_tag("p")
+    marker.string = token
+    block.replace_with(marker)
+
+
 def animation_info(html):
     """Each animation block in page order: its mode labels and the caption under the player.
 
@@ -332,14 +350,18 @@ def animation_info(html):
 
 
 def animation(soup, block, tokens, info, files):
-    """An animation block as its GIF(s), one per mode, and the caption as plain text.
+    """An animation block as its video URL(s) (or still images), one per mode, and the caption as plain text.
 
     The playback is drawn by JavaScript, so it can only be a recording (see record_animations).
     Built as Markdown and swapped in after markdownify.
     """
     parts = []
     for label, name in files or []:
-        parts.append((f"**{label}**\n\n" if label else "") + f"![{label or 'Animation'}](images/{name})")
+        if name.endswith(".mp4"):  # uploaded (upload_animation); a bare URL on its own line renders as a video
+            shown = json.load(open(URLS_FILE)).get(name, name)  # already uploaded by main() before the Markdown is written
+        else:
+            shown = f"![{label or 'Animation'}](_images/{name})"
+        parts.append((f"**{label}**\n\n" if label else "") + shown)
     if not parts:
         parts.append("[Animation: not captured. Re-run with --screenshots]")
     if info.get("caption"):
@@ -351,11 +373,13 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=()):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
     drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
+    cells: file names of the run-output screenshots, one per executable_spark block in page order
+    (record_cells); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
     dropped = set()
@@ -373,7 +397,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         p.string = EXERCISE_TOKEN.format(i)
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
-    diagrams_seen = animations_seen = 0
+    diagrams_seen = animations_seen = cells_seen = 0
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
@@ -400,6 +424,10 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             new = soup.new_tag("p")
             new.string = token
             block.replace_with(new)
+        elif kind == "executable_spark":
+            name = cells[cells_seen] if cells_seen < len(cells) else None
+            cells_seen += 1
+            spark_cell(soup, block, tokens, name, cells_seen)
         elif kind == "static_code":
             code_block(soup, block)
         elif kind == "big_number":
@@ -649,7 +677,7 @@ def solution_block(b, image=None):
             items.append(f"{i}. {q['question']}" + (f"\\\n   *{q['context']}*" if q.get("context") else ""))
         return "**Follow-up questions**\n\n" + "\n".join(items)
     if kind == "schema_diagram":  # tables and relationships: drawn by the site, so it is a screenshot
-        out = (f"![Schema diagram](images/{image})" if image
+        out = (f"![Schema diagram](_images/{image})" if image
                else "[Schema diagram: not captured. Re-run with --screenshots]")
         return out + (f"\n\n*{b['caption']}*" if b.get("caption") else "")
     if kind == "code":
@@ -699,7 +727,7 @@ INCLUDE_AIRFLOW_EXERCISES = False
 # The dbt and Kafka exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark"}
 
 
 def challenge_path(c):
@@ -731,7 +759,7 @@ def airflow_widgets(url, out_dir, slug, shoot):
     except ImportError:
         print("playwright not installed; Airflow exercises go at the end", file=sys.stderr)
         return []
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     widgets = []
     with sync_playwright() as p:
@@ -877,7 +905,7 @@ def airflow_exercise_markdown(c, n, total, shots):
     starter = (cfg.get("starter") or {}).get("source") or (files[0]["source"] if files else "")
     out.append(f"**Starter** — `{challenge_path(c)}`\n\n```python\n{starter}\n```")
     if shots:  # panes the page really shows, as the page draws them
-        out += [f'**{shots[k][0]}**\n\n<img src="images/{shots[k][1]}" alt="{shots[k][0]}" width="{shots[k][2]}">'
+        out += [f'**{shots[k][0]}**\n\n<img src="_images/{shots[k][1]}" alt="{shots[k][0]}" width="{shots[k][2]}">'
                 for k in SHOT_ORDER if k in shots]
     out.append("<details>\n<summary><strong>Solution</strong></summary>")
     # The site only draws the graph after a correct fix once the code is Run, and Run needs a
@@ -952,7 +980,7 @@ def screenshot_schema_diagrams(url, out_dir, slug, challenges):
     except ImportError:
         print("playwright not installed", file=sys.stderr)
         return {}
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     saved = {}
     with sync_playwright() as p:
@@ -1019,22 +1047,407 @@ def screenshot_schema_diagrams(url, out_dir, slug, challenges):
 
 # Animations (sql_animation, kafka_animation, pipeline_animation ...): a player that plays by
 # itself once scrolled into view, with a step counter ("3/9") and sometimes mode toggles.
-# Each mode is recorded as a screen video of the player alone, cropped, and made into a GIF.
-GIF_FILTER = ("fps=15,scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=stats_mode=diff[p];"
-              "[b][p]paletteuse=dither=sierra2_4a")
+# Each mode is recorded with Playwright's video recorder (real speed; see record_animation) as an MP4 of the
+# player alone (a GIF of these players was 5 to 10 MB), kept outside the repo in ANIM_DIR and
+# uploaded as a GitHub user-attachments asset; GitHub shows a bare asset URL on its own line as a video
+# player. tools/animation_urls.json maps each recording's name to its URL so a re-run reuses it.
+ANIM_DIR = os.environ.get("ANIM_DIR") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".animations")
+URLS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animation_urls.json")
+REPO = "Dulain-Willis/data-eng-knowledge"
+ANIM_STATS = {}
+_HIDE_PINNED = """() => { for (const e of document.querySelectorAll('body *')) {
+    const p = getComputedStyle(e).position;
+    if ((p === 'fixed' || p === 'sticky') && e.getBoundingClientRect().height < 140) e.style.visibility = 'hidden'; } }"""
 _STEP = re.compile(r"(\d+)\s*/\s*(\d+)")
 _PLAYER_BOX = """(block) => { const bs = [...block.querySelectorAll('button')]; if (!bs.length) return null;
     let a = bs[0]; while (a && !bs.every(b => a.contains(b))) a = a.parentElement;
     const r = a.getBoundingClientRect(); return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
 
 
-def record_animations(url, out_dir, slug, info):
-    """Save every animation block's playback as a GIF: one per mode (toggle) if it has any.
+def upload_animation(name, force=False):
+    """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
+    in tools/animation_urls.json and return it. Needs `gh auth login`. The token goes to curl through a
+    mode-600 config file (never on the command line, where `ps` could show it) that is deleted afterwards."""
+    urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
+    if force or name not in urls:  # force: upload a re-recorded file as a NEW asset
+        tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
+        rid = subprocess.run(["gh", "api", f"repos/{REPO}", "--jq", ".id"], capture_output=True, text=True,
+                             check=True).stdout.strip()
+        fd, cfg = tempfile.mkstemp(suffix=".curlrc")  # mkstemp creates the file with mode 600
+        try:
+            with os.fdopen(fd, "w") as fh:
+                fh.write(f'header = "Authorization: Bearer {tok}"\n')
+            res = subprocess.run(["curl", "-s", "-K", cfg, "-X", "POST",
+                                  "-H", "Accept: application/json", "-H", "Content-Type: video/mp4",
+                                  "--data-binary", "@" + os.path.join(ANIM_DIR, name),
+                                  f"https://uploads.github.com/user-attachments/assets?name={name}"
+                                  f"&content_type=video/mp4&repository_id={rid}"],
+                                 capture_output=True, text=True, check=True).stdout
+        finally:
+            os.remove(cfg)
+        urls[name] = json.loads(res)["url"]
+        with open(URLS_FILE, "w") as fh:
+            json.dump(dict(sorted(urls.items())), fh, indent=1)
+            fh.write("\n")
+    return urls[name]
 
-    Returns {block number: [(mode label or None, file name)]}. The capture runs from the
-    moment the mode starts until the step counter reaches its last step (two seconds' grace),
-    so it needs no fixed length. The crop is the smallest box holding all the player's buttons,
-    which leaves out the caption paragraph that sits below it (that goes into the Markdown).
+
+def _media_stats(path):
+    """(duration in seconds, distinct frames per second) of a video; distinct = frames mpdecimate keeps."""
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                               capture_output=True, text=True, check=True).stdout)
+    out = subprocess.run(["ffmpeg", "-i", path, "-vf", "mpdecimate,showinfo", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    return dur, out.count("pts_time") / dur
+
+
+def _wait_idle(block, page, began, cap=150):
+    """Finish detector for a player with no step counter: its markup has not changed for 4 seconds
+    (the cap is generous). Returns the time of the last change, plus nothing else to trim."""
+    last, changed = None, time.monotonic()
+    while time.monotonic() - began < cap:
+        sig = block.evaluate("b => b.innerHTML.length + ':' + b.querySelectorAll('*').length + ':' + "
+                             "[...b.querySelectorAll('[style]')].map(e => e.getAttribute('style')).join('|').length")
+        sig = hash(sig + block.inner_text())
+        if sig != last:
+            last, changed = sig, time.monotonic()
+        elif time.monotonic() - changed >= 4:
+            break
+        page.wait_for_timeout(250)
+    return changed + 1.5
+
+
+# The START CHECK. A video must open on the first frame where the player is really on screen: its own
+# title-bar dots (red, yellow, green) at the exact spot the DOM puts them inside the player box, and its
+# step counter reading "1/N". Dots elsewhere in the frame (a code block of the article has the same
+# three dots) do not count. Geometry comes from the DOM while recording (_GEOM_JS); every number in it
+# is relative to the player box and scales with the box width, so it works at any video size.
+_GEOM_JS = """(block) => {
+  const bs = [...block.querySelectorAll('button')]; if (!bs.length) return null;
+  let a = bs[0]; while (a && !bs.every(b => a.contains(b))) a = a.parentElement;
+  const r = a.getBoundingClientRect();
+  const want = {red: 'rgb(255, 95, 87)', yellow: 'rgb(255, 189, 46)', green: 'rgb(40, 201, 64)'};
+  const dots = {};
+  for (const e of a.querySelectorAll('span')) {
+    const q = e.getBoundingClientRect(), c = getComputedStyle(e).backgroundColor;
+    for (const k in want) if (c === want[k] && q.width >= 6 && q.width <= 32 && !dots[k])
+      dots[k] = [q.x - r.x + q.width / 2, q.y - r.y + q.height / 2, q.width];
+  }
+  let counter = null;
+  for (const e of a.querySelectorAll('*')) {
+    if (e.children.length) continue;
+    const t = e.textContent.trim();
+    if (/^\\d+\\s*\\/\\s*\\d+$/.test(t)) {
+      const n = e.firstChild, i = n.textContent.indexOf(t[0]), rg = document.createRange();
+      rg.setStart(n, i); rg.setEnd(n, i + 1);
+      const c = rg.getBoundingClientRect();
+      const q = e.getBoundingClientRect();
+      counter = {text: t, first: [c.x - r.x, c.y - r.y, c.width, c.height],
+                 rect: [q.x - r.x, q.y - r.y, q.right - r.x, q.bottom - r.y]};
+    }
+  }
+  return {x: r.x, y: r.y, w: r.width, h: r.height, dots, counter};
+}"""
+_DOT_RGB = {"red": (255, 95, 87), "yellow": (255, 189, 46), "green": (40, 201, 64)}
+DOT_TOL = 90  # max colour distance of a title-bar dot (fade-in frames are a little dim)
+_ONE_W, _ONE_H = 12, 18
+# Template of the digit "1" in the step counter (mean of the counters of the first 75 reviewed videos),
+# 0..1 luminance, rows top to bottom.
+_ONE = [
+    [.10,.10,.10,.11,.11,.10,.10,.10,.10,.10,.10,.10],
+    [.10,.10,.10,.09,.08,.24,.41,.18,.09,.11,.10,.10],
+    [.10,.10,.13,.30,.32,.57,.73,.21,.10,.11,.10,.11],
+    [.09,.09,.19,.56,.62,.76,.77,.21,.10,.12,.10,.10],
+    [.10,.10,.15,.33,.33,.58,.75,.21,.10,.11,.10,.09],
+    [.10,.10,.10,.14,.11,.46,.78,.21,.08,.11,.11,.11],
+    [.10,.10,.10,.11,.09,.43,.76,.21,.09,.11,.11,.11],
+    [.10,.10,.10,.12,.10,.43,.75,.20,.10,.12,.10,.11],
+    [.10,.10,.11,.12,.08,.42,.75,.20,.09,.12,.10,.11],
+    [.11,.11,.14,.18,.14,.44,.76,.25,.15,.13,.10,.11],
+    [.10,.10,.39,.65,.63,.77,.90,.67,.62,.33,.10,.09],
+    [.10,.10,.36,.54,.54,.56,.58,.54,.54,.28,.09,.12],
+    [.10,.11,.17,.20,.20,.18,.19,.19,.19,.15,.08,.21],
+    [.10,.11,.11,.11,.10,.10,.10,.10,.10,.10,.10,.16],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.11],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.11],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10],
+    [.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10,.10],
+]
+
+
+def _video_size(path):
+    w, h = subprocess.run(["ffprobe", "-v", "error", "-select_streams", "v:0", "-show_entries", "stream=width,height",
+                           "-of", "csv=p=0", path], capture_output=True, text=True, check=True).stdout.strip().split(",")
+    return int(w), int(h)
+
+
+def _read_frames(path, count, start=0.0, native=True):
+    """First `count` frames of a video from `start` as rgb24 bytes (no frame dropping or duplication)."""
+    w, h = _video_size(path)
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{start:.3f}", "-i", path, "-frames:v", str(count),
+                          "-vsync", "0", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    size = w * h * 3
+    return [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)], w, h
+
+
+def _px(frame, w, x, y):
+    i = (int(y) * w + int(x)) * 3
+    return frame[i], frame[i + 1], frame[i + 2]
+
+
+def dots_distance(frame, w, h, geom, ox=0.0, oy=0.0, scale=None):
+    """Largest colour distance of the three title-bar dots from their expected colours when the player box
+    has its top-left corner at (ox, oy) in the frame; 999 if a dot would fall outside the frame."""
+    s = scale or (w / geom["w"])
+    worst = 0
+    for name, rgb in _DOT_RGB.items():
+        d = geom["dots"].get(name)
+        if not d:
+            return 999
+        cx, cy = ox + d[0] * s, oy + d[1] * s
+        if cx < 2 or cy < 2 or cx >= w - 2 or cy >= h - 2:
+            return 999
+        pts = [_px(frame, w, cx + i, cy + j) for i in (-1, 0, 1) for j in (-1, 0, 1)]
+        avg = [sum(p[c] for p in pts) / 9 for c in range(3)]
+        worst = max(worst, max(abs(avg[c] - rgb[c]) for c in range(3)))
+    return worst
+
+
+def _counter_patch(frame, w, h, geom, ox=0.0, oy=0.0, scale=None):
+    """Luminance patch (rows of floats, _ONE_H x _ONE_W) around the counter's first character, normalised
+    to 0..1 by its own min and max; None when the counter has no readable spot in the frame."""
+    c = geom.get("counter")
+    if not c:
+        return None
+    s = scale or (w / geom["w"])
+    fx, fy, fw, fh = c["first"]
+    x0 = int(round(ox + (fx + fw / 2) * s - _ONE_W / 2))
+    y0 = int(round(oy + (fy + fh / 2) * s - _ONE_H / 2))
+    if x0 < 0 or y0 < 0 or x0 + _ONE_W > w or y0 + _ONE_H > h:
+        return None
+    rows = [[sum(_px(frame, w, x0 + i, y0 + j)) / 3 for i in range(_ONE_W)] for j in range(_ONE_H)]
+    lo = min(min(r) for r in rows)
+    hi = max(max(r) for r in rows)
+    if hi - lo < 25:  # nothing drawn there (yet)
+        return None
+    return [[(v - lo) / (hi - lo) for v in r] for r in rows]
+
+
+def _corr(a, b):
+    xs = [v for r in a for v in r]
+    ys = [v for r in b for v in r]
+    mx, my = sum(xs) / len(xs), sum(ys) / len(ys)
+    sxy = sum((x - mx) * (y - my) for x, y in zip(xs, ys))
+    sxx = sum((x - mx) ** 2 for x in xs)
+    syy = sum((y - my) ** 2 for y in ys)
+    return sxy / ((sxx * syy) ** 0.5 or 1)
+
+
+def counter_is_one(patch):
+    """Does the patch show the digit "1"? Best correlation with the template of a "1" over small shifts
+    (where the glyph sits inside the counter's box differs a few px between layouts)."""
+    if patch is None or _ONE is None:
+        return None
+    best = -1
+    for dy in range(-4, 5):
+        for dx in (-2, -1, 0, 1, 2):
+            shifted = [[patch[min(max(j + dy, 0), _ONE_H - 1)][min(max(i + dx, 0), _ONE_W - 1)]
+                        for i in range(_ONE_W)] for j in range(_ONE_H)]
+            best = max(best, _corr(shifted, _ONE))
+    return best
+
+
+def start_check(path, geom, ox=0.0, oy=0.0, scale=None, frames=None):
+    """START CHECK of a finished video (or of `frames`, a (frames, w, h) tuple, for tests). Returns
+    (ok, problems). The first frame must show the player's own dots at their exact spot and a step
+    counter that reads "1"; the first 3 frames must keep showing the player (no page text coming
+    back), and the counter must still read "1" in them."""
+    fr, w, h = frames or _read_frames(path, 8)
+    problems = []
+    if len(fr) < 3:
+        return False, ["video has fewer than 3 frames"]
+    d0 = dots_distance(fr[0], w, h, geom, ox, oy, scale)
+    if d0 > DOT_TOL:
+        problems.append(f"first frame is not the player: its title-bar dots are missing at the expected spot (off by {d0:.0f})")
+    for i in (1, 2):
+        di = dots_distance(fr[i], w, h, geom, ox, oy, scale)
+        if di > DOT_TOL:
+            problems.append(f"frame {i} lost the player's dots (off by {di:.0f})")
+    for i in range(3):
+        p = _counter_patch(fr[i], w, h, geom, ox, oy, scale)
+        c = counter_is_one(p)
+        if p is None and i == 0 and d0 <= DOT_TOL:
+            problems.append("first frame: no step counter drawn (placeholder or blank player)")
+        elif c is not None and c < 0.7:
+            problems.append(f"frame {i}: step counter does not read 1 (match {c:.2f}): the player is past step 1")
+    return not problems, problems
+
+
+def end_check(path, geom):
+    """Bottom control bar present: the last frame has the step counter drawn where the DOM had it (counted
+    from the bottom of the crop, since the player can grow while it plays). `geom["counter_bottom"]`
+    is that distance, taken in the DOM at the end of the playback."""
+    c, cb = geom.get("counter"), geom.get("counter_bottom")
+    if not c or cb is None:
+        return False, ["no counter geometry to check the control bar with"]
+    w, h = _video_size(path)
+    dur = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                               capture_output=True, text=True, check=True).stdout)
+    fr, _, _ = _read_frames(path, 20, start=max(0.0, dur - 0.5))
+    s = w / geom["w"]
+    l, t, r, b = c["rect"]
+    x0, x1 = int(l * s), int(r * s)
+    y1 = int(h - cb * s)
+    y0 = int(y1 - (b - t) * s)
+    if x0 < 0 or y0 < 0 or x1 > w or y1 > h or not fr:
+        return False, ["control bar region is outside the video (crop cut off the bottom of the player)"]
+    vals = [sum(_px(fr[-1], w, x, y)) / 3 for y in range(y0, y1) for x in range(x0, x1)]
+    if max(vals) - min(vals) < 25:
+        return False, ["last frame: the step counter is not visible (bottom control bar cut off?)"]
+    return True, []
+
+
+def _player_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
+    """Time (s) of the first frame in [lo, lo+span] of the raw recording where the player is on screen:
+    cropped to the player box (x, y, w, h) and scaled like the final video, its three title-bar dots are in
+    their colours at the exact spot the DOM gave and its step counter reads 1. Raises if there is none (the
+    caller retries the recording; no guessing from the script clock)."""
+    vf = f"fps={fps},crop={w}:{h}:{x}:{y},scale=1600:-2:flags=lanczos"
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{lo:.2f}", "-t", str(span), "-i", webm,
+                          "-vf", vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    vw = 1600
+    vh = int(round(h * 1600 / w / 2)) * 2
+    size = vw * vh * 3
+    for i in range(len(raw) // size):
+        fr = raw[i * size:(i + 1) * size]
+        if dots_distance(fr, vw, vh, geom) > DOT_TOL:
+            continue
+        c = counter_is_one(_counter_patch(fr, vw, vh, geom))
+        if c is not None and c >= 0.7:  # the placeholder ("Preparing the animation") has the dots but no counter
+            return lo + i / fps
+    raise RuntimeError("the player's title-bar dots and a step counter reading 1 never showed at their expected spot in the recording")
+
+
+def record_animation(browser, url, k, m, label, dest, box_css):
+    """Record animation block k in mode m (label) to the MP4 `dest`; returns its stats, or None if the
+    player's controls never mounted.
+
+    Playwright's own video recorder captures the page at real speed (screenshots in a loop stall the page
+    and gave slow, choppy video). The window is the player's height plus 40 px, so the player is never cut
+    off; the video is 2x pixels (viewport and record size doubled, page zoom 2, so layout stays 1150 px
+    wide but small text is drawn sharp). The crop is the player box; the trim runs from the moment
+    the player is in view until the counter reaches its last step plus 2 seconds.
+    """
+    W = max(1150, int(box_css["w"]) + 48)
+    H = int(-(-box_css["h"] // 1)) + 40
+    with tempfile.TemporaryDirectory() as tmp:
+        ctx = browser.new_context(viewport={"width": W * 2, "height": H * 2}, color_scheme="light",
+                                  record_video_dir=tmp, record_video_size={"width": W * 2, "height": H * 2})
+        page = ctx.new_page()
+        t0 = time.monotonic()
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
+        page.evaluate("document.documentElement.style.zoom = 2")
+        page.wait_for_timeout(1000)
+        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        # All setup happens while the player is still below the fold: the site starts playing the moment
+        # the player scrolls into view, so that jump is the start of the recording (nothing of step 1 is lost).
+        page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
+        page.wait_for_timeout(300)
+        gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})", gap)  # block top well below the viewport (the site loads a bit ahead of the fold)
+        page.wait_for_timeout(1500)
+        if m > 0:  # pick the mode while out of view; a switched mode starts paused (Airflow animations)
+            block.locator("button[role=radio]").nth(m).click()
+            page.wait_for_timeout(500)
+        before = _STEP.findall(block.inner_text()) if block.locator("button").count() else []
+        restart = bool(before) and int(before[-1][0]) > 1  # a player in the first screen at page load has played on already
+        jump_mark = mark = time.monotonic()
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
+                      block.evaluate("b => b.getBoundingClientRect().top") - 10)  # instant: the site may smooth-scroll
+        block.locator("button").first.wait_for(state="attached", timeout=15000)
+        # When does the step counter first show? A player that is mounted at once shows it within a moment;
+        # one that shows "Preparing the animation" first shows it later, and step 1 starts only then.
+        counter_t = None
+        while time.monotonic() - jump_mark < 25:
+            if _STEP.findall(block.inner_text()):
+                counter_t = time.monotonic()
+                break
+            page.wait_for_timeout(50)
+        if counter_t is None:
+            raise RuntimeError("the step counter never appeared")
+        preparing = counter_t - jump_mark > 0.4
+        if m > 0:
+            play = block.locator('button[aria-label="Play"]')
+            if play.count():
+                play.first.click()
+        if restart:  # play it again from step 1; the recording starts at this click
+            page.wait_for_timeout(700)
+            block.locator('button[aria-label="Restart"]').first.click()
+            mark = time.monotonic()
+        elif preparing:
+            mark = counter_t
+        first_seen = last_seen = None
+        geom = last_geom = None  # the player's own geometry (DOM, screen pixels), first taken at step 1..9
+        h_max = 0
+        began = mark
+        while time.monotonic() - began < 170:
+            steps = _STEP.findall(block.inner_text())
+            now = time.monotonic()
+            g = block.evaluate(_GEOM_JS)
+            if g:
+                h_max = max(h_max, g["h"])
+                last_geom = g
+                if (geom is None and len(g["dots"]) == 3 and g["counter"] and steps
+                        and int(steps[-1][0]) < 10 and now - mark > 0.3):
+                    geom = g
+            if steps:
+                first_seen = first_seen or now
+                if int(steps[-1][0]) >= int(steps[-1][1]):
+                    last_seen = last_seen or now
+                    if now - last_seen >= 2:
+                        break
+            elif first_seen is None and now - began > 8:  # no counter at all: wait for the markup to settle
+                last_seen = _wait_idle(block, page, began)
+                first_seen = began
+                break
+            page.wait_for_timeout(100)
+        ctx.close()
+        if geom is None:
+            raise RuntimeError("never saw the player's title-bar dots and step counter in the DOM")
+        vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
+        x, y, w = (int(round(geom[c])) for c in "xyw")
+        h = int(round(max(h_max, geom["h"])))
+        h -= h % 2
+        if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
+            return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
+        # The video clock is offset from the script clock by a varying amount (up to seconds on heavy pages), so
+        # find the start in the video itself: the first frame where the player is really on screen (its own
+        # title-bar dots at the exact spot the DOM gave, and a step counter that reads 1). There is no fallback
+        # to the script clock: no such frame means the recording is bad and is redone.
+        mark_t = jump_mark - t0
+        jump = _player_start_frame(os.path.join(tmp, vids[0]), geom, x, y, w, h, max(0.0, mark_t - 6), 20)
+        start = jump + ((mark - jump_mark) if restart else 0)  # a restarted player starts at the click, not at the jump
+        live = (last_seen - mark) if first_seen and last_seen else None
+        end = start + live + 2 if live is not None else start + (time.monotonic() - mark)
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.3f}", "-to", f"{end:.3f}",
+                        "-i", os.path.join(tmp, vids[0]),
+                        "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
+                        "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
+    geom["h"] = h
+    if last_geom and last_geom["counter"]:
+        geom["counter_bottom"] = last_geom["h"] - last_geom["counter"]["rect"][3]
+    box = {"x": x, "y": y, "w": w, "h": h}
+    return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
+
+
+def record_animations(url, out_dir, slug, info, only=None):
+    """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
+
+    Returns {block number: [(mode label or None, file name)]}; ANIM_STATS holds per-file
+    numbers. Each recording is checked (duration against the live playback time, at least 10 distinct
+    frames per second) and redone up to 3 times if it fails, one at a time.
     """
     if not info:
         return {}
@@ -1046,75 +1459,147 @@ def record_animations(url, out_dir, slug, info):
     except ImportError:
         print("playwright not installed", file=sys.stderr)
         return {}
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     saved = {}
     with sync_playwright() as p:
         browser = p.chromium.launch()
         for k, entry in enumerate(info):
+            if only is not None and k not in only:
+                continue
+            # Measure the player once in a throwaway window (no video, tall viewport): its size sets the
+            # recording window, which must be taller than the player or the crop lands on the wrong region.
+            ctx = browser.new_context(viewport={"width": 1150, "height": 1600}, color_scheme="light")
+            page = ctx.new_page()
+            page.goto(url, wait_until="domcontentloaded", timeout=60000)
+            page.wait_for_timeout(3000)
+            block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+            block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
+            try:  # Spark animations mount their controls only once in view
+                block.locator("button").first.wait_for(state="attached", timeout=10000)
+            except Exception:
+                pass
+            box = block.evaluate(_PLAYER_BOX)
+            if not box:
+                # Seen once per lesson (see the four still-image cases): the site never mounts the
+                # player and leaves the code and seed table on screen. Keep that as a still image.
+                page.wait_for_timeout(5000)
+                box = block.evaluate(_PLAYER_BOX)
+            if not box:
+                name = f"{slug}_animation_{k + 1}.png"
+                bb = block.bounding_box()
+                shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
+                    "format": "png", "captureBeyondViewport": True, "clip": {
+                        "x": bb["x"], "y": bb["y"] + page.evaluate("scrollY"),
+                        "width": bb["width"], "height": bb["height"], "scale": 2}})
+                with open(os.path.join(img_dir, name), "wb") as fh:
+                    fh.write(base64.b64decode(shot["data"]))
+                ctx.close()
+                print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
+                saved.setdefault(k, []).append((None, name))
+                continue
+            # the player can grow while it plays (captions, tables): take the largest size seen so far
+            box_css = {"w": box["w"], "h": box["h"]}
+            ctx.close()
             for m, label in enumerate(entry["labels"] or [None]):
-                with tempfile.TemporaryDirectory() as tmp:
-                    ctx = browser.new_context(viewport={"width": 1000, "height": 900}, color_scheme="light")
-                    page = ctx.new_page()
-                    page.goto(url, wait_until="domcontentloaded")
-                    page.wait_for_timeout(3000)
-                    block = page.locator('[data-note-block-type$="_animation"]').nth(k)
-                    block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
-                    if m > 0:
-                        page.wait_for_timeout(300)
-                    box = block.evaluate(_PLAYER_BOX)
-                    if not box:
-                        ctx.close()
-                        print(f"warning: animation {k + 1} has no player controls; not captured", file=sys.stderr)
+                name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
+                                                      if label else "") + ".mp4"
+                dest = os.path.join(ANIM_DIR, name)
+                for attempt in range(3):
+                    try:
+                        st = record_animation(browser, url, k, m, label, dest, box_css)
+                    except Exception as e:  # a navigation timeout: wait and retry this one
+                        print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}); retrying", file=sys.stderr)
+                        time.sleep(10)
+                        continue
+                    if "error" in st:
+                        box_css["h"] = max(box_css["h"], st["need_h"])
+                        continue
+                    dur, fps = _media_stats(dest)
+                    vw, vh = _video_size(dest)
+                    st.update(name=name, dur=dur, fps=fps)
+                    start_ok, start_problems = start_check(dest, st["geom"])
+                    end_ok, end_problems = end_check(dest, st["geom"])
+                    problems = start_problems + end_problems
+                    if fps < 10:
+                        problems.append(f"only {fps:.1f} distinct frames/s")
+                    if st["live"] is not None and abs(dur - (st["live"] + 2)) > 0.3:
+                        problems.append(f"duration {dur:.1f} s vs live {st['live']:.1f} s + 2 s")
+                    if vw != 1600 or vh % 2:
+                        problems.append(f"size {vw}x{vh}")
+                    st["problems"] = problems
+                    if not problems:
+                        ANIM_STATS[name] = st
                         break
-                    # Each frame is a 2x screenshot of the player alone, taken as fast as the browser
-                    # allows (about 14 per second). Playwright's recorded video is compressed and
-                    # its frames are 1x, so the small labels in the diagrams (down to 6.5 px) turned
-                    # fuzzy; at 2x they stay readable after the GIF is scaled down.
-                    cdp = ctx.new_cdp_session(page)
-                    clip = {"x": box["x"], "y": box["y"], "width": box["w"], "height": box["h"], "scale": 2}
-                    if m > 0:
-                        block.locator("button[role=radio]").nth(m).click()
-                        page.wait_for_timeout(300)
-                        play = block.locator('button[aria-label="Play"]')
-                        if play.count():  # a switched mode starts paused (Airflow animations)
-                            play.first.click()
-                    stamps, done_since, last_hash = [], None, None
-                    began = still_since = time.monotonic()
-                    while time.monotonic() - began < 150:
-                        stamp = time.monotonic() - began
-                        shot = cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 92, "clip": clip})
-                        with open(os.path.join(tmp, f"f{len(stamps):05d}.jpg"), "wb") as fh:
-                            fh.write(base64.b64decode(shot["data"]))
-                        stamps.append(stamp)
-                        steps = _STEP.findall(block.inner_text())
-                        if steps and int(steps[-1][0]) >= int(steps[-1][1]):
-                            done_since = done_since or time.monotonic()
-                            if time.monotonic() - done_since >= 2:
-                                break
-                        elif not steps:  # no counter: stop once nothing has moved for 3 seconds
-                            if hash(shot["data"]) != last_hash:
-                                last_hash, still_since = hash(shot["data"]), time.monotonic()
-                            elif time.monotonic() - still_since >= 3:
-                                break
-                    ctx.close()
-                    if len(stamps) < 2:
-                        print(f"warning: animation {k + 1} produced no frames; not captured", file=sys.stderr)
-                        break
-                    with open(os.path.join(tmp, "list.txt"), "w") as fh:  # each frame lasts until the next
-                        for i, stamp in enumerate(stamps):
-                            span = stamps[i + 1] - stamp if i + 1 < len(stamps) else 1.0
-                            fh.write(f"file 'f{i:05d}.jpg'\nduration {max(span, 0.001):.4f}\n")
-                        fh.write(f"file 'f{len(stamps) - 1:05d}.jpg'\n")
-                    name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
-                                                          if label else "") + ".gif"
-                    subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
-                                    "-i", os.path.join(tmp, "list.txt"),
-                                    "-vf", GIF_FILTER, "-loop", "0",
-                                    os.path.join(img_dir, name)], check=True)
-                    saved.setdefault(k, []).append((label, name))
+                    print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
+                else:
+                    raise RuntimeError(f"{name}: could not record a passing video")
+                saved.setdefault(k, []).append((label, name))
         browser.close()
     return saved
+
+
+# Run-output cells are screenshotted whole after clicking Run; a cell has finished when the text
+# inside it stops changing. The site pins an "Ask AI" button to the viewport, which would sit on top
+# of the shot, so fixed-position elements are hidden first.
+_HIDE_FIXED = """() => { for (const e of document.querySelectorAll('body *'))
+  if (getComputedStyle(e).position === 'fixed') e.style.visibility = 'hidden'; }"""
+_CELL_ERROR = re.compile(r"Traceback|Error\b|Exception\b", re.I)
+
+
+def record_cells(url, out_dir, slug, count):
+    """Click Run on every executable_spark cell and save the whole cell as <slug>_cell_<n>.png.
+
+    Returns the file names in page order (None for a cell that could not be captured). Warns
+    about cells that show no output or an error.
+    """
+    if not count:
+        return []
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("playwright not installed; run-output cells not captured", file=sys.stderr)
+        return []
+    img_dir = os.path.join(out_dir, "_images")
+    os.makedirs(img_dir, exist_ok=True)
+    names = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="executable_spark"]')
+        if blocks.count() != count:
+            print(f"warning: page has {blocks.count()} runnable cells, the HTML has {count}", file=sys.stderr)
+        for i in range(min(count, blocks.count())):
+            block = blocks.nth(i)
+            block.scroll_into_view_if_needed()
+            page.wait_for_timeout(800)
+            before = block.inner_text()
+            block.get_by_role("button", name="Run", exact=True).click()
+            began = time.monotonic()
+            last, stable_since = before, None
+            while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
+                page.wait_for_timeout(300)
+                now = block.inner_text()
+                if now != last:
+                    last, stable_since = now, time.monotonic()
+                elif stable_since and time.monotonic() - stable_since >= 1.5:
+                    break
+            result = last[len(before):] if last.startswith(before) else last
+            if last == before:
+                print(f"warning: cell {i + 1} showed no output after Run", file=sys.stderr)
+            elif _CELL_ERROR.search(result):
+                print(f"warning: cell {i + 1} output looks like an error: {result.strip()[:120]!r}",
+                      file=sys.stderr)
+            page.evaluate(_HIDE_FIXED)
+            name = f"{slug}_cell_{i + 1}.png"
+            block.screenshot(path=os.path.join(img_dir, name))
+            names.append(name)
+        names += [None] * (count - len(names))
+        browser.close()
+    return names
 
 
 def screenshot_diagrams(url, out_dir, slug):
@@ -1129,7 +1614,7 @@ def screenshot_diagrams(url, out_dir, slug):
         print("playwright not installed: .venv/bin/pip install playwright && "
               ".venv/bin/playwright install chromium", file=sys.stderr)
         return []
-    img_dir = os.path.join(out_dir, "images")
+    img_dir = os.path.join(out_dir, "_images")
     os.makedirs(img_dir, exist_ok=True)
     names = []
     with sync_playwright() as p:
@@ -1174,8 +1659,15 @@ def main():
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
                   if "--screenshots" in sys.argv else {})
+    for entries in animations.values():  # upload now: a failure here must not leave a half-written lesson file
+        for _, name in entries:
+            if name.endswith(".mp4"):
+                upload_animation(name)
+    n_cells = len(BeautifulSoup(html, "html.parser").find_all(attrs={"data-note-block-type": "executable_spark"}))
+    cells = record_cells(url, out_dir, slug, n_cells) if "--screenshots" in sys.argv else []
     path = os.path.join(out_dir, slug + ".md")
-    with open(path, "w", encoding="utf-8") as f:
+    tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
+    with open(tmp_path, "w", encoding="utf-8") as f:
         challenges = fetch_challenges(slug)
         drop_refs = False
         airflow = bool(challenges) and challenges[0].get("challenge_type") == "airflow"
@@ -1204,7 +1696,8 @@ def main():
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
-                       load_drops(slug)))
+                       load_drops(slug), cells))
+    os.replace(tmp_path, path)
     print(path)
 
 
