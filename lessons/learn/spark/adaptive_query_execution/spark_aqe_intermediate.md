@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 11 challenges
-
 # Adaptive Query Execution: Intermediate
 
 On the morning after New Year's Eve at Uber, the nightly Spark job joining trips to pricing events and rider accounts ran on the same code as every other night, but one corporate account had booked a tenth of all trips and a filter shrank the pricing side to a few megabytes. Whether the job finished by breakfast came down to what Spark measured between its stages.

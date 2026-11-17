@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 3 challenges
-
 # Junk and Degenerate Dimensions: Advanced
 
 Ines is in the data modeling round of a Shopify data engineering loop. The interviewer shares an order payload: an order number like #1042, payment and fulfillment statuses, flags for test orders and gifts, and the sales channel. The whiteboard already holds a date dimension next to customer and product. 'Model the order line fact,' the interviewer says, 'and tell me where each of these leftover fields lives.' Ines puts all 6 on the fact. The follow-ups arrive fast: why not one dimension per flag, what does a row of that dimension mean, what happens to your design when merchants add a coupon code with 50,000 values, and how do you count orders without double counting the shipping fee? Each answer needs a number and a named cost. This lesson builds both.

@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 13 challenges
-
 # Storage Formats: Intermediate
 
 At Uber, an on-call engineer has 10 minutes to pull every trip in city 42 from last Tuesday out of a year of trip logs before a pricing review. The same filter can read all 730GB or a single 128MB row group. Which one it reads depends on how the files were laid out when written, and on whether Spark can check that layout before reading a single row.

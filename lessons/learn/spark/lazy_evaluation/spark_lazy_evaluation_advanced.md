@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 11 challenges
-
 # Lazy Evaluation: Advanced
 
 A LinkedIn data engineer runs nightly label propagation over the member graph to find communities: each round, every member adopts the smallest label among their connections, and a sum checks whether any label moved. Round 2 finishes in 4 minutes. Round 30 takes an hour on identical data, because Spark replays every earlier round before it can answer.

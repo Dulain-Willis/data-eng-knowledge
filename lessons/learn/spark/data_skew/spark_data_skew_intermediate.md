@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 15 challenges
-
 # Data Skew: Intermediate
 
 You're a data engineer at Instagram, and the nightly job that joins every follow edge to the account being followed has stalled at 199 of 200 tasks. The last task holds every edge pointing at Cristiano Ronaldo, the most-followed person on the platform. Doubling the partition count changes nothing. This lesson shows you how to measure that key, split it, and finish the stage on time.

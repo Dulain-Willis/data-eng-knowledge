@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Tasks and Data: Beginner
 
 Airflow began at Airbnb as a data engineering tool, and a nightly host payout job is the kind of pipeline it schedules. A host_payouts DAG totals yesterday's checkouts, sends the figures to the payments service, and records how many hosts got paid. Carrying those rows through its workers or telling the warehouse to sum them decides whether it finishes by 6am or dies at 3am out of memory.

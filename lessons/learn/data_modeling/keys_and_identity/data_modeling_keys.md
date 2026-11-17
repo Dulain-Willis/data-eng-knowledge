@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 22 min · 10 challenges
-
 # Keys & Identity
 
 FreshCart closed March 2024 with revenue 11% higher than its payment processor settled. The cause was 2 `customers` rows for 1 person, 1 from the app and 1 from the website, and every order joined to both. Nothing in the schema said those rows had to be different people. Keys are how a schema says that, and this lesson is how to choose them.

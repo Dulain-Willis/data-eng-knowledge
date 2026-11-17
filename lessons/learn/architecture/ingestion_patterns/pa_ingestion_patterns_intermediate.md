@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 12 challenges
-
 # Ingestion Patterns: Intermediate
 
 Netflix keeps search indexes in sync with production databases. When a title is pulled from the catalog, a poller asking for recently changed rows never learns the row was deleted, so the title stays searchable. Re-dumping the table under a lock would stall writes. Netflix engineers published a framework that reads the database's change log and dumps existing rows without locks. This lesson builds that design for an `orders` table.

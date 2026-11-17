@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 18 min · 12 challenges
-
 # Relationships
 
 A GitHub engineer is adding Discussions. Users already comment on issues and on pull requests, and now they will comment on discussions. One comments table for all 3, or one per kind? Teams nest inside teams, repositories fork other repositories, and one user belongs to many organizations. Each is a relationship, its model decides which queries stay cheap, and the last section weighs 3 answers to the comments question.

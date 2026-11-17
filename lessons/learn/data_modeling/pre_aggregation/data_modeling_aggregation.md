@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 23 min · 12 challenges
-
 # Pre-Aggregation
 
 At Uber, one operations team opens its Monday dashboard: trips and fares for the 300 cities it covers, over the last 90 days. Pointed at the raw trips table, the page spins for 40 seconds while the whole team waits. Pointed at a nightly summary table, it reads 27,000 rows and loads before the coffee cools. Pre-aggregation decides which morning they get.

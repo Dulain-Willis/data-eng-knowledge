@@ -1,5 +1,3 @@
-Advanced·Spark · 14 min · 7 challenges
-
 # Execution Model: Advanced
 
 Picture the nightly Spark job behind Netflix's Top 10 row fanning out into 2,000 tasks. One night 1,999 of them finish in 3 minutes and the last runs for 40 on a failing disk. Whether the row refreshes before breakfast depends on 2 components inside the driver: the one that cuts stages, and the one that hands out tasks, retries them, and launches a copy of the straggler.

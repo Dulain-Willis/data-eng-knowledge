@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 9 challenges
-
 # Producers: Beginner
 
 An Uber driver's phone reports its position every few seconds, and every report is one send() call into a topic. Some driver is always pulling into SFO's pickup zone while a broker in that cluster is restarting. Whether the ping lands, where it lands, and whether the rider's map jumps backward are all decided by settings in the producer, before any broker sees the record.

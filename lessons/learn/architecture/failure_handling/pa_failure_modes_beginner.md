@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 10 challenges
-
 # Failure Handling: Beginner
 
 A Stripe settlement pipeline pulls payout files from dozens of card networks overnight. One network's API goes down for 3 minutes during a deploy. All 400 workers see the error at the same moment. What each worker does in the next 10 seconds decides whether the API comes back or gets knocked over again by Stripe's own retries, and whether anyone notices before the finance team opens the report.

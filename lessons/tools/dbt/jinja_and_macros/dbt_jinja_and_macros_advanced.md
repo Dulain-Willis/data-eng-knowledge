@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Jinja and Macros: Advanced
 
 GitLab runs its analytics on a public dbt project. An engineer there adds a macro that reads the list of subscription plans from the warehouse and emits one revenue column per plan. CI's `dbt parse` passes with 0 plan columns. The nightly build produces 6. The model file is identical in both runs. Where did the second shape come from?

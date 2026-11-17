@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 11 challenges
-
 # Ingestion Patterns: Advanced
 
 Noon on Black Friday at Shopify: a celebrity sneaker drop opens and orders pour into a shared database. The event pipeline must copy those orders out without slowing checkout, hand every order to shipping even if the broker blinks, swallow a surge it can't stop, and keep every other merchant's data flowing while a single storefront eats the capacity.

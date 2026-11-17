@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 10 challenges
-
 # Incremental Models: Beginner
 
 Spotify Wrapped lands each December and turns a year of a listener's streams into top songs, top artists and minutes listened. A plays table feeding it, 1 row per stream, rebuilt every night from the first stream ever recorded to add 1 day, would finish later each night as history grows. The fix is a model that writes only the plays it has not seen.

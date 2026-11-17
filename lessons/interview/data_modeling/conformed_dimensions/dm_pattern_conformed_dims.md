@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 7 challenges
-
 # Conformed and Role-Playing Dimensions: Advanced
 
 Ines is in the final data modeling round at Airbnb. The interviewer draws 2 boxes: one for bookings, one for search events. 'Product wants search-to-booking conversion by city and by host tenure. The search team and the bookings team each built their own listing table, and the numbers never match. Fix it.' Then comes a second turn: a booking has 3 dates, and its guest and host are both users. Ines has met each idea alone. The interviewer is testing whether she can hold them together: a dimension every fact table agrees on, one user table joined in 2 roles, and a guest profile whose trust tier changes weekly without the user table tripling in size. This lesson builds that answer piece by piece, with the row counts behind each choice.

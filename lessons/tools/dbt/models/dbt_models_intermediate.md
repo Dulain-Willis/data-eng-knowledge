@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 6 challenges
-
 # Models: Intermediate
 
 At Spotify, a listener on Premium Individual upgrades to Premium Duo on March 2. The billing system updates her row in place, and by March 3 nothing in the warehouse says she was ever on Individual. The finance team asks why Duo revenue jumped and Individual revenue dipped. Whether anyone can answer depends on how the dbt project was built.

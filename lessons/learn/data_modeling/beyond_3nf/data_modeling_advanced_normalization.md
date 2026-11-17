@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 19 min · 12 challenges
-
 # Beyond 3NF
 
 At Airbnb, a host profile table pairs every language a host speaks with every listing the host manages. A host with 3 languages and 4 listings fills 12 rows, and the table passes every 3NF check. A host adds Italian, and the language-sync job inserts 1 row where the full update needs 4. One dashboard now shows that host's Italian on 1 listing, another on all 4.

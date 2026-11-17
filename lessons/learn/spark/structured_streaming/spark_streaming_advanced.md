@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 13 challenges
-
 # Structured Streaming: Advanced
 
 Midnight on New Year's Eve at Uber: ride requests pour in, phones on packed streets upload events 20 minutes late, and a streaming job pairs every request with the driver who accepted it. Whether that job keeps up or falls over comes down to 4 choices: where its state lives, how long it waits for stragglers, how much it reads per batch, and how fast it must answer.

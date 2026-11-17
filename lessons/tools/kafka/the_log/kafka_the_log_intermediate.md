@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 9 challenges
-
 # The Log: Intermediate
 
 At LinkedIn, where Kafka was written, a topic takes every edit a member makes to their profile, and a new search index needs each member's current headline and nothing older. A second topic takes page views and must hold 7 days, then let them go. Both are directories of segment files, and what those files keep, drop and split decides whether either job works.

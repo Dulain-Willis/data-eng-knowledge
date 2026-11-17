@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 12 challenges
-
 # Catalyst Optimizer: Beginner
 
 Say 2 Netflix engineers each build the nightly job that totals yesterday's viewing minutes per title. One chains Python lambdas over an RDD. The other writes the same logic with DataFrame columns. They use the same cluster and the same input, and the DataFrame job finishes first, because Spark rewrote it before any task started. This lesson shows what that rewrite does and how to watch it happen.

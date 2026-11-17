@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 22 min · 12 challenges
-
 # Schema Types
 
 A billing team closes the month, reconciles the revenue report against the bank statement, and finds the two disagree by $4,712.38. No transaction is missing. No single row is wrong on its own. The gap traces back to a column someone declared as FLOAT 3 years earlier. Each column in a schema carries a decision like that one, and this lesson walks through the ones that break in production.

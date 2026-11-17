@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Kafka in the Pipeline: Beginner
 
 Black Friday at Shopify. Every checkout becomes a row in an orders database, and the merchant dashboards need those rows in the warehouse within minutes. Nobody on the data team wants to maintain a hand-written copier program per table. One connector pulls each row onto the orders log, another writes the log out to storage, and the only argument left is which file format the dashboards read fastest.

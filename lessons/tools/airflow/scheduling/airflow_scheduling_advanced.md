@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Scheduling: Advanced
 
 Shopify shows a live globe of sales every Black Friday Cyber Monday weekend, Friday through Monday. This lesson builds the batch pipeline behind a globe like it in Airflow. Regional checkout files land at unpredictable minutes, the weekend's summary windows follow a retail calendar, a running total must never count an hour twice, and a mid-weekend schedule change must not drop an hour. Each is a scheduling decision.

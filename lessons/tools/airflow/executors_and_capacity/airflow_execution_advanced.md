@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Executors and Capacity: Advanced
 
 Airflow began at Airbnb in 2014, built by Maxime Beauchemin to run the company's data pipelines. When a scheduler there dies at 3am the night before a holiday, whether the morning's pricing dashboards load depends on a second scheduler finding the orphaned tasks, on a metadata database small enough to answer fast, and on caps sized for the night's real peak.

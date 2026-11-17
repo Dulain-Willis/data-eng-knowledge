@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 9 challenges
-
 # Deploying dbt: Beginner
 
 GitLab's data team keeps its dbt project in a public repository, and changes reach it through merge requests. Take one that edits an orders model. Before merge, that model and the models reading it build in the author's own schema. After merge a scheduled run builds it into production, and if a test fails there, the next step decides what dashboards show.

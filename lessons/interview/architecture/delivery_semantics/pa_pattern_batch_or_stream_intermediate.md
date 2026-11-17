@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 35 min · 2 challenges
-
 # Batch or Stream?: Intermediate
 
 The interviewer at Uber opens with a story rather than a question. A rider opens the app and sees a fare and an ETA. Behind that screen, a pricing model reads demand in each neighborhood, and a city operations team reads the same demand on a dashboard the next morning. 'Same data, 2 consumers,' she says. 'Which of those do you build as a stream, which as a batch, and how do you know?' The candidate starts with 'streaming is faster', and she waits. Faster than what? And who pays for the speed? The answer she wants names a latency the consumer needs, a cost of being late, the shape of the source, and the team that will carry the pager. Then: how the stream and the batch share code, how the stream is tested before launch, and what the job does when it crashes at 03:00.

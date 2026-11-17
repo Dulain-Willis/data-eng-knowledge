@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 35 min · 2 challenges
-
 # The Spark Deep Dive: Intermediate
 
 A candidate sits in a systems round at Netflix, where the batch data platform runs on Spark. The interviewer shares a screen: a nightly job that joins 2 TB of playback events to a 30 GB title catalog, scheduled for 90 minutes, finished last night in 6 hours. 'Tell me what happened,' she says, 'and what you would change.' The screen shows a stage list from the Spark UI so far: stage 3 ran 200 tasks, median task 25 seconds, slowest task 5 hours 33 minutes. The candidate who recognizes that shape, names the join strategy the planner picked, and says which executor setting bounded the spill is the one who gets the next round. This lesson builds that recognition, starting with the execution model and the UI metrics it produces. Join strategies come next, then the sizing arithmetic, then the skew fixes, each worked on real numbers.
