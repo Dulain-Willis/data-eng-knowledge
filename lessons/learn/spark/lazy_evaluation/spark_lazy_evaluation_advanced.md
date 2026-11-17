@@ -87,7 +87,7 @@ On the Jobs tab, planning shows up as a gap. A job's clock starts when the DAGSc
 
 The animation runs the same growth on a loop small enough to watch. It starts from Monday's events, adds another day per round with `union`, and ends in a single `collect()`.
 
-![Animation](_images/spark_lazy_evaluation_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/04aa7585-48ce-42b9-9012-9eab5eaaddf0
 
 The loop's 3 rounds launch nothing. When `collect()` runs, 1 job with 1 stage starts: each day's table brings its 2 partitions along, so the stage runs 8 tasks, and the driver gathers all 12 rows. Every round left its operators, and here its partitions too, in the job that finally ran.
 

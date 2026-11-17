@@ -215,7 +215,7 @@ Use the table as a test for any stage: when a task's input, held in memory as ro
 
 This job joins trips to drivers with broadcasting switched off, so both sides are shuffled into 3 reducer tasks by `driver_id`. Driver 101 has 7 of the 12 trips. Every row a reducer task receives is held in its execution memory while the sort-merge join sorts and matches it, so watch which task collects the 7.
 
-![Animation](_images/spark_memory_caching_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/c70d3ea4-caa3-4b2f-89fb-3fa61416936e
 
 The plan has 3 stages: a map stage for each side writing shuffle files, then the join stage reading them. The task that receives driver 101 holds at least 7 trip rows, while the other 2 tasks share at most the remaining 5. Scale every row up a million times: that task gets the same share of memory as its neighbours, with several times their input, and it is the one that spills.
 

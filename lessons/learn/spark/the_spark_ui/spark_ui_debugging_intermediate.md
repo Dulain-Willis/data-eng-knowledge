@@ -117,8 +117,7 @@ Bytes depend on encoding, so count records instead. The stage page reports Shuff
 
 The animation runs that combine on 15 rows of viewing minutes split into 3 partitions. Watch the shuffle: each map task sends at most 3 rows, one per country, so 15 input rows become no more than 9 shuffled ones.
 
-![Animation](_images/spark_ui_debugging_intermediate_animation_1.gif)
-
+https://github.com/user-attachments/assets/626b0c74-1b93-49bc-a7aa-b171ca38a58c
 
 <br>
 
@@ -243,7 +242,7 @@ A records ratio near 1 rules out data skew, and the shared executor confirms it.
 
 The animation shows the data-skew side on a sort-merge join. Title 7 appears in 10 of the 15 plays, so whichever reduce task hash partitioning assigns to key 7 receives at least 11 rows, the 10 plays plus the title itself, while the other tasks split the remaining handful.
 
-![Animation](_images/spark_ui_debugging_intermediate_animation_2.gif)
+https://github.com/user-attachments/assets/00d3ae68-d937-4ec6-9e5e-33d50667b642
 
 When the tell reads data skew, the levers are ones you already have: salt the hot key, isolate it and process it separately, or filter it out first if the hot key is NULL. For a sort-merge join, adaptive execution splits any partition larger than both 5 times the median and 256 MB on its own. A window like stage 4's gets no such help, which is why its 66 million rows still ran on a single core.
 

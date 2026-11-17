@@ -350,14 +350,18 @@ def animation_info(html):
 
 
 def animation(soup, block, tokens, info, files):
-    """An animation block as its GIF(s), one per mode, and the caption as plain text.
+    """An animation block as its video URL(s) (or still images), one per mode, and the caption as plain text.
 
     The playback is drawn by JavaScript, so it can only be a recording (see record_animations).
     Built as Markdown and swapped in after markdownify.
     """
     parts = []
     for label, name in files or []:
-        parts.append((f"**{label}**\n\n" if label else "") + f"![{label or 'Animation'}](_images/{name})")
+        if name.endswith(".mp4"):  # uploaded (upload_animation); a bare URL on its own line renders as a video
+            shown = upload_animation(name) if "--screenshots" in sys.argv else name
+        else:
+            shown = f"![{label or 'Animation'}](_images/{name})"
+        parts.append((f"**{label}**\n\n" if label else "") + shown)
     if not parts:
         parts.append("[Animation: not captured. Re-run with --screenshots]")
     if info.get("caption"):
@@ -1044,16 +1048,48 @@ def screenshot_schema_diagrams(url, out_dir, slug, challenges):
 # Animations (sql_animation, kafka_animation, pipeline_animation ...): a player that plays by
 # itself once scrolled into view, with a step counter ("3/9") and sometimes mode toggles.
 # Each mode is recorded as a screen video of the player alone, cropped, and made into a GIF.
-GIF_FILTER = ("fps=15,scale=1000:-1:flags=lanczos,split[a][b];[a]palettegen=stats_mode=diff[p];"
-              "[b][p]paletteuse=dither=sierra2_4a")
+# The recording is an MP4 (a GIF of these players was 5 to 10 MB), kept outside the repo in ANIM_DIR and
+# uploaded as a GitHub user-attachments asset; GitHub shows a bare asset URL on its own line as a video
+# player. tools/animation_urls.json maps each recording's name to its URL so a re-run reuses it.
+ANIM_DIR = os.environ.get("ANIM_DIR") or os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", ".animations")
+URLS_FILE = os.path.join(os.path.dirname(os.path.abspath(__file__)), "animation_urls.json")
+REPO = "Dulain-Willis/data-eng-knowledge"
+MP4_FILTER = "fps=15,scale=1600:-2:flags=lanczos,format=yuv420p"
+# A wide player (diagrams up to ~1100 px) is cut off at the sides in a 1000 px window, and a tall one
+# (770 px+) at the bottom in a 900 px one, so record in a big window and capture beyond the viewport.
+ANIM_VIEWPORT = {"width": 1400, "height": 1200}
+_HIDE_PINNED = """() => { for (const e of document.querySelectorAll('body *')) {
+    const p = getComputedStyle(e).position;
+    if ((p === 'fixed' || p === 'sticky') && e.getBoundingClientRect().height < 140) e.style.visibility = 'hidden'; } }"""
 _STEP = re.compile(r"(\d+)\s*/\s*(\d+)")
 _PLAYER_BOX = """(block) => { const bs = [...block.querySelectorAll('button')]; if (!bs.length) return null;
     let a = bs[0]; while (a && !bs.every(b => a.contains(b))) a = a.parentElement;
     const r = a.getBoundingClientRect(); return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
 
 
+def upload_animation(name):
+    """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
+    in tools/animation_urls.json and return it. Needs `gh auth login`; the token only goes to github.com."""
+    urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
+    if name not in urls:
+        tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
+        rid = subprocess.run(["gh", "api", f"repos/{REPO}", "--jq", ".id"], capture_output=True, text=True,
+                             check=True).stdout.strip()
+        res = subprocess.run(["curl", "-s", "-X", "POST", "-H", f"Authorization: Bearer {tok}",
+                              "-H", "Accept: application/json", "-H", "Content-Type: video/mp4",
+                              "--data-binary", "@" + os.path.join(ANIM_DIR, name),
+                              f"https://uploads.github.com/user-attachments/assets?name={name}"
+                              f"&content_type=video/mp4&repository_id={rid}"],
+                             capture_output=True, text=True, check=True).stdout
+        urls[name] = json.loads(res)["url"]
+        with open(URLS_FILE, "w") as fh:
+            json.dump(dict(sorted(urls.items())), fh, indent=1)
+            fh.write("\n")
+    return urls[name]
+
+
 def record_animations(url, out_dir, slug, info):
-    """Save every animation block's playback as a GIF: one per mode (toggle) if it has any.
+    """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
     Returns {block number: [(mode label or None, file name)]}. The capture runs from the
     moment the mode starts until the step counter reaches its last step (two seconds' grace),
@@ -1078,7 +1114,7 @@ def record_animations(url, out_dir, slug, info):
         for k, entry in enumerate(info):
             for m, label in enumerate(entry["labels"] or [None]):
                 with tempfile.TemporaryDirectory() as tmp:
-                    ctx = browser.new_context(viewport={"width": 1000, "height": 900}, color_scheme="light")
+                    ctx = browser.new_context(viewport=ANIM_VIEWPORT, color_scheme="light")
                     page = ctx.new_page()
                     page.goto(url, wait_until="domcontentloaded")
                     page.wait_for_timeout(3000)
@@ -1088,7 +1124,7 @@ def record_animations(url, out_dir, slug, info):
                         block.locator("button").first.wait_for(state="attached", timeout=10000)
                     except Exception:
                         pass
-                    page.evaluate(_HIDE_FIXED)  # the pinned "Ask AI" button would sit on top of the player
+                    page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
                     if m > 0:
                         page.wait_for_timeout(300)
                     box = block.evaluate(_PLAYER_BOX)
@@ -1127,7 +1163,8 @@ def record_animations(url, out_dir, slug, info):
                     began = still_since = time.monotonic()
                     while time.monotonic() - began < 150:
                         stamp = time.monotonic() - began
-                        shot = cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 92, "clip": clip})
+                        shot = cdp.send("Page.captureScreenshot", {"format": "jpeg", "quality": 92, "clip": clip,
+                                                                   "captureBeyondViewport": True})
                         with open(os.path.join(tmp, f"f{len(stamps):05d}.jpg"), "wb") as fh:
                             fh.write(base64.b64decode(shot["data"]))
                         stamps.append(stamp)
@@ -1151,11 +1188,12 @@ def record_animations(url, out_dir, slug, info):
                             fh.write(f"file 'f{i:05d}.jpg'\nduration {max(span, 0.001):.4f}\n")
                         fh.write(f"file 'f{len(stamps) - 1:05d}.jpg'\n")
                     name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
-                                                          if label else "") + ".gif"
+                                                          if label else "") + ".mp4"
+                    os.makedirs(ANIM_DIR, exist_ok=True)
                     subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-f", "concat", "-safe", "0",
-                                    "-i", os.path.join(tmp, "list.txt"),
-                                    "-vf", GIF_FILTER, "-loop", "0",
-                                    os.path.join(img_dir, name)], check=True)
+                                    "-i", os.path.join(tmp, "list.txt"), "-vf", MP4_FILTER,
+                                    "-movflags", "+faststart", "-c:v", "libx264", "-crf", "23",
+                                    os.path.join(ANIM_DIR, name)], check=True)
                     saved.setdefault(k, []).append((label, name))
         browser.close()
     return saved

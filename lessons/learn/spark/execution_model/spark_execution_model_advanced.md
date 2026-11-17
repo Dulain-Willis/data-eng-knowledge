@@ -35,8 +35,7 @@ The split is by unit. The DAGScheduler reasons in stages and knows nothing about
 
 The program below groups 9 rides by city and sums fares, reading the table as 3 partitions with 3 shuffle partitions. The DAGScheduler finds 1 shuffle, in the groupBy, and cuts 2 stages: a ShuffleMapStage of 3 tasks that hash each row's city and write shuffle files, and a ResultStage of 3 tasks that each sum the cities hashing to their partition, so 1 reducer may get 2 cities and another none. Stage 0 goes to the TaskScheduler as a TaskSet of 3 tasks, and only when the 3rd map output is registered does the DAGScheduler submit stage 1, so no reducer starts before every map file exists. The driver collects 3 rows: SF at 55.0, NYC at 42.5 and LA at 65.5. This walkthrough and the log below assume adaptive execution is off; with it on, the map stage runs as a job of its own and the small reduce partitions may be merged.
 
-![Animation](_images/spark_execution_model_advanced_animation_1.gif)
-
+https://github.com/user-attachments/assets/48c0d91b-ee5c-4a0f-b84c-35467a3458b5
 
 <br>
 
@@ -264,7 +263,7 @@ Both schedulers live in the driver, and so does every result an action brings ho
 
 The program below filters 12 events to the 7 from the US and collects them, with the table read as 4 partitions. The filter runs as 4 tasks, each keeping its own US rows. Then each task serializes its rows, ships them to the driver, and the driver deserializes all 4 result sets into 1 list. For 12 rows this costs nothing. For 400 million rows of 200 bytes it is 80 GB arriving at a process with 8 GB of heap, and the shape of the picture stays the same: every row passes through the JVM that is also running both schedulers.
 
-![Animation](_images/spark_execution_model_advanced_animation_2.gif)
+https://github.com/user-attachments/assets/dfacb4f2-64ca-49ba-8991-d44cfe002612
 
 Spark guards this with `spark.driver.maxResultSize`, default 1g. The driver adds up the serialized size of results as they arrive and aborts the job once the total crosses the limit, with an error naming how many tasks' results exceeded it. Raising the limit moves the failure from an error message to an out-of-memory crash of the driver. The fix is to reduce on the executors first and move only the reduction. The cell below reads every completed order on the executors and brings back 1 row.
 

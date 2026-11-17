@@ -106,7 +106,7 @@ This is the shape the reader accepts. PushedFilters lists EqualTo(trip_date,2024
 
 Every row the reader drops is also a row the rest of the stage never touches, shuffle write included. The animation totals fares per city for 1 day across 12 trips in 3 partitions. Its tables sit in memory with no row groups, so the filter runs right after the scan in the same stage instead of inside the reader; downstream, the effect is identical.
 
-![Animation](_images/spark_storage_formats_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/a0335594-ff32-46a2-9fb4-28a996629726
 
 Five of the 12 trips are dated 2024-03-12, so at most 5 rows reach partial aggregation, and the shuffle moves per-city partial sums instead of raw trips. The job runs as 2 stages with 1 shuffle, from the `groupBy`.
 

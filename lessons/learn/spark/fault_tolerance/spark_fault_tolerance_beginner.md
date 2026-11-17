@@ -176,7 +176,7 @@ In that code, filter and selectExpr are narrow: partition 2 of gross comes only 
 
 The groupBy adds a shuffle, so the job runs as 2 stages. In the first, each map task filters its split, adds up a partial sum for each region it saw, and writes those partial sums to local disk in buckets by region. In the second, each reduce task fetches its region's partial sums from every map task and adds them. A cut-down version of the job plays below: watch each region's partial sums cross between the stages.
 
-![Animation](_images/spark_fault_tolerance_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/3f15fe57-9129-4208-82ef-a114911edb6a
 
 The reducer that produces EU's total of 90 fetched from every map task, because any of them could hold EU rows. That's what a wide dependency costs on recovery. If a reduce task dies while every map output is still on a healthy executor's disk, Spark reruns that reduce task alone, and it fetches the same buckets again. If the executor that died also held map output, the reducers trying to fetch it fail with FetchFailedException. Spark then reruns the lost map tasks from the files, using their lineage, and reruns the reducers after them.
 
@@ -303,7 +303,7 @@ The executor's memory, and the order 5 it held, disappeared together. The driver
 
 The animation below runs the same filter over 12 orders and collects the 9 completed ones. No shuffle is involved: each task filters its own partition and sends its rows to the driver as 1 result, and the driver assembles them in partition order.
 
-![Animation](_images/spark_fault_tolerance_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/ff11f2d6-5bfd-4f2b-94e6-93ad340bb25c
 
 A rerun of any of those tasks would leave the board unchanged: 1 result per partition, 9 rows in total. Shuffle output follows the same rule. A rerun map task writes its buckets again, and the driver records a single output location per map task, so reducers read each map task's rows once.
 

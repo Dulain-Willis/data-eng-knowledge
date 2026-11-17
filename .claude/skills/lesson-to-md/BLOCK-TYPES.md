@@ -15,7 +15,7 @@ The site builds a lesson from blocks tagged `data-note-block-type="<type>"`, and
 | `key_takeaways`, `synthesis` | Plain divs with canvas-drawn bullets and no `li`. | `##` heading plus bullets. |
 | `pipeline_diagram`, `schema_diagram` | HTML boxes layered with SVG, no text structure. | 2x screenshot. |
 | `executable_spark` | A runnable PySpark cell: seed tables on the left, code editor, Run button, and an output table that only appears after Run (drawn by JavaScript). The static HTML holds just the code in a `<pre>`. | `record_cells` clicks Run, waits until the cell text stops changing, and takes one 2x screenshot of the whole cell (`_images/<slug>_cell_<n>.png`, alt `Run output n`); the code follows as a ```` ```python ```` fence (screenshots can cut long lines). Warns on a cell with no output or an error. |
-| `spark_animation` | Like the other `*_animation` blocks, but the controls mount lazily once scrolled into view and the static HTML shows "Preparing the animation"; `record_animations` waits for the first button before measuring the player. | GIF. |
+| `spark_animation` | Like the other `*_animation` blocks, but the controls mount lazily once scrolled into view and the static HTML shows "Preparing the animation"; `record_animations` waits for the first button before measuring the player. | MP4, uploaded (see below). |
 
 ## Left out on purpose
 
@@ -37,3 +37,5 @@ The site builds a lesson from blocks tagged `data-note-block-type="<type>"`, and
 - `lessons/` is tracked and committed on purpose; per the user, DataDriven's people approved this copy.
 - Python tooling lives in `.venv/`; Playwright's Chromium sits in `~/.cache/ms-playwright`.
 - `tools/__pycache__/*.pyc` is tracked and changes on every run, so `git add` files by path.
+
+- **Animation videos (Spark and any `*_animation` made with `--screenshots`):** `record_animations` records each mode as an MP4 into `ANIM_DIR` (default `.animations/`, git-ignored; never commit it), in a 1400x1200 window with `captureBeyondViewport` (a 1000x900 window clipped the bottom control bar and the sides). `upload_animation` posts it to GitHub's user-attachments endpoint (needs `gh auth login`) and the Markdown gets the bare URL on its own line, which GitHub renders as a video player. `tools/animation_urls.json` maps recording name to URL, so a re-run reuses uploads; delete a key to force a re-upload after re-recording. The player's camera pans on purpose, so a card cut at an edge in one frame is normal; the player is at most 1102 px wide.
