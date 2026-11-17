@@ -57,7 +57,7 @@ The optimizer did its part well: the filter runs right after the scan of `titles
 
 The animation runs the same shape on 10 view rows and 6 titles, 2 of them new. Its first line switches broadcasting off to stand in for the 2GB estimate; with 6 rows on the small side, Spark would otherwise broadcast at plan time. Watch which rows travel between tasks.
 
-![Animation](_images/spark_aqe_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/ebbdd28b-807b-40bd-9f14-105397565732
 
 All 10 view rows are hashed by `title_id` and moved, and 3 of them find a match. Scale that to 800GB and the shuffle moves every view of every title to serve a join against 40 titles.
 

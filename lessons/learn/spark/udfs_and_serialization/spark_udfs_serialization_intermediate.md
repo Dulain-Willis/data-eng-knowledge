@@ -364,8 +364,7 @@ products.withColumn("price_tier", tier).groupBy("price_tier").agg(
 
 The animation plays the same chain over 8 products in 2 partitions. The tier is computed inside each map task, on rows already there, before the shuffle write for the `groupBy`. The aggregation's shuffle is the only data that moves; with the UDF, every row would also have gone to a Python worker and back inside each map task.
 
-![Animation](_images/spark_udfs_serialization_intermediate_animation_1.gif)
-
+https://github.com/user-attachments/assets/adc458a5-7a36-4aec-8f79-8940185475bf
 
 <br>
 

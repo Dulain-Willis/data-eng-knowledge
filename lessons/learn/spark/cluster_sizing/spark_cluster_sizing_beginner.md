@@ -347,7 +347,7 @@ A broadcast join collects the whole small table on the driver before sending a c
 
 The animation below rolls 12 view rows up into minutes per title and collects the result. Count the rows at each step: the groupBy shuffles them by title across 3 tasks, and the driver receives 1 row per title, 4 in all.
 
-![Animation](_images/spark_cluster_sizing_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/f0a1b4de-90cd-46c7-9233-7efe1ed43005
 
 Every reduction placed before `collect()` runs on the executors and shrinks what crosses to the driver. Put the same `collect()` ahead of the groupBy and all 12 rows arrive; at production scale that is the gap between a few kilobytes and many gigabytes.
 

@@ -159,7 +159,7 @@ A DataFrame is a description. The rows that satisfy the filter exist only inside
 
 The animation below runs a filter and a groupBy over 8 orders split into 2 partitions, ending in a `collect()`. Step through it and watch the timeline: the first 2 lines produce no task at all. When `collect()` arrives, 2 tasks read the 2 partitions and drop orders 3 and 5 inside the task that read them. Each task then adds up its own completed orders per region and sends those partial totals on. The first partition's totals are US 120 and EU 80, plus 60 for APAC. The second's are US 95 and EU 55, plus 70 for LATAM. The 2 grouping tasks combine them into 4 regional totals: US reaches 215 and EU 135, while APAC stays at 60 and LATAM at 70. The driver receives those 4 rows. Orders 3 and 5 never travelled, and no table of 6 filtered rows was ever stored between the 2 lines.
 
-![Animation](_images/spark_lazy_evaluation_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/b0eb556a-fe6e-4cb5-aadb-4361e9ece72e
 
 Run the cell below. The chain filters and groups by `status` before it collects, all in one job. The filter removes every order whose status reads anything other than `Completed` before the grouping sees a row, which is why the result holds 1 row.
 

@@ -30,7 +30,7 @@ A task is the unit the scheduler ships: the stage's code, serialized once, plus 
 
 The program below reads 6 orders as 2 partitions. The filter and the net column need nothing from any other row, so they run inside the first stage's 2 tasks; 5 rows survive the filter. The groupBy needs every EU row on 1 task, so rows move: that boundary ends stage 0 and starts stage 1, which has 2 tasks because the run uses 2 shuffle partitions. The orderBy needs the regions arranged by revenue across the whole result, which moves the rows once more into stage 2. The job runs 3 stages and 6 tasks, and the driver receives 3 rows: US 210, EU 145, APAC 75.
 
-![Animation](_images/spark_execution_model_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/e1600eb1-dfad-4c8c-9929-b653057e0d98
 
 | Stage | Tasks | Rows in | Shuffle write | Shuffle read | Ends with |
 | --- | --- | --- | --- | --- | --- |
@@ -97,8 +97,7 @@ A task runs on 1 slot with 1 partition in hand, and it can see nothing else. It 
 
 The program below has that shape. It reads 6 events as 3 partitions; each task keeps the clicks, multiplies seconds into milliseconds, and hands its rows straight to the driver. The 3 tasks have nothing to wait for, so the job is 1 stage and collects 4 rows.
 
-![Animation](_images/spark_execution_model_intermediate_animation_2.gif)
-
+https://github.com/user-attachments/assets/c601eec9-e377-46d7-a84a-22d39c655563
 
 <br>
 
@@ -176,8 +175,7 @@ The first stage of a job gets 1 task per input partition, and Spark fixes that c
 
 The program below sets 4 shuffle partitions and groups 9 hits read as 3 partitions. Stage 0 runs 3 tasks, 1 per input partition. Stage 1 runs 4 tasks, 1 per shuffle partition, and because only 3 devices exist, at least 1 of the 4 tasks reads an empty bucket and contributes nothing. The driver receives mobile 4, desktop 3, tv 2.
 
-![Animation](_images/spark_execution_model_intermediate_animation_3.gif)
-
+https://github.com/user-attachments/assets/ffa85a30-8105-4c3a-bde8-54ccec65c67a
 
 <br>
 

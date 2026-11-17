@@ -245,7 +245,7 @@ Of 40GB, 49 parts in 50 are remote: 39.2GB. There are 1,000 × 500 = 500,000 blo
 
 Every line of the bill multiplies rows crossing the boundary by bytes per row. A filter and a narrow select before the wide operation cut both, and the partial aggregate cuts rows to 1 per key per map task. The board plays a filter and a sum over 6 orders read as 2 partitions and shuffled to 2 reducers.
 
-![Animation](_images/spark_narrow_wide_shuffle_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/ed0b9bec-d045-44ed-85fa-d917b37273b9
 
 Of the 6 orders, 4 survive the filter, and each map task sends 1 partial sum for every customer it holds, so the cancelled orders never reach the shuffle. The driver collects c1 at 100, c2 at 50 and c3 at 35.
 
@@ -339,7 +339,7 @@ The repartition, the groupBy and the orderBy each add a shuffle. The groupBy's h
 
 Spark records how each DataFrame is partitioned. After repartition("customer_id"), every row for a customer sits in 1 partition, so a groupBy("customer_id") that follows finds its requirement met and adds no shuffle of its own. The board plays exactly that: 2 wide operations in the code, rows exchanged once.
 
-![Animation](_images/spark_narrow_wide_shuffle_advanced_animation_2.gif)
+https://github.com/user-attachments/assets/f2455692-77f6-4e87-a4d4-53b176e3e886
 
 The driver collects c1 at 120 over 3 orders, c2 at 75 over 2, and c3 at 35 over 1. Look at what crossed the shuffle: all 6 raw orders, because a repartition moves rows before any aggregation runs. A plain groupBy would have shuffled partial sums. Repartitioning by a key first pays off only when 2 or more wide operations then share it.
 

@@ -27,7 +27,7 @@ Take an `orders` table of 8 rows that Spark reads as 4 partitions of 2 rows each
 | 2 | 105 EU Completed, 106 LATAM Pending | 105 |
 | 3 | 107 US Completed, 108 APAC Completed | 107, 108 |
 
-![Animation](_images/spark_narrow_wide_shuffle_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/046ad55a-2f0a-4407-91f6-f4af9e0c48b4
 
 Each of the 4 tasks reads its own 2 rows and hands the survivors straight to the driver. No arrow crosses from one task to another, and the result still has 4 partitions: 3 of them now hold 1 row each and the fourth holds 2. `filter` and `select` can shrink a partition or change its columns, as can `withColumn`, and none of them moves the partition count or the executor holding each partition. A `union` places both inputs' partitions side by side, unchanged.
 
@@ -139,7 +139,7 @@ Partition 1
 
 So Spark moves rows. Each task reads the region of every row it holds and sends the row to the task that will own that region, so that all 3 US orders arrive at one task and both EU orders arrive at another. Only then can a task write the US row, with order 7 next to orders 1 and 3, and be certain the list is complete. That movement of rows between tasks is a shuffle, and the next section takes it apart.
 
-![Animation](_images/spark_narrow_wide_shuffle_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/70207faa-1039-4e53-877c-8b93472151fd
 
 In the diagram, 2 tasks read the input and 2 receive the moved rows. Follow order 7: it starts in the second input partition and ends up next to orders 1 and 3, which started in the first. Follow order 6: LATAM appears once, yet its data still travels, because the task that read it could not know it was alone. A wide transformation moves data for every key, even one with no partner, though for an aggregation like this each task first folds a key's rows into a single partial list and sends that.
 
@@ -224,7 +224,7 @@ destination = hash(key) % num_shuffle_partitions
 | Several keys can share a destination | A reading task may hold many groups |
 | Every row is routed, even a key seen once | A key appearing a single time still travels |
 
-![Animation](_images/spark_narrow_wide_shuffle_beginner_animation_3.gif)
+https://github.com/user-attachments/assets/15d72ba9-585b-4b93-8ae3-75e6debc0a41
 
 The diagram has 3 writing tasks and 3 reading tasks. Each writer splits its 3 rows into piles, one pile per reader that has rows coming, and each reader collects its pile from every writer. Watch the US rows: 4 of them, spread across several input partitions, converge on a single reading task, which then counts 4. The reader that receives `JP` counts a single row, and it still waited for every writer to finish, because any writer might have been holding another `JP`.
 

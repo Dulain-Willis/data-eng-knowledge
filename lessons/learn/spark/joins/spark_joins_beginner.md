@@ -28,8 +28,7 @@ A join is therefore a wide transformation on both of its inputs. Spark hashes th
 
 The first line of the program below turns off Spark's automatic broadcasting, so that the join you watch is the shuffle version. Section 1 explains what that setting does when it is left alone. Watch for 2 shuffles, one per table, before any output row appears, and notice that each output row is built inside the task that received both of its halves.
 
-![Animation](_images/spark_joins_beginner_animation_1.gif)
-
+https://github.com/user-attachments/assets/293545b1-f4f2-4a8c-ae8f-53e904ff181e
 
 <br>
 
@@ -93,8 +92,7 @@ That is a broadcast join. The driver collects the small table, builds a hash tab
 
 `F.broadcast(products)` is a hint that tells Spark to broadcast that side whatever it estimates the size to be. Watch the animation below: `products` leaves its partitions once, arrives whole at every `orders` task, and the output appears without any row of `orders` changing executor.
 
-![Animation](_images/spark_joins_beginner_animation_2.gif)
-
+https://github.com/user-attachments/assets/3b5a1255-ce07-41df-be39-10147990f7e1
 
 <br>
 
@@ -331,8 +329,7 @@ Give `products` a `version` column and let product 4017 carry 2 rows: version 1 
 
 The rule behind the table: for each key, the output holds left rows times right rows. A key that is unique on the right contributes exactly its left count, 2 rows on the right double that count, and 3 rows on each side turn 6 input rows into 9 output rows. In the program below, `products` is 4 rows, far under the threshold, so Spark broadcasts it. Watch the 2 `orders` that carry 4017: each one meets both versions in its task's copy of the catalog and emits 2 rows.
 
-![Animation](_images/spark_joins_beginner_animation_3.gif)
-
+https://github.com/user-attachments/assets/b01b61be-4a14-4a77-8592-49d869f7dd7c
 
 <br>
 

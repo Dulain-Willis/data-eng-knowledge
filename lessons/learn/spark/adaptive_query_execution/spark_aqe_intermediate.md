@@ -34,7 +34,7 @@ The loop the driver runs, once per finished stage
 
 The board below plays a sort-merge join followed by a count per country, with broadcasting switched off so both sides shuffle. Count the stages as it runs. The 2 scans each write shuffle files keyed on `customer_id`. The join stage reads them, counts per country inside each task, and writes a second shuffle keyed on `country`. A last stage finishes the count. That makes 4 stages and 3 exchanges: 3 moments where output is complete on disk before anything downstream reads it.
 
-![Animation](_images/spark_aqe_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/a3101a65-e161-4a75-b232-e5d8ef7e278e
 
 *The board draws the plan Spark builds before the job starts. AQE's rewrites are what the rest of this lesson covers, and the board does not show them.*
 
@@ -433,8 +433,7 @@ Because the split follows map tasks, a single hot key gets divided too: its rows
 
 The board plays a sort-merge join in which customer 1 owns 9 of the 12 orders. Watch the task that receives customer 1 after the shuffle: that is the partition AQE would split. The `customers` block that lands beside it is the one each piece would need a copy of.
 
-![Animation](_images/spark_aqe_intermediate_animation_2.gif)
-
+https://github.com/user-attachments/assets/0268843d-5def-4194-9192-f7e5169820bd
 
 <br>
 

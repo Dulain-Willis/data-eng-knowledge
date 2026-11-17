@@ -332,7 +332,7 @@ A null key can never satisfy an equality, so an inner join has nothing to find f
 
 The animation runs a left join of 7 orders to 3 customers with broadcasting off and 2 shuffle partitions. Four of the 7 orders have no `customer_id`. Watch the 4 null rows: they leave their input tasks for the same reducer, and each comes out with a null `name`.
 
-![Animation](_images/spark_data_skew_intermediate_animation_2.gif)
+https://github.com/user-attachments/assets/de57d956-2d44-4366-b1aa-ff551e431b50
 
 At scale that reducer holds the 12M null follows plus its share of real keys, and the work is pure overhead: each output row is the input row with nulls appended. A `groupBy` on the same column also builds a null group, but a combining aggregate such as `count` keeps it to a partial per map task, so the left join is where null skew costs the most.
 
@@ -417,7 +417,7 @@ A stage ends when its slowest task ends. At 200 partitions the hot task holds th
 
 The animation replays section 1's 9 orders without the salt, at 6 shuffle partitions, twice the 3 used there. The 6 orders for `c7` still meet on a single task. The other 3 orders land wherever their keys hash, and at least 2 of the 6 tasks receive nothing at all.
 
-![Animation](_images/spark_data_skew_intermediate_animation_3.gif)
+https://github.com/user-attachments/assets/2e3b7f6f-3229-4115-88de-8b0b79363276
 
 **A sort-merge join's stage runs 41 minutes, 40 of them spent waiting on a single task. A teammate raises spark.sql.shuffle.partitions from 200 to 1,000, and the stage now runs 40 minutes. What explains the result?**
 

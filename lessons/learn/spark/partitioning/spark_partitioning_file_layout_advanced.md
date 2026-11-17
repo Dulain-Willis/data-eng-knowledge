@@ -15,7 +15,7 @@ Bucketing fixes a table's hash layout at write time. Spark hashes each row's buc
 
 That knowledge is what a join normally buys with a shuffle. The pricing job joins `trips`, 2TB per day, to `drivers`, 120GB, on `driver_id`. Neither table is stored by `driver_id`, so Spark hash-partitions both inputs across the network before a trip can meet its driver. The animation runs that join on 10 trips and 4 drivers.
 
-![Animation](_images/spark_partitioning_file_layout_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/daba3e0a-4b33-4528-9fb0-f0add0688984
 
 The first line turns off broadcasting, which would otherwise copy a table this small whole to every task; the production tables are far too large for that shortcut. What runs instead is an exchange on each side: every input task writes its rows to shuffle files keyed by `driver_id`, and each reducer task fetches its share from all of them. Every row for driver 7 reaches the same reducer, whichever partition it started in, and meets its match there.
 
@@ -47,8 +47,7 @@ The write, line by line
 
 The animation shows that reuse at small scale. Once rows are hash-partitioned by `driver_id`, a `groupBy` on `driver_id` needs no second exchange, because each driver's rows already sit in 1 partition. A bucketed table is that first exchange, saved to disk.
 
-![Animation](_images/spark_partitioning_file_layout_advanced_animation_2.gif)
-
+https://github.com/user-attachments/assets/0df7403b-b6ec-44aa-8b04-75a6f0e5ab19
 
 <br>
 
@@ -400,7 +399,7 @@ Take 1 day of trips partitioned by `city`: 300GB under `city=New York` and 40MB 
 
 The program below left-joins 12 trips to drivers; 5 of those trips have no driver yet.
 
-![Animation](_images/spark_partitioning_file_layout_advanced_animation_4.gif)
+https://github.com/user-attachments/assets/4db8c1a0-94df-4944-b5ff-e3591f01638f
 
 All 5 null-key trips meet on the same reducer task. A bucketed write sends rows through the same hash, so on disk those trips would share 1 bucket, and that bucket stays whole in every read.
 

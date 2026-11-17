@@ -318,7 +318,7 @@ Spill totals say whether a stage spilled. Sizing needs the stage's summary metri
 
 The animation below plays a sort-merge join in which user 7 owns 9 of the 12 events. Each key's rows land on a single reducer task, so the task that receives user 7 holds those 9 events and the matching user row, more than any other task. At production scale, that task is the max row of the summary metrics.
 
-![Animation](_images/spark_ui_debugging_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/fef1c7e5-6abb-41e2-9331-944eb97d67e2
 
 > **TIP**
 >
