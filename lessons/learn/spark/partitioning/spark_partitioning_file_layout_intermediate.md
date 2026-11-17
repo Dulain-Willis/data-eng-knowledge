@@ -20,7 +20,7 @@ Both `repartition(n)` and `coalesce(n)` change how many partitions a DataFrame h
 
 Below, 9 orders arrive in 2 input partitions and `repartition(4)` spreads them over 4. Each task of the first stage writes its rows to shuffle files, then the 4 tasks of the second stage each fetch a share. With no column given, Spark deals rows out round-robin, so the 4 outputs end up close to equal in size.
 
-https://github.com/user-attachments/assets/2f0ee170-add1-493f-8d82-3314651e8c86
+https://github.com/user-attachments/assets/1c905c67-2ae1-4381-8b7c-4fb312e2ff93
 
 The physical plan shows this as `Exchange RoundRobinPartitioning(4)`. The price is that of any shuffle: every row is serialized, written to local disk and fetched over the network by the next stage. In return, `repartition` can raise the count as well as lower it, and the pieces come out balanced however lopsided the inputs were.
 
