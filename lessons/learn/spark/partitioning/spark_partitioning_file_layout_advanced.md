@@ -47,7 +47,7 @@ The write, line by line
 
 The animation shows that reuse at small scale. Once rows are hash-partitioned by `driver_id`, a `groupBy` on `driver_id` needs no second exchange, because each driver's rows already sit in 1 partition. A bucketed table is that first exchange, saved to disk.
 
-https://github.com/user-attachments/assets/90076635-b659-4e45-8865-fc89880733b8
+https://github.com/user-attachments/assets/52d8a117-4f3d-4753-b9f1-08cfe6ce4021
 
 <br>
 

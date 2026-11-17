@@ -208,7 +208,7 @@ placed = sales.withColumn("slot", F.col("store_id") % 4)
 
 A two-phase aggregation computes each key's result in 2 rounds: a partial pass produces a small result per piece of the key, and a final pass per key combines the pieces. Before writing one by hand, check whether Spark already runs it. The animation below groups 7 orders by customer_id and sums amount. Five of the orders belong to c7, and the table is read as 2 partitions. Watch what each map task writes before the shuffle.
 
-https://github.com/user-attachments/assets/6ad0223d-cf0f-4848-b1d6-2ff540ef1c7a
+https://github.com/user-attachments/assets/8f76b069-64d3-46d7-818c-94c8b29e62b9
 
 Each map task sums its own c7 rows before writing, so the reducer that owns c7 receives at most 2 rows for it, 1 per input partition, and adds them to 195. The physical plan shows the same split: a HashAggregate with partial_sum(amount) below the Exchange, and a final HashAggregate with sum(amount) above it. Scale it up: 40M rows of a hot key read by 2,000 map tasks reach their reducer as 2,000 partial sums. That task was never slow, so a hand-salted version of this query adds a second shuffle and a second aggregation and buys nothing. The same holds for count, min, max and avg, which carries a sum and a count through the shuffle.
 

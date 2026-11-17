@@ -129,7 +129,7 @@ A hash or sort-merge join works because equal keys can be routed to one task. Ro
 
 The animation broadcasts 3 surge windows and runs 4 trips through them in 2 tasks, with start times in minutes. No shuffle happens. Each task tests each of its trips against all 3 windows: 12 comparisons to produce 4 rows.
 
-https://github.com/user-attachments/assets/b70c48b1-a0fe-409d-9fbd-9d5c41c782e1
+https://github.com/user-attachments/assets/53596212-b3da-44ee-bb15-6b6cddb343b4
 
 <br>
 

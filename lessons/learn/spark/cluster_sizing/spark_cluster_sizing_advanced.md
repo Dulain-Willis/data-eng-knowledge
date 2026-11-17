@@ -66,7 +66,7 @@ An executor that has run no task for executorIdleTimeout, 60 seconds by default,
 
 The animation runs a groupBy over 4 input partitions with 3 shuffle partitions. Count the tasks in each stage as it plays: 4 map tasks, then 3 reducers. That per-stage count, divided by slots per executor, is what the driver chases, so the target moves at every stage boundary that changes the task count.
 
-https://github.com/user-attachments/assets/0454f762-92e6-4648-badb-9a1ce4ce93ca
+https://github.com/user-attachments/assets/e5cc7c24-bf95-476d-9a03-33341d859edc
 
 Scale it up to a job with a map stage of 800 tasks, a groupBy stage of 200, then a final stage of 8 tasks after repartition(8) that writes 8 files. With a cap of 50 the target runs 50, 50, then 2. The fate of the other 48 depends on how shuffle files are protected, because the final stage reads the 200-task stage's output from every executor that wrote it.
 
@@ -206,7 +206,7 @@ The shuffle row is where jobs die. Each fetch failure fails the reading stage's 
 
 Each map task writes its shuffle output to the executor it ran on. In the join below broadcast is off, so both tables shuffle by title_id, and each of the 3 reducers fetches its share from every map task. Whichever node holds a map task's output is a dependency of every reducer.
 
-https://github.com/user-attachments/assets/04acaffc-2413-4708-b669-c6a34f046ba0
+https://github.com/user-attachments/assets/403e3067-024e-41cb-bb32-9517a243084e
 
 If the executor that ran one views map task is reclaimed after the map stage, each reducer misses the rows that task wrote. Spark reruns that single map task, then the reducer attempts that failed. Lose 1 node out of 12 and about a twelfth of the map stage reruns; lose 4 at once and a third of it reruns while the reducers wait.
 

@@ -339,7 +339,7 @@ The repartition, the groupBy and the orderBy each add a shuffle. The groupBy's h
 
 Spark records how each DataFrame is partitioned. After repartition("customer_id"), every row for a customer sits in 1 partition, so a groupBy("customer_id") that follows finds its requirement met and adds no shuffle of its own. The board plays exactly that: 2 wide operations in the code, rows exchanged once.
 
-https://github.com/user-attachments/assets/192802c2-99c9-4325-8b08-6fbccb6e0d88
+https://github.com/user-attachments/assets/44d6541b-ff0e-42c4-9176-4521d8f0dee8
 
 The driver collects c1 at 120 over 3 orders, c2 at 75 over 2, and c3 at 35 over 1. Look at what crossed the shuffle: all 6 raw orders, because a repartition moves rows before any aggregation runs. A plain groupBy would have shuffled partial sums. Repartitioning by a key first pays off only when 2 or more wide operations then share it.
 

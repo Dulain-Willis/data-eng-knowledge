@@ -150,7 +150,7 @@ Read literally, this chain sorts every order and then throws most of them away. 
 
 The animation runs that chain on 8 orders read as 2 partitions. Watch where the Cancelled and Pending orders disappear. The read tasks drop them, so only the 4 Completed orders cross the shuffle to be sorted, and order 3, with a profit of 4500, comes out on top.
 
-https://github.com/user-attachments/assets/d7e40d9e-c734-4818-aead-c87ca687c908
+https://github.com/user-attachments/assets/bc45fecb-c4f9-46df-bcde-df8923691c8f
 
 #### When a filter cannot move
 
@@ -199,7 +199,7 @@ The second rewrite works on columns. Catalyst walks the plan from the result bac
 
 In the next animation the query averages price by category over a 6-column products table. Catalyst dropped product_id and product_name before the first task ran, along with supplier and weight_kg, so none of those 4 columns crosses the shuffle. Kitchen comes out at (45 + 60 + 35) / 3, about 46.67.
 
-https://github.com/user-attachments/assets/728bfc3f-5d09-44ce-924e-14c5f29d348b
+https://github.com/user-attachments/assets/acc9d4fb-649e-4644-97af-e0bde479f490
 
 <br>
 

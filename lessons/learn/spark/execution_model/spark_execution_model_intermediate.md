@@ -30,7 +30,7 @@ A task is the unit the scheduler ships: the stage's code, serialized once, plus 
 
 The program below reads 6 orders as 2 partitions. The filter and the net column need nothing from any other row, so they run inside the first stage's 2 tasks; 5 rows survive the filter. The groupBy needs every EU row on 1 task, so rows move: that boundary ends stage 0 and starts stage 1, which has 2 tasks because the run uses 2 shuffle partitions. The orderBy needs the regions arranged by revenue across the whole result, which moves the rows once more into stage 2. The job runs 3 stages and 6 tasks, and the driver receives 3 rows: US 210, EU 145, APAC 75.
 
-https://github.com/user-attachments/assets/62dc6e61-62f9-415e-a0c5-24b9e298670a
+https://github.com/user-attachments/assets/44814a63-4d25-4bb1-979b-aa8750ab4754
 
 | Stage | Tasks | Rows in | Shuffle write | Shuffle read | Ends with |
 | --- | --- | --- | --- | --- | --- |
@@ -175,7 +175,7 @@ The first stage of a job gets 1 task per input partition, and Spark fixes that c
 
 The program below sets 4 shuffle partitions and groups 9 hits read as 3 partitions. Stage 0 runs 3 tasks, 1 per input partition. Stage 1 runs 4 tasks, 1 per shuffle partition, and because only 3 devices exist, at least 1 of the 4 tasks reads an empty bucket and contributes nothing. The driver receives mobile 4, desktop 3, tv 2.
 
-https://github.com/user-attachments/assets/b8945831-0f3d-4ca4-b590-3616c3f1ceec
+https://github.com/user-attachments/assets/fab33532-0c0d-45ed-9888-9bd32ee66559
 
 <br>
 

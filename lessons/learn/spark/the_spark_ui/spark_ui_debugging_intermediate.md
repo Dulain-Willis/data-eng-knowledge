@@ -242,7 +242,7 @@ A records ratio near 1 rules out data skew, and the shared executor confirms it.
 
 The animation shows the data-skew side on a sort-merge join. Title 7 appears in 10 of the 15 plays, so whichever reduce task hash partitioning assigns to key 7 receives at least 11 rows, the 10 plays plus the title itself, while the other tasks split the remaining handful.
 
-https://github.com/user-attachments/assets/044817ae-e58e-47b1-8421-6decb3a322a4
+https://github.com/user-attachments/assets/6b323625-f7db-462b-8da4-99f648692f2d
 
 When the tell reads data skew, the levers are ones you already have: salt the hot key, isolate it and process it separately, or filter it out first if the hot key is NULL. For a sort-merge join, adaptive execution splits any partition larger than both 5 times the median and 256 MB on its own. A window like stage 4's gets no such help, which is why its 66 million rows still ran on a single core.
 

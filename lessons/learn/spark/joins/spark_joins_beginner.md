@@ -28,7 +28,7 @@ A join is therefore a wide transformation on both of its inputs. Spark hashes th
 
 The first line of the program below turns off Spark's automatic broadcasting, so that the join you watch is the shuffle version. Section 1 explains what that setting does when it is left alone. Watch for 2 shuffles, one per table, before any output row appears, and notice that each output row is built inside the task that received both of its halves.
 
-https://github.com/user-attachments/assets/6a228321-1e22-43f6-ad5b-14e0b67e3093
+https://github.com/user-attachments/assets/f2b3352b-1cde-4440-953d-7ac80a4bfc7a
 
 <br>
 

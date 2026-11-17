@@ -139,7 +139,7 @@ Partition 1
 
 So Spark moves rows. Each task reads the region of every row it holds and sends the row to the task that will own that region, so that all 3 US orders arrive at one task and both EU orders arrive at another. Only then can a task write the US row, with order 7 next to orders 1 and 3, and be certain the list is complete. That movement of rows between tasks is a shuffle, and the next section takes it apart.
 
-https://github.com/user-attachments/assets/6100c9d5-aa31-45f1-bb15-22640d754d56
+https://github.com/user-attachments/assets/01f81f75-374f-4e4c-9aeb-582075ad3c89
 
 In the diagram, 2 tasks read the input and 2 receive the moved rows. Follow order 7: it starts in the second input partition and ends up next to orders 1 and 3, which started in the first. Follow order 6: LATAM appears once, yet its data still travels, because the task that read it could not know it was alone. A wide transformation moves data for every key, even one with no partner, though for an aggregation like this each task first folds a key's rows into a single partial list and sends that.
 
