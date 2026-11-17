@@ -134,7 +134,7 @@ A 630MB relation on a 4GB executor sits beside the execution memory its 4 tasks 
 
 The program below forces a broadcast so you can see the plan's shape: the small table goes whole to every task of the large side, and no row of the large side moves. The board draws titles reaching each task. In memory, the tasks on an executor share a single deserialized copy, so the example cluster holds 40 copies of 630MB, one per executor, rather than 160, one per task. The engine draws the plan as written, before any runtime rewrite.
 
-https://github.com/user-attachments/assets/6c1f9458-0ada-4b32-981f-32a7aff1a0d0
+https://github.com/user-attachments/assets/347494f0-06d7-4ce7-a267-bfebeb481781
 
 <br>
 
@@ -204,7 +204,7 @@ Coalescing reads a single number per reducer partition, its shuffle bytes, and m
 
 Every reducer partition, even an empty one, launches a task and reports back to the driver, and coalescing merges neighbours to save that overhead. The board shows the plan before the runtime merge, so every reducer is drawn.
 
-https://github.com/user-attachments/assets/13bd7fb3-83fc-48d0-a85e-a020258744db
+https://github.com/user-attachments/assets/b903ddd0-0707-4592-aaaf-43e2ae4fd436
 
 With 6 reducers on 3 regions, at least 3 of them are empty, and merging those saves 3 launches. Merging all 6 into a single task saves 2 more and puts the whole stage on 1 core while the other cores the job holds wait. Coalescing pays only while the merged task count stays at or above the cores free to run it. Below that line, each merge buys milliseconds of overhead with a core's worth of wall time, which is the trade the next table prices.
 

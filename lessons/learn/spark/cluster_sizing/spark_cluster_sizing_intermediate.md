@@ -100,7 +100,7 @@ After a shuffle, the stage runs spark.sql.shuffle.partitions tasks, 200 unless y
 
 The board below reads a 12-row table as 6 input partitions and groups it into 4 shuffle partitions. Watch each stage's task count: 6 tasks read and 4 tasks aggregate, and a shuffle partition that receives no keys still gets a task. The board draws the plan as written, with no AQE merging.
 
-https://github.com/user-attachments/assets/55ef63de-0aea-44dc-b624-5bb2b5ccd272
+https://github.com/user-attachments/assets/febf486e-d970-4c71-829c-fc8444577539
 
 Run this on the practice data. It repartitions orders into 4 partitions and counts the rows in each, so every output row is 1 task of the stage that follows the repartition. Change 4 to 3 and run it again: the number of rows follows.
 

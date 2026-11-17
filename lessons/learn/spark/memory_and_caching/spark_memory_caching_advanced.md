@@ -273,7 +273,7 @@ Classifying the failure
 
 Back in the pricing job, a stage builds each rider's list of trip events with `collect_list`. Most tasks finish in seconds. One fails with `Java heap space`, is retried 3 times, and the stage aborts on the 4th failure. The animation below plays the same grouping on 12 events and shows why no retry can succeed.
 
-https://github.com/user-attachments/assets/6f29bd3e-4a24-4fc3-8998-8cb455e955c7
+https://github.com/user-attachments/assets/81db7c81-cb8e-4727-96d1-5d92eb6c017e
 
 The shuffle sends every row for a key to the same reduce task. User 7 owns 8 of the 12 events, so one task assembles a list twice the size of all the others combined, while the remaining lists stay short. Scaled up to a rider with millions of events, that single task holds the whole list in its heap, and every retry hands the same rider to a task with the same heap. Raising executor memory postpones the failure until that rider's list grows again. The first fix changes what the task must hold: aggregate the hot rider to counts or a capped sample instead of a full list, or split the hot key off and process it on its own path.
 

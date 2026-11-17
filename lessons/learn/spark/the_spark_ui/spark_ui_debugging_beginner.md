@@ -378,7 +378,7 @@ Task 137 handled shuffle partition 137 of the join, which collects every `profil
 
 The animation runs a sort-merge join of 6 events to 3 users, with `spark.sql.autoBroadcastJoinThreshold` set to -1 so both sides shuffle. User u1 owns 4 of the 6 events. In the join stage, whichever of the 2 tasks receives u1 handles at least 5 of the 9 shuffled rows, and in a full-size job that task would sit alone in the Max column.
 
-https://github.com/user-attachments/assets/d723f4d6-536b-4649-b625-c299fd3b7493
+https://github.com/user-attachments/assets/2552b9ec-f399-4722-b184-108acbdd3a69
 
 Now on the practice data. The cell counts rows per `user_id` in `transactions`, largest first. In a join on `user_id`, the top count is a floor on the records its task would read, and setting it against a typical count predicts how far that task's Records would sit above the median.
 
@@ -508,7 +508,7 @@ Shuffle Read means it fetched another stage's output, and Shuffle Write means it
 
 This animation joins 8 views to 4 profiles with broadcasting turned off. The scan tasks read 12 rows from the 2 tables, the stages' Input. They write all 12 into shuffle partitions, the Shuffle Write, and the join tasks fetch the same 12 back, the Shuffle Read. The 8 joined rows go to the driver through `collect()`, so Output stays empty. Delete the first line and Spark would broadcast `profiles`, and the run would have no shuffle at all.
 
-https://github.com/user-attachments/assets/75e5fdc1-526c-4544-a382-f74eba33a154
+https://github.com/user-attachments/assets/37b71ccc-d4e2-452f-bd0d-93d8c3d9bde4
 
 **A job joins a 9.6 GiB orders table to a 4 MiB regions table with default settings and ends with collect(). What does the stage that runs the join show?**
 
