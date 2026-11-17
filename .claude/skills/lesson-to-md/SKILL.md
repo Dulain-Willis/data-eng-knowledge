@@ -5,7 +5,7 @@ description: Convert a datadriven.io lesson to Markdown with tools/lesson_to_md.
 
 # Lesson to Markdown
 
-`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/images/`, where `<out_dir>` comes from `tools/topics.json` (slug without its tier suffix -> `<area>/<topic>` under `lessons/`; a slug not in the map stops the script, so add the entry first, and ask the user which card it belongs to if unsure). It is a topic folder like `lessons/learn/architecture/storage_layers` (named after the card title in the site's UI, snake_case; all tiers of one UI card share it) (default `lessons/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
+`tools/lesson_to_md.py <slug> --screenshots` writes `<out_dir>/<slug>.md` and 2x diagram screenshots to `<out_dir>/_images/`, where `<out_dir>` comes from `tools/topics.json` (slug without its tier suffix -> `<area>/<topic>` under `lessons/`; a slug not in the map stops the script, so add the entry first, and ask the user which card it belongs to if unsure). It is a topic folder like `lessons/learn/architecture/storage_layers` (named after the card title in the site's UI, snake_case; all tiers of one UI card share it) (default `lessons/`). The user runs it and pushes the result. You hand over the command, then verify by structure so lesson text stays out of the chat.
 
 ## Steps
 
@@ -39,7 +39,7 @@ Run every check against every regenerated file. The two heading equations held o
 
 - `##` count = the page's `section_header` blocks + 2 (the synthesis and key takeaways headers).
 - `###` count = the page's `h3` blocks + 1 ("What you will be able to do").
-- Every `![...](images/...)` resolves to a file. `not captured` 0, escaped underscores `\_` 0, lone `//` lines 0.
+- Every `![...](_images/...)` resolves to a file. `not captured` 0, escaped underscores `\_` 0, lone `//` lines 0.
 - Python lessons: indented lines inside fences, above 0.
 - `info_list` rows: each `li` with 2 or more text spans appears as a two-line bullet (`- **label** *tag*\` then the description).
 

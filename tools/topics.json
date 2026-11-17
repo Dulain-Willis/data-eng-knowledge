@@ -62,5 +62,20 @@
   "kafka_in_the_pipeline": "tools/kafka/kafka_in_the_pipeline",
   "kafka_producers": "tools/kafka/producers",
   "kafka_replication": "tools/kafka/replication",
-  "kafka_the_log": "tools/kafka/the_log"
+  "kafka_the_log": "tools/kafka/the_log",
+  "spark_execution_model": "learn/spark/execution_model",
+  "spark_lazy_evaluation": "learn/spark/lazy_evaluation",
+  "spark_narrow_wide_shuffle": "learn/spark/shuffles",
+  "spark_catalyst_tungsten": "learn/spark/catalyst_optimizer",
+  "spark_partitioning_file_layout": "learn/spark/partitioning",
+  "spark_joins": "learn/spark/joins",
+  "spark_data_skew": "learn/spark/data_skew",
+  "spark_memory_caching": "learn/spark/memory_and_caching",
+  "spark_aqe": "learn/spark/adaptive_query_execution",
+  "spark_storage_formats": "learn/spark/storage_formats",
+  "spark_cluster_sizing": "learn/spark/cluster_sizing",
+  "spark_ui_debugging": "learn/spark/the_spark_ui",
+  "spark_streaming": "learn/spark/structured_streaming",
+  "spark_udfs_serialization": "learn/spark/udfs_and_serialization",
+  "spark_fault_tolerance": "learn/spark/fault_tolerance"
 }
