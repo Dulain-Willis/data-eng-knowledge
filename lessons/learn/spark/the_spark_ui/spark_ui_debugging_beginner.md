@@ -378,7 +378,7 @@ Task 137 handled shuffle partition 137 of the join, which collects every `profil
 
 The animation runs a sort-merge join of 6 events to 3 users, with `spark.sql.autoBroadcastJoinThreshold` set to -1 so both sides shuffle. User u1 owns 4 of the 6 events. In the join stage, whichever of the 2 tasks receives u1 handles at least 5 of the 9 shuffled rows, and in a full-size job that task would sit alone in the Max column.
 
-https://github.com/user-attachments/assets/156836e1-3112-4c00-b4c7-d9f7640cc2ca
+https://github.com/user-attachments/assets/15a04414-92a3-45a4-90a7-717231fde766
 
 Now on the practice data. The cell counts rows per `user_id` in `transactions`, largest first. In a join on `user_id`, the top count is a floor on the records its task would read, and setting it against a typical count predicts how far that task's Records would sit above the median.
 
