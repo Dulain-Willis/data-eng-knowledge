@@ -44,12 +44,11 @@ With the setting at true, the controller makes a replica from outside the ISR th
 
 **Election off (default)**
 
-![Election off (default)](_images/kafka_replication_advanced_animation_1_election-off-default.gif)
+https://github.com/user-attachments/assets/ec4ba634-70e7-436f-a98f-dd72a4530567
 
 **Election on**
 
-![Election on](_images/kafka_replication_advanced_animation_1_election-on.gif)
-
+https://github.com/user-attachments/assets/bba64783-d781-47ea-812d-a74b468f1bfb
 
 <br>
 

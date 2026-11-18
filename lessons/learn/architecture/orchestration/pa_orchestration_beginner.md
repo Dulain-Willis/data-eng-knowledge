@@ -27,12 +27,11 @@ The hour-long gaps are a guess about durations, and the guess holds until the fi
 
 **Cron chain**
 
-![Cron chain](_images/pa_orchestration_beginner_animation_1_cron-chain.gif)
+https://github.com/user-attachments/assets/c55bb481-e9c0-45a2-938b-d70f607a5c88
 
 **Orchestrator**
 
-![Orchestrator](_images/pa_orchestration_beginner_animation_1_orchestrator.gif)
-
+https://github.com/user-attachments/assets/3185f448-33a1-40e8-b44a-a998b03da88e
 
 <br>
 

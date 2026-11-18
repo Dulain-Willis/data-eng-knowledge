@@ -22,12 +22,11 @@ A consumer polls a batch, writes each row to the table, then commits its offset.
 
 **insert sink**
 
-![insert sink](_images/kafka_in_the_pipeline_advanced_animation_1_insert-sink.gif)
+https://github.com/user-attachments/assets/0d667d10-5fc2-4da9-a671-51289ca7f757
 
 **upsert sink**
 
-![upsert sink](_images/kafka_in_the_pipeline_advanced_animation_1_upsert-sink.gif)
-
+https://github.com/user-attachments/assets/d747abf2-e71e-409a-8f1e-cadde1547f14
 
 <br>
 

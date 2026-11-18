@@ -202,15 +202,15 @@ The word `all` means the replicas in the in-sync set at the moment of the write,
 
 **acks=1**
 
-![acks=1](_images/kafka_producers_beginner_animation_1_acks-1.gif)
+https://github.com/user-attachments/assets/ef5c6125-df74-4cfa-bb11-e4914d516af5
 
 **acks=all**
 
-![acks=all](_images/kafka_producers_beginner_animation_1_acks-all.gif)
+https://github.com/user-attachments/assets/3949ed40-84c4-4c12-be41-1b508ae52528
 
 **acks=0**
 
-![acks=0](_images/kafka_producers_beginner_animation_1_acks-0.gif)
+https://github.com/user-attachments/assets/2deada7b-d560-4303-91b6-cf41b40fad70
 
 The animation plays 6 payments through a 3-broker cluster with the followers deliberately slow. Switch between `acks=1` and `acks=all` and watch when each record is marked acknowledged relative to the followers' copies; then strike the leader down after a couple of sends and compare what the surviving brokers hold against what the producer believed was done.
 
@@ -320,11 +320,11 @@ The application wrote `send()` once and received 1 callback with an offset, 338 
 
 **delivery.timeout.ms=120000**
 
-![delivery.timeout.ms=120000](_images/kafka_producers_beginner_animation_2_delivery-timeout-ms-120000.gif)
+https://github.com/user-attachments/assets/65a57a25-d9e7-4ee4-b362-30fc5c4bd56c
 
 **delivery.timeout.ms=1000**
 
-![delivery.timeout.ms=1000](_images/kafka_producers_beginner_animation_2_delivery-timeout-ms-1000.gif)
+https://github.com/user-attachments/assets/9277f70a-28d5-44a8-86eb-9009d37f546c
 
 The animation sends 8 inventory updates through a partition whose only replica goes down for 1.5 seconds partway through; the single replica keeps anything else from taking over, so the gap stands in for a leader election of that length. Under the default delivery timeout the producer holds the records caught in the gap and lands every one when the broker returns. Switch to a 1 second delivery timeout and the same outage turns those records into errors delivered to the application.
 

@@ -205,7 +205,7 @@ The table gives what the scheduler stores for each task when every task carries 
 
 ### A pool of 1 slot, 3 tasks waiting
 
-![Animation](_images/airflow_execution_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/4f61c1a7-59d2-41d1-8f0c-fba296dfcd7e
 
 With 1 slot in `warehouse` and 3 tasks ready at the same instant, the slot goes to `load_revenue` at weight 10, then to `refresh_dim` at 5, then to `archive_logs` at 1. While `archive_logs` waits, the reason it reports is the pool: the weight set its place in the line, and the 1-slot pool is why there is a line at all.
 

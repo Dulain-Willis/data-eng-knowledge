@@ -143,11 +143,11 @@ The animation runs 4 changes to `orders` between 10:00 and 10:11: order 1001's t
 
 **Query-based**
 
-![Query-based](_images/pa_ingestion_patterns_intermediate_animation_1_query-based.gif)
+https://github.com/user-attachments/assets/ad2eddf9-3b87-40b5-89d8-6b133222b768
 
 **Log-based**
 
-![Log-based](_images/pa_ingestion_patterns_intermediate_animation_1_log-based.gif)
+https://github.com/user-attachments/assets/3dab4565-4111-44f4-8cae-866706358ff5
 
 The query-based poller fires at 10:10 with its bookmark at 10:00. It copies 1001 at 13500 and the new 1003, and never learns that 1001 passed through 13000 or that 1002 was deleted, so the replica still shows order 1002 at 8000. The log-based connector applies each change around 2 seconds after it is written, and the replica ends identical to the source.
 
