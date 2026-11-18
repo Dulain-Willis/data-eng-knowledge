@@ -1634,7 +1634,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             play.first.click()
             mark = time.monotonic()
         last_geom, h_max, last_seen = geom, geom["h"], None
-        while time.monotonic() - mark < 170:
+        while time.monotonic() - mark < 400:  # the longest Python players run about 3 minutes
             g = block.evaluate(_BAR_GEOM_JS)
             if g:
                 last_geom, h_max = g, max(h_max, g["h"])
