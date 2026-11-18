@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 11 challenges
-
 # Data Quality: Intermediate
 
 Suppose that on a Tuesday morning at Uber the nightly trips load finished on time, its row count sat inside the normal band, and no schema check blocked it. A finance dashboard still shows the average fare jumping from $14.20 to $15.89 overnight, and no rider paid more. One city's feed had started sending fares in cents. This lesson builds the checks that would have held that load.

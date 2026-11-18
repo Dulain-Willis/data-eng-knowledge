@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 32 min · 10 challenges
-
 # Idempotent Reruns: Intermediate
 
 Take a fix to the currency conversion in Airbnb's nightly booking revenue. Every day from January 1 to March 31 is wrong by a few percent, and finance wants all 90 days corrected before the quarter closes. Rerunning 90 nights of a pipeline that writes 3 tables works only if every write, every read and every key choice gives the same answer twice.

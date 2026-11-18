@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Testing: Beginner
 
 Take a payouts model at Shopify, where Shopify Payments deposits each merchant's sales into their bank account. Suppose the order loader replays an hour of events overnight and a few thousand orders land twice. Without a test, the model doubles those merchants' payouts, and that is real money sent out. With a `unique` test on `order_id`, the build stops at the orders model and the payouts table keeps the previous day's correct rows.
@@ -314,11 +312,11 @@ Put a `not_null` test on 3 versions of the same column and the 3 outcomes separa
 
 **data_tests: unique, not_null**
 
-![data_tests: unique, not_null](_images/dbt_testing_beginner_animation_1_data-tests-unique-not-null.gif)
+https://github.com/user-attachments/assets/91b9cedd-ebb7-4728-82c7-ac55642cbe52
 
 **no data_tests**
 
-![no data_tests](_images/dbt_testing_beginner_animation_1_no-data-tests.gif)
+https://github.com/user-attachments/assets/295be519-b107-4b8d-9b52-e82b1daecc28
 
 *$ dbt build*
 

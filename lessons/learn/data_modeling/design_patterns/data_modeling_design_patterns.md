@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 21 min · 12 challenges
-
 # Design Patterns
 
 Say 2 teams at Netflix bring weekly hours watched to the same leadership meeting, and their numbers are 3 percent apart. One team counted raw play events. The other read a cleaned table that drops trailers and autoplay previews. Both computed what they meant to. The disagreement ends when both teams read one cleaned silver table and one metric definition says whether trailers count.

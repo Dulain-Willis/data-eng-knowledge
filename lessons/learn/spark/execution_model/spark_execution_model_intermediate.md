@@ -1,5 +1,3 @@
-Intermediate·Spark · 12 min · 12 challenges
-
 # Execution Model: Intermediate
 
 Netflix's nightly viewing report aggregates every play event from the last 24 hours into one table per region. One Monday it takes 3 hours instead of 40 minutes. The Spark UI shows 1 job, 3 stages, and a second stage with 200 tasks where 197 finish in under a second. Reading that screen correctly tells you where the time went, and what flag to change.

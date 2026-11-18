@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 30 min · 4 challenges
-
 # How Data Moves: Advanced
 
 Shopify's Black Friday weekend is the loudest 4 days on its data platform. In 2023 the company reported $9.3 billion in merchant sales over the weekend, with peak minutes above $4 million, and a public live globe animating every order as it lands. Behind that globe sits a pipeline doing 5 hard things at once: a retried ingestion task must not count an order twice, a burst of checkout events must not drown the consumers, order totals must reach a dashboard served from another continent, the buyer's email must never appear in the analytics copy, and the globe's definition of 'live' has a monthly bill attached. Pipeline interview loops ask about exactly these 5 pressures, usually one at a time and in disguise. This lesson is the scouting report for each: how the question is phrased, what the interviewer is scoring, and the answer that earns the top mark.

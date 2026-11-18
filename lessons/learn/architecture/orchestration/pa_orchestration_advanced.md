@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 40 min · 11 challenges
-
 # Orchestration: Advanced
 
 Take the Airbnb team that owns nightly booking revenue. A bug fix lands at 16:00 that changes how cleaning fees are counted, and the last 30 days need recomputing before finance reads them at 07:00 tomorrow. The same warehouse runs the 01:00 loads behind host payouts. How the orchestrator schedules, limits and watches those 30 reruns decides whether anyone gets paged tonight.

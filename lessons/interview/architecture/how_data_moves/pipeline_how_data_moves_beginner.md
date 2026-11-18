@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 4 challenges
-
 # How Data Moves: Beginner
 
 Every December, Spotify ships Wrapped: your year of listening, turned into a share card. Behind it sits a batch job over most of the year's play history, and nobody would mind if it ran for hours, because the deadline is a date on a calendar. Open the app the same day and the home screen can reflect what you played earlier that morning. That path moves data another way: one event at a time, soon after it happens. Add the catalog files a label delivers and the partner APIs a company like this pulls from, and you have 4 ways of moving data under one roof, each chosen for a reason. Interviewers ask about this because the simplest version of the question hides a scoring rubric: can you name which way the data moves and why, and can you point at where it breaks.

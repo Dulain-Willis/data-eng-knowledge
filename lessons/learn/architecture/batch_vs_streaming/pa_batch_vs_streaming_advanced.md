@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 35 min · 11 challenges
-
 # Batch vs Streaming: Advanced
 
 Suppose LinkedIn's profile-view counter were built from 2 jobs: a nightly batch over every view ever logged and a stream job counting today's. On Tuesday they disagree by 340 views for one member, because last week's bot filter change landed in the batch code only. This lesson is about how a pipeline ends up with 2 answers, and how it gets back to 1.

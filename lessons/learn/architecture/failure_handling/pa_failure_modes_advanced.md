@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 12 challenges
-
 # Failure Handling: Advanced
 
 Uber's engineers have written about sending failed payment events for the Driver Injury Protection program through delayed retry queues and, as a last stop, a dead letter queue. When a premium-calculation service slows to a crawl on a Friday evening, decisions made long before that evening determine whether those queues protect drivers' coverage or bury millions of good payments.

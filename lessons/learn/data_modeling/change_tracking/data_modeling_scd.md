@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 17 min · 12 challenges
-
 # Change Tracking
 
 Spotify's analytics team runs a monthly report: streams per subscription plan. On March 15, Ines upgrades from Free to Premium, and the customer table records her new plan. The next morning, February's Free stream count is lower than it was yesterday, and February's Premium count is higher. No February data changed. How the team stores Ines's plan change decides which report they can trust.

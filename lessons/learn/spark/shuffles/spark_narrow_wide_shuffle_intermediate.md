@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 15 challenges
-
 # Shuffles: Intermediate
 
 Spotify Wrapped, written as a Spark job, takes a year of plays, groups them by listener and artist, then sorts by stream count to find each listener's favourites. The grouping and the sort each move data across the cluster, and how much moves, where it lands on disk and whether a later pass can skip it decides whether the job finishes overnight or eats the weekend.

@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 8 challenges
-
 # Executors and Capacity: Beginner
 
 Suppose it is 06:00 on a Monday at Airbnb, the company where Airflow was written. 40 listing DAGs want their hourly run at once, every one loads into a warehouse that accepts 4 connections, and a sensor has waited on a partner feed since midnight. Which tasks start, which sit in `queued`, which wait in `scheduled`, and which process makes that call?
@@ -161,11 +159,11 @@ Mornings 2 and 3 want the same 48 tasks and both run 32, yet the 16 that wait si
 
 **max_active_tasks=2**
 
-![max_active_tasks=2](_images/airflow_execution_beginner_animation_1_max-active-tasks-2.gif)
+https://github.com/user-attachments/assets/54cc8a1f-cdcb-427b-ba70-a4fe3cd23a29
 
 **max_active_tasks=3**
 
-![max_active_tasks=3](_images/airflow_execution_beginner_animation_1_max-active-tasks-3.gif)
+https://github.com/user-attachments/assets/f74ae871-6e10-4027-b3ef-b6dab6ed1a63
 
 Play the night. At 01:00 the run appears. `pull_a` and `pull_b` move through `queued` into `running` while `pull_c` stops at `scheduled`; pause on its cell and Airflow's reason names the DAG's limit. At 01:10 the first 2 finish and `pull_c` takes its turn, so `merge` starts 10 minutes later than it would with 3 slots. Switch the variant and the 3 pulls start together.
 
@@ -236,11 +234,11 @@ At 01:05 the pool blocks `refresh_prices`, which shows `scheduled`; its details 
 
 **warehouse pool: 2 slots**
 
-![warehouse pool: 2 slots](_images/airflow_execution_beginner_animation_2_warehouse-pool-2-slots.gif)
+https://github.com/user-attachments/assets/038a2427-c78c-43da-84d2-1403042d25de
 
 **warehouse pool: 4 slots**
 
-![warehouse pool: 4 slots](_images/airflow_execution_beginner_animation_2_warehouse-pool-4-slots.gif)
+https://github.com/user-attachments/assets/918b022d-d951-4b9e-b062-dbb873f45d1a
 
 Step through the hour from 01:00. `load_bookings` and `load_reviews` take both `warehouse` slots the moment the first run is created, and `load_events`, which asks for 2, waits in `scheduled` with the pool given as its reason. After 10 minutes the single-slot loads succeed, the pair of slots is free at once, and `load_events` starts. The 4-slot variant starts all 3 together.
 

@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 10 challenges
-
 # Idempotent Reruns: Beginner
 
 Early Sunday morning at Airbnb, the 01:00 job that loads Saturday's bookings into the warehouse dies partway through with a connection reset. The on-call engineer shrugs at the error and clicks retry. Monday's revenue dashboard shows the best Saturday in company history. Nobody made a booking twice; the retry loaded most of them a second time. The write pattern this lesson teaches is the difference between those 2 Mondays.

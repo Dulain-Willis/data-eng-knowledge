@@ -1,5 +1,3 @@
-Beginner·Spark · 12 min · 12 challenges
-
 # Fault Tolerance: Beginner
 
 Netflix kills its own production servers at random to prove its systems survive failure. Suppose a Spark job there counts last night's plays per title. At 2 a.m. an executor vanishes, and Spark rebuilds the lost work. At 3 a.m. the job fails on a malformed title ID. An engineer patches the parser, reruns the whole job, and every count on the morning dashboard doubles. This lesson explains why.

@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Deploying dbt: Intermediate
 
 GitLab's data team keeps its dbt project in a public repository, and every change arrives as a merge request. An analyst renames a column in 1 staging model with hundreds of models below it. The CI job has minutes, not an hour: it must build the changed model and its descendants, borrow everything else from production, and report back before the reviewer finishes reading the diff.
@@ -30,7 +28,7 @@ The `@` operator exists because `stg_orders+` picks `fct_orders` without `stg_cu
 
 A test joins the set through its parents. With the default indirect selection, called eager, dbt includes a test when at least one of its parents is selected, which is why the `unique` test is selected along with `stg_orders+` and with `stg_orders+1`. A `relationships` test between `fct_orders` and `stg_customers` would be selected with `fct_orders` alone, and would fail in the same empty schema for the same reason the join did.
 
-![Animation](_images/dbt_deployment_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/9dd89d60-26b4-4ea1-9131-ce221c15bf01
 
 *$ dbt build*
 

@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 5 challenges
-
 # Models: Beginner
 
 GitLab publishes its whole analytics codebase, and most of it is dbt models that turn raw CRM and billing tables into the recurring revenue figures finance reports each month, with product usage tables feeding the same models. When an analyst there changes how a trial counts toward that revenue the week the quarter closes, the change is one SQL file, and dbt rebuilds every table that reads it.
@@ -283,11 +281,11 @@ Storage is the quieter difference. A view occupies a row in the warehouse's cata
 
 **materialized='view'**
 
-![materialized='view'](_images/dbt_models_beginner_animation_1_materialized-view.gif)
+https://github.com/user-attachments/assets/0758bda2-4278-40f8-af41-b959b11b92e1
 
 **materialized='table'**
 
-![materialized='table'](_images/dbt_models_beginner_animation_1_materialized-table.gif)
+https://github.com/user-attachments/assets/5ff0abf7-aebb-491a-9c06-b63a020ba44c
 
 *$ dbt run*
 
@@ -352,7 +350,7 @@ With more than 1 thread, dbt builds nodes that have no path between them at the 
 
 The graph also answers the question the folder of saved queries could not: what reads this? Every edge out of a model is a model that will break if its columns change, and dbt can list them from the files alone, before anything is run.
 
-![Animation](_images/dbt_models_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/54a70080-df07-4c56-a82b-01476a383d60
 
 *$ dbt run*
 

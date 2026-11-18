@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 30 min · 11 challenges
-
 # Batch vs Streaming: Intermediate
 
 It is 23:10 on a rainy Friday in Chicago and a stadium concert has let out. Uber's rider app shows a surge multiplier that recomputes from driver supply and rider demand as the crowd pours onto the street. A pipeline that summarized demand every hour would still show a calm evening. Latency, throughput, and what each one costs decide whether the multiplier moves before the crowd disperses.

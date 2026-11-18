@@ -1,5 +1,3 @@
-Advanced·Data Modeling · 25 min · 7 challenges
-
 # Fact Table Selection: Advanced
 
 You are 20 minutes into an onsite at Amazon when the interviewer draws a box labeled orders on the whiteboard and starts talking. An order is placed and picked, then goes through packing and shipping before it is delivered, usually within 4 days, sometimes not for 40. Finance wants daily revenue by product. Operations wants the median time from pack to ship, by warehouse. Leadership wants to know how many orders are sitting unshipped right now. Design the fact tables. Answering with a single table is the mistake most candidates make here. Each of those consumers wants a different grain, a different write pattern and a different row count, and the complete answer names which of the 4 fact table types serves each one and what each costs to keep current. This lesson builds that answer piece by piece, with the numbers the interviewer expects you to say out loud.

@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 7 challenges
-
 # Testing: Advanced
 
 Picture Duolingo's data team rewriting the SQL that decides whether a day counts toward a learner's streak, so a day covered by a streak freeze stops registering as a miss. Nobody wants to find a bug by resetting a learner's 1,000-day streak to 0, so the rewrite ships only after a test on 6 rows written by hand shows the new logic keeps every streak the old rules kept.
@@ -198,11 +196,11 @@ dbt test --select "test_type:unit" runs every unit test and nothing else. In dbt
 
 **when score >= 70 then 'pass'**
 
-![when score >= 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+https://github.com/user-attachments/assets/e9e6712f-b30b-4ef5-ba9f-2e295a7a55c4
 
 **when score > 70 then 'pass'**
 
-![when score > 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+https://github.com/user-attachments/assets/a8e08b1a-8885-4c07-8a06-f9293c2d5ac1
 
 *$ dbt build*
 

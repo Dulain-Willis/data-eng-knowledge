@@ -84,6 +84,12 @@ def clean(soup):
         panel.decompose()
     for t in soup.select(".sr-only"):
         t.decompose()
+    # the row above the title (level, minutes, challenge count, tool logo): the level is in the
+    # title, the exercises live in their own folders, so the lesson starts at its title
+    for h1 in soup.find_all("h1"):
+        row = h1.find_previous_sibling("div")
+        if row is not None and row.select_one(".mini-bars"):
+            row.decompose()
     # decorative "//" that sits beside some headings
     for span in soup.find_all("span"):
         if span.get_text(strip=True) == "//" and not span.find_parent("td"):
@@ -478,10 +484,6 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
     # escape_underscores=False keeps names like fare_amount readable
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not
-    # Tool logos are site-relative (/tool-marks/x.png); point them at the copies vendored in
-    # lessons/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
-    for img in soup.find_all("img", src=re.compile(r"^/tool-marks/")):
-        img["src"] = "../../" + img["src"].lstrip("/")
     md = markdownify(str(soup), heading_style="ATX", bullets="-", code_language="sql",
                      escape_underscores=False, newline_style="BACKSLASH")
     for token, text in tokens.items():
@@ -1442,6 +1444,226 @@ def record_animation(browser, url, k, m, label, dest, box_css):
     return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
 
 
+# Per-type player rules. The Spark and dbt players (title-bar dots, "n / m" counter) use record_animation above.
+# The Airflow, Kafka and pipeline players share another frame (.smv-frame: header and body, the control bar
+# (.smv-bar) at its bottom) and have no dots and no usable "n / m" counter (Airflow shows a clock, Kafka
+# "t = 1.3 s"), and the common ancestor of their buttons is only the 42 px control bar. For these:
+#   box    the .smv-frame that holds the buttons (full player, bar included);
+#   start  the first video frame where the frame's static control-bar buttons (Restart, speed) are drawn
+#          like in the finished recording, i.e. the player is on screen; the site starts it on mount;
+#   end    the control bar's play button turns into "Replay" (the playback is over); the tail is 2 s after.
+BAR_PLAYER_TYPES = {"airflow_animation", "kafka_animation", "pipeline_animation"}
+_BAR_BOX = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame');
+    if (!f) return null; const r = f.getBoundingClientRect();
+    return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
+_BAR_GEOM_JS = """(block) => {
+  const bs = [...block.querySelectorAll('button')]; const b0 = bs[0]; const f = b0 && b0.closest('.smv-frame');
+  if (!f) return null;
+  const r = f.getBoundingClientRect();
+  const rel = e => { if (!e) return null; const q = e.getBoundingClientRect(); return [q.x - r.x, q.y - r.y, q.width, q.height]; };
+  const restart = block.querySelector('button[aria-label="Restart"]');
+  const speed = bs.find(b => /^Playback speed/.test(b.getAttribute('aria-label') || ''));
+  const bar = f.querySelector('.smv-bar');
+  if (!restart || !speed || !bar) return null;
+  return {x: r.x, y: r.y, w: r.width, h: r.height, restart: rel(restart), speed: rel(speed), bar: rel(bar),
+          replay: !!block.querySelector('button[aria-label="Replay"]'), text: bar.innerText.replace(/\\s+/g, ' ')};
+}"""
+_BAR_TOL = 14  # mean colour difference (0..255) of a control-bar button between a frame and the finished recording
+
+
+def _bar_region_diff(fr, ref, w, h, geom, ox=0.0, oy=0.0, scale=None):
+    """Worst mean absolute colour difference, over the Restart and speed buttons, between frame `fr` and
+    `ref` (both w x h rgb24, the player box with its top-left at (ox, oy)). 999 if a button is outside."""
+    s = scale or (w / geom["w"])
+    worst = 0
+    for key in ("restart", "speed"):
+        bx, by, bw, bh = geom[key]
+        x0, y0 = int(round(ox + bx * s)), int(round(oy + by * s))
+        x1, y1 = int(round(x0 + bw * s)), int(round(y0 + bh * s))
+        if x0 < 0 or y0 < 0 or x1 > w or y1 > h:
+            return 999
+        tot = 0
+        for y in range(y0, y1):
+            a, b = (y * w + x0) * 3, (y * w + x1) * 3
+            tot += sum(abs(p - q) for p, q in zip(fr[a:b], ref[a:b]))
+        worst = max(worst, tot / ((x1 - x0) * (y1 - y0) * 3))
+    return worst
+
+
+def _bar_has_buttons(ref, w, h, geom):
+    """The reference frame really shows the buttons (they have some contrast), so matching them means something."""
+    s = w / geom["w"]
+    bx, by, bw, bh = geom["restart"]
+    x0, y0, x1, y1 = (int(round(v)) for v in (bx * s, by * s, (bx + bw) * s, (by + bh) * s))
+    vals = [sum(_px(ref, w, x, y)) / 3 for y in range(y0, y1) for x in range(x0, x1)]
+    return bool(vals) and max(vals) - min(vals) >= 25
+
+
+def _body_blank(fr, w, h, geom):
+    """True if the player body (everything above the control bar) is one flat colour."""
+    s = w / geom["w"]
+    y1 = int(geom["bar"][1] * s)
+    vals = [sum(_px(fr, w, x, y)) / 3 for y in range(0, max(y1, 1), 6) for x in range(0, w, 6)]
+    return max(vals) - min(vals) < 25
+
+
+def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
+    """Time (s) of the first frame in [lo, lo+span] of the raw recording where the player is on screen:
+    cropped like the final video, its Restart and speed buttons look like the same buttons in the last frame
+    of the recording, and the next two frames still do. Raises if there is none."""
+    vf = f"crop={w}:{h}:{x}:{y},scale=1600:-2:flags=lanczos"
+    vw, vh = 1600, int(round(h * 1600 / w / 2)) * 2
+    size = vw * vh * 3
+    ref = subprocess.run(["ffmpeg", "-loglevel", "error", "-sseof", "-0.5", "-i", webm, "-vf", vf + ",fps=30",
+                          "-frames:v", "15", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                         capture_output=True).stdout[-size:]
+    if len(ref) != size or not _bar_has_buttons(ref, vw, vh, geom):
+        raise RuntimeError("the last frame of the recording does not show the control bar")
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{lo:.2f}", "-t", str(span), "-i", webm,
+                          "-vf", f"fps={fps}," + vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    frs = [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)]
+    for i in range(len(frs) - 2):
+        if all(_bar_region_diff(frs[i + j], ref, vw, vh, geom) <= _BAR_TOL for j in range(3)):
+            return lo + i / fps
+    raise RuntimeError("the player's control bar never showed at its expected spot in the recording")
+
+
+def bar_start_check(path, geom):
+    """START CHECK for a bar player: the first 3 frames already show the control bar buttons (the video does not
+    open on page text or a half-mounted player) and the body is not blank."""
+    fr, w, h = _read_frames(path, 8)
+    if len(fr) < 3:
+        return False, ["video has fewer than 3 frames"]
+    ref = _read_frames(path, 1, start=max(0.0, _duration(path) - 0.5))[0]
+    if not ref or not _bar_has_buttons(ref[0], w, h, geom):
+        return False, ["last frame: no control bar"]
+    problems = []
+    for i in range(3):
+        d = _bar_region_diff(fr[i], ref[-1], w, h, geom)
+        if d > _BAR_TOL:
+            problems.append(f"frame {i} does not show the control bar (difference {d:.0f})")
+    step = 7  # sampling stride in pixels: a page-text first frame turning into the player is a big jump, normal motion is not
+    jump = sum(abs(a - b) for a, b in zip(fr[0][::step * 3 + 1], fr[2][::step * 3 + 1])) / len(fr[0][::step * 3 + 1])
+    if jump > 5:
+        problems.append(f"frame 0 is not the player (jump of {jump:.0f} to frame 2)")
+    if _body_blank(fr[2], w, h, geom):
+        problems.append("the player body is blank in the first frames")
+    elif len(fr) >= 8:  # a half-drawn body (the player still mounting) shows much less than frame 7 does
+        s = w / geom["w"]
+        y1 = int(geom["bar"][1] * s)
+        ink = lambda f: sum(1 for y in range(int(y1 * .12), y1, 3) for x in range(0, w, 3) if sum(_px(f, w, x, y)) / 3 > 70)
+        ref_ink = ink(fr[7])
+        for i in range(3):
+            if ref_ink and ink(fr[i]) < 0.8 * ref_ink:
+                problems.append(f"frame {i}: the player body is still half drawn")
+    return not problems, problems
+
+
+def bar_end_check(path, geom):
+    """END CHECK for a bar player: the DOM showed "Replay" (playback finished), and the last frame shows the
+    control bar and a body that is not blank."""
+    w, h = _video_size(path)
+    fr, _, _ = _read_frames(path, 20, start=max(0.0, _duration(path) - 0.5))
+    if not fr:
+        return False, ["no frames at the end"]
+    problems = []
+    if not geom.get("ended"):
+        problems.append("the playback never reached Replay")
+    if _bar_region_diff(fr[-1], fr[0], w, h, geom) > _BAR_TOL:
+        problems.append("last frame: control bar changes at the end (cut off?)")
+    if _body_blank(fr[-1], w, h, geom):
+        problems.append("last frame: the player body is blank")
+    return not problems, problems
+
+
+def _duration(path):
+    return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                                capture_output=True, text=True, check=True).stdout)
+
+
+def record_bar_animation(browser, url, k, m, label, dest, box_css):
+    """record_animation for the BAR_PLAYER_TYPES (same recorder settings: Playwright video, window = player
+    height + 40, 2x via doubled viewport/record size and page zoom 2, crop + fps=30 + scale 1600 lanczos +
+    libx264 crf 20, 2 s tail); only the box, the start and the end are found by the rules above."""
+    W = max(1150, int(box_css["w"]) + 48)
+    H = int(-(-box_css["h"] // 1)) + 40
+    with tempfile.TemporaryDirectory() as tmp:
+        ctx = browser.new_context(viewport={"width": W * 2, "height": H * 2}, color_scheme="light",
+                                  record_video_dir=tmp, record_video_size={"width": W * 2, "height": H * 2})
+        page = ctx.new_page()
+        t0 = time.monotonic()
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
+        page.evaluate("document.documentElement.style.zoom = 2")
+        page.wait_for_timeout(1000)
+        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        page.evaluate(_HIDE_PINNED)
+        page.wait_for_timeout(300)
+        gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})", gap)
+        page.wait_for_timeout(1500)
+        if m > 0:  # pick the mode while out of view; a switched mode starts paused
+            block.locator("button[role=radio]").nth(m).click()
+            page.wait_for_timeout(500)
+        jump_mark = time.monotonic()
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
+                      block.evaluate("b => b.getBoundingClientRect().top") - 10)
+        geom = None
+        while time.monotonic() - jump_mark < 25:  # the player is mounted once its control bar is
+            geom = block.evaluate(_BAR_GEOM_JS)
+            if geom:
+                break
+            page.wait_for_timeout(50)
+        if not geom:
+            raise RuntimeError("the control bar never appeared")
+        mount_t = mark = time.monotonic()
+        play = block.locator('button[aria-label="Play"]')
+        if m > 0 and play.count():  # a switched mode starts paused: the playback starts at this click
+            play.first.click()
+            mark = time.monotonic()
+        last_geom, h_max, last_seen = geom, geom["h"], None
+        while time.monotonic() - mark < 170:
+            g = block.evaluate(_BAR_GEOM_JS)
+            if g:
+                last_geom, h_max = g, max(h_max, g["h"])
+                if g["replay"] and time.monotonic() - mark > 1:
+                    last_seen = time.monotonic()
+                    break
+            page.wait_for_timeout(100)
+        if last_seen is None:
+            raise RuntimeError("the playback never reached Replay")
+        # Park the pointer outside the player (no hover tooltip over the caption) and nudge the page so the
+        # compositor paints the final state: without this the headless video can keep showing the last
+        # frame before the Pause -> Replay swap (seen on the 16-step pipeline player).
+        page.mouse.move(2, 2)
+        page.wait_for_timeout(300)
+        page.mouse.move(6, 4)
+        page.screenshot(clip={"x": 0, "y": 0, "width": 8, "height": 8})  # forces a fresh paint into the video
+        page.wait_for_timeout(1700)
+        g = block.evaluate(_BAR_GEOM_JS)
+        if g:
+            last_geom, h_max = g, max(h_max, g["h"])
+        ctx.close()
+        geom = dict(last_geom, h=h_max, ended=True)
+        vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
+        x, y, w = (int(round(geom[c])) for c in "xyw")
+        h = int(round(h_max))
+        h -= h % 2
+        if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
+            return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
+        webm = os.path.join(tmp, vids[0])
+        pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
+        start = pres + (mark - mount_t)
+        live = last_seen - mark
+        end = start + live + 2
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.3f}", "-to", f"{end:.3f}", "-i", webm,
+                        "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
+                        "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
+    geom["h"] = h
+    return {"live": live, "box": {"x": x, "y": y, "w": w, "h": h}, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
+
+
 def record_animations(url, out_dir, slug, info, only=None):
     """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
@@ -1479,12 +1701,13 @@ def record_animations(url, out_dir, slug, info, only=None):
                 block.locator("button").first.wait_for(state="attached", timeout=10000)
             except Exception:
                 pass
-            box = block.evaluate(_PLAYER_BOX)
+            bar = block.get_attribute("data-note-block-type") in BAR_PLAYER_TYPES
+            box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 # Seen once per lesson (see the four still-image cases): the site never mounts the
                 # player and leaves the code and seed table on screen. Keep that as a still image.
                 page.wait_for_timeout(5000)
-                box = block.evaluate(_PLAYER_BOX)
+                box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 name = f"{slug}_animation_{k + 1}.png"
                 bb = block.bounding_box()
@@ -1501,13 +1724,17 @@ def record_animations(url, out_dir, slug, info, only=None):
             # the player can grow while it plays (captions, tables): take the largest size seen so far
             box_css = {"w": box["w"], "h": box["h"]}
             ctx.close()
+            used = set()
             for m, label in enumerate(entry["labels"] or [None]):
                 name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
                                                       if label else "") + ".mp4"
+                while name in used:  # two modes whose labels slug alike (score >= 70 / score > 70): keep both files
+                    name = name[:-4] + "-2.mp4"
+                used.add(name)
                 dest = os.path.join(ANIM_DIR, name)
                 for attempt in range(3):
                     try:
-                        st = record_animation(browser, url, k, m, label, dest, box_css)
+                        st = (record_bar_animation if bar else record_animation)(browser, url, k, m, label, dest, box_css)
                     except Exception as e:  # a navigation timeout: wait and retry this one
                         print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}); retrying", file=sys.stderr)
                         time.sleep(10)
@@ -1518,8 +1745,8 @@ def record_animations(url, out_dir, slug, info, only=None):
                     dur, fps = _media_stats(dest)
                     vw, vh = _video_size(dest)
                     st.update(name=name, dur=dur, fps=fps)
-                    start_ok, start_problems = start_check(dest, st["geom"])
-                    end_ok, end_problems = end_check(dest, st["geom"])
+                    start_ok, start_problems = (bar_start_check if bar else start_check)(dest, st["geom"])
+                    end_ok, end_problems = (bar_end_check if bar else end_check)(dest, st["geom"])
                     problems = start_problems + end_problems
                     if fps < 10:
                         problems.append(f"only {fps:.1f} distinct frames/s")
@@ -1532,6 +1759,8 @@ def record_animations(url, out_dir, slug, info, only=None):
                         ANIM_STATS[name] = st
                         break
                     print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
+                    if bar and attempt >= 1:  # a window barely taller than the player can mis-place it: give it room (the crop stays the player)
+                        box_css["h"] += 160
                 else:
                     raise RuntimeError(f"{name}: could not record a passing video")
                 saved.setdefault(k, []).append((label, name))

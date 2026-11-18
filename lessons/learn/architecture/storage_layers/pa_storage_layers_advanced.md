@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 12 challenges
-
 # Storage Layers: Advanced
 
 At Netflix, an analyst refreshes a viewing-hours dashboard at the exact second a nightly job rewrites yesterday's partition. On a plain directory of files, the chart can count some old files alongside some new ones. Netflix engineers built an open table format to make that moment impossible, and the fix lives entirely in metadata.

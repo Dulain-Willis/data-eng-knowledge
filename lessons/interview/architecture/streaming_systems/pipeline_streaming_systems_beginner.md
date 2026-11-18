@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 4 challenges
-
 # Streaming Systems: Beginner
 
 Ines is 40 minutes into a data engineering loop at Uber when the interviewer draws a phone on the whiteboard. "Every driver app emits trip events: requested, accepted, started, completed. Operations wants completed trips per city per minute on a dashboard. Walk me through the pipeline." Ines sketches producers writing to a log, and a consumer that fills a table. Then the follow-ups come. A driver enters a tunnel, and the completed event lands 3 minutes 40 seconds after the trip ended: which minute counts it? One app release sends `fare` as text instead of a number: does every consumer stop? The dashboard team asks whether fresh numbers every 30 seconds are enough, or whether each event must be processed the moment it lands. Every follow-up probes one skill: naming the part of a streaming system that breaks, and the property that keeps it correct.

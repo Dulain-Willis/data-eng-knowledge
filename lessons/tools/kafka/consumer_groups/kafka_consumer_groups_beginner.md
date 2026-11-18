@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 10 challenges
-
 # Consumer Groups: Beginner
 
 A new team at LinkedIn ships a dashboard that reads the page-view topic. They start it on Friday and see 0 records, so they file a bug against the producer team. Monday brings the opposite: the dashboard is 40 million records behind and climbing. Both mysteries come down to 1 setting and 1 number this lesson teaches: where a group starts, and how lag is measured.
@@ -69,7 +67,7 @@ After that batch the consumer remembers, in its own memory, that partition 0 is 
 
 Between one `poll` and the next, the consumer does its work on the batch: it charges the cards, writes the rows, calls the downstream service. The broker does not watch this work; it sees only the next fetch. The consumer must call `poll` again within `max.poll.interval.ms`, 5 minutes by default. A batch of 500 records that take 1 second each finishes in about 8 minutes. That is past the deadline, so the group treats the consumer as gone. What the group does about it comes in a later lesson; for now, size the batch so the loop returns in time: 500 records at 1 second each needs `max.poll.records` under 300, or a handler 2 times faster.
 
-![Animation](_images/kafka_consumer_groups_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/7c0af2d9-1f9b-4391-a017-1ed89c61e969
 
 Watch the consumer's position in the animation. After each batch it moves forward by the batch size, and the next fetch asks for exactly that offset. The setting changes how many records the consumer holds at once between polls, and nothing about which records it reads or in what order.
 
@@ -135,7 +133,7 @@ Groups do not share work with each other. A `billing` group and a `fraud` group 
 
 ![Pipeline diagram 1](_images/kafka_consumer_groups_beginner_diagram_1.png)
 
-![Animation](_images/kafka_consumer_groups_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/730d1b35-0bea-423f-90cf-92fe07918037
 
 In the animation, every record with key `cust-2` lands on 1 partition, and that partition belongs to 1 member, so 1 member sees all of that customer's orders in order. With 2 members each holds 2 partitions; with 5, 4 members hold 1 each and `billing-e` holds nothing. Use the crash control to stop `billing-b`: once the coordinator notices it is gone, its partitions are dealt to the others, and when it restarts it rejoins and the group deals again.
 
@@ -183,7 +181,7 @@ With `enable.auto.commit=true`, the default, the consumer commits on its own: du
 
 `commit` comes in 2 forms. The synchronous form blocks until the coordinator confirms, so the loop pauses for a round trip but knows the position was saved before the next poll. The asynchronous form sends the commit and returns at once, so the loop keeps polling and the confirmation, or the failure, arrives later. The Java client names them `commitSync` and `commitAsync`. A loop that commits once a batch usually affords the synchronous round trip; a loop that commits after every record usually cannot.
 
-![Animation](_images/kafka_consumer_groups_beginner_animation_3.gif)
+https://github.com/user-attachments/assets/31f9e2c5-c2e7-4a27-87e5-b8b265fe1488
 
 In the base run the consumer commits after each batch, crashes after processing its 2nd batch, and on restart reads that batch again: 1 batch of duplicate rows lands in the ledger. In the variant the loop never commits, so the restart finds no saved position for the group and the whole partition is read from the start, doubling every row it had written. The difference between the 2 runs is 1 line in the loop.
 
@@ -233,7 +231,7 @@ group.id=report-v1
 auto.offset.reset=earliest
 ```
 
-![Animation](_images/kafka_consumer_groups_beginner_animation_4.gif)
+https://github.com/user-attachments/assets/fbd0386d-71f2-4999-823d-381783d134c3
 
 The producer writes 5 records before the consumer starts. Under `latest`, the consumer's first fetch asks for offset 5, and the 3 records the producer writes afterwards are the only ones it reads. Under `earliest`, the first fetch asks for 0, and it reads 8. Both runs commit after reading, so if either consumer restarts it continues from its commit and the setting no longer matters.
 

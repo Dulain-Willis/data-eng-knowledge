@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 16 challenges
-
 # Joins: Advanced
 
 Say you're on Uber's pricing data team, and the nightly job that tags each trip with the surge multiplier live when it started has crept from 20 minutes to 9 hours. Its join condition is a time range, the 8 lookup tables it enriches trips with are broadcast to 400 executors, and the product team now wants the same answer per ride, in milliseconds.

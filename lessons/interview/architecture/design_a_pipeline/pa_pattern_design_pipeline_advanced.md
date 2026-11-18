@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 20 min · 4 challenges
-
 # Design a Pipeline
 
 You are 20 minutes into a system design round at a company with 40 product teams.

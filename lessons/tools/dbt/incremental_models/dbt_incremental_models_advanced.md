@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 6 challenges
-
 # Incremental Models: Advanced
 
 A Spotify analyst flags that stream counts for March 5 to 13 are low. The model that counts plays over 30 seconds had a wrong threshold, fixed on March 15, and the incremental build keeps the bad rows. A full refresh would reprocess every day since January 1. This lesson is about rebuilding those 9 days alone, and knowing the result matches a rebuild.
@@ -201,7 +199,7 @@ A unit test on the incremental model can override `is_incremental()` to true and
 
 The incremental filter asks the source for rows with `updated_at` later than the mark. A row deleted at the source has no `updated_at` any more; it has nothing. It arrives in no batch and matches nothing in the merge, and the merge touches no target row absent from the batch. The target keeps the row at its last known values for as long as the model exists, and `count(*)` on the fact runs ahead of the source by 1 for every deletion. Section 1's comparison is what notices: its second half, rows in the fact that staging lacks, returns every deleted order.
 
-![Animation](_images/dbt_incremental_models_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/ae730a75-1435-4440-a01b-a58d40320672
 
 *$ dbt run*
 
