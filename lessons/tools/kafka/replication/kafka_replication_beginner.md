@@ -171,11 +171,11 @@ At 09:00:04 broker 3's disk started stalling. It kept answering, slowly, so at 0
 
 **Healthy followers**
 
-![Healthy followers](_images/kafka_replication_beginner_animation_1_healthy-followers.gif)
+https://github.com/user-attachments/assets/8cb9d58e-7ec1-422f-bf19-d781842feeb7
 
 **Broker 3 stalls**
 
-![Broker 3 stalls](_images/kafka_replication_beginner_animation_1_broker-3-stalls.gif)
+https://github.com/user-attachments/assets/9546e08a-024a-4437-b924-ade61065bfe7
 
 Running `--describe` at 09:00:35 prints `Isr: 1,2` against `Replicas: 1,2,3`: 1 replica is assigned and not caught up. The lag rule covers a follower that is alive and stuck; a broker that stops altogether leaves every ISR sooner, about 9 seconds after it falls silent, through the session timeout section 4 introduces.
 
@@ -295,11 +295,11 @@ The pause has 2 parts. The controller needs around 9 seconds, the session timeou
 
 **No failure**
 
-![No failure](_images/kafka_replication_beginner_animation_2_no-failure.gif)
+https://github.com/user-attachments/assets/00b9479e-22c0-41ce-9013-01f63019b187
 
 **Broker 2 killed at 2 s**
 
-![Broker 2 killed at 2 s](_images/kafka_replication_beginner_animation_2_broker-2-killed-at-2-s.gif)
+https://github.com/user-attachments/assets/cdde972f-0a0f-41e8-b7e9-bb96420db407
 
 A dead leader's partitions each pass to the next in-sync broker in their Replicas list. On the 4-broker layout broker 2 leads only orders-1, so broker 3 inherits it alone. On topics with many more partitions than brokers, each pass of the assignment puts a different broker second, so the leadership of a broker that led 100 partitions, and its producers' retries, splits across the survivors.
 

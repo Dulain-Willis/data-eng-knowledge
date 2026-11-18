@@ -174,12 +174,11 @@ publish under none_failed_min_one_success
 
 **publish under all_success**
 
-![publish under all_success](_images/airflow_task_lifecycle_intermediate_animation_1_publish-under-all-success.gif)
+https://github.com/user-attachments/assets/6095994f-087d-4bad-a3d9-a9582842f471
 
 **publish under none_failed_min_one_success**
 
-![publish under none_failed_min_one_success](_images/airflow_task_lifecycle_intermediate_animation_1_publish-under-none-failed-min-one-success.gif)
-
+https://github.com/user-attachments/assets/a2361baf-45f5-4530-b168-f6c9710054fa
 
 <br>
 
@@ -439,12 +438,11 @@ hourly_sessions()
 
 **pull_sessions with execution_timeout**
 
-![pull_sessions with execution_timeout](_images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-with-execution-timeout.gif)
+https://github.com/user-attachments/assets/2c6450aa-e2e6-4fe3-8c2e-116aa6eddef5
 
 **pull_sessions without execution_timeout**
 
-![pull_sessions without execution_timeout](_images/airflow_task_lifecycle_intermediate_animation_2_pull-sessions-without-execution-timeout.gif)
-
+https://github.com/user-attachments/assets/59b53fca-bd67-4de8-871d-d1328b47912b
 
 <br>
 

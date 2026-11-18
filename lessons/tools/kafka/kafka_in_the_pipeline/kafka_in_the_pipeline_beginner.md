@@ -46,11 +46,11 @@ Watch a connector pair built from the pieces you already know. The source task b
 
 **keyed by customer id**
 
-![keyed by customer id](_images/kafka_in_the_pipeline_beginner_animation_1_keyed-by-customer-id.gif)
+https://github.com/user-attachments/assets/9ba1cea1-4f3e-44f4-a986-9dd39b8e5607
 
 **no key**
 
-![no key](_images/kafka_in_the_pipeline_beginner_animation_1_no-key.gif)
+https://github.com/user-attachments/assets/81df66b7-af58-41e2-b7dd-8ae2033c141a
 
 > **TIP**
 >
@@ -504,11 +504,11 @@ A warehouse sink writes rows into a table rather than files, and the crash quest
 
 **insert mode**
 
-![insert mode](_images/kafka_in_the_pipeline_beginner_animation_2_insert-mode.gif)
+https://github.com/user-attachments/assets/6c5de517-b1ba-4294-a3ad-50e3b209d674
 
 **upsert by key**
 
-![upsert by key](_images/kafka_in_the_pipeline_beginner_animation_2_upsert-by-key.gif)
+https://github.com/user-attachments/assets/8d2594cf-9d68-4055-b539-3431f1ca939d
 
 > Commit only after the upload finishes
 >

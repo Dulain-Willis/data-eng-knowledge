@@ -328,11 +328,11 @@ The smallest case shows the shape every undersized cap produces. A DAG runs 4 in
 
 **warehouse pool: 2 slots**
 
-![warehouse pool: 2 slots](_images/airflow_execution_advanced_animation_1_warehouse-pool-2-slots.gif)
+https://github.com/user-attachments/assets/78698e9a-a0c3-40a7-ba8f-d6231d1f397a
 
 **warehouse pool: 4 slots**
 
-![warehouse pool: 4 slots](_images/airflow_execution_advanced_animation_1_warehouse-pool-4-slots.gif)
+https://github.com/user-attachments/assets/1969b7a1-645c-407f-9e2b-08ee8965bc30
 
 The Kubernetes executor is sized differently, because it has no worker fleet: each task is a pod, and the cap is the cluster's spare capacity, with `[kubernetes_executor] worker_pods_creation_batch_size` setting how many pods 1 loop may launch. A burst of 200 heavy tasks against a cluster with room for 40 pods leaves 160 pods pending and 160 tasks queued, in whatever order the cluster admits them. A pool of 40 on every task pinned to that executor turns that into a queue Airflow orders by priority weight and shows on the pool page.
 
