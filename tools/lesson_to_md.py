@@ -1620,7 +1620,14 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             page.wait_for_timeout(100)
         if last_seen is None:
             raise RuntimeError("the playback never reached Replay")
-        page.wait_for_timeout(2000)
+        # Park the pointer outside the player (no hover tooltip over the caption) and nudge the page so the
+        # compositor paints the final state: without this the headless video can keep showing the last
+        # frame before the Pause -> Replay swap (seen on the 16-step pipeline player).
+        page.mouse.move(2, 2)
+        page.wait_for_timeout(300)
+        page.mouse.move(6, 4)
+        page.screenshot(clip={"x": 0, "y": 0, "width": 8, "height": 8})  # forces a fresh paint into the video
+        page.wait_for_timeout(1700)
         g = block.evaluate(_BAR_GEOM_JS)
         if g:
             last_geom, h_max = g, max(h_max, g["h"])
