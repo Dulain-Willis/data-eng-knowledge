@@ -1760,7 +1760,10 @@ def record_animations(url, out_dir, slug, info, only=None):
                     problems = start_problems + end_problems
                     if fps < 10:
                         problems.append(f"only {fps:.1f} distinct frames/s")
-                    if st["live"] is not None and abs(dur - (st["live"] + 2)) > 0.3:
+                    # A bar player's video can end up to 1 s early (the video clock lags on a loaded machine; the
+                    # finished state is still on screen and the END CHECK covers it): keep at least a 1 s tail.
+                    lo = 1.0 if bar else 1.7
+                    if st["live"] is not None and not (st["live"] + lo <= dur <= st["live"] + 2.3):
                         problems.append(f"duration {dur:.1f} s vs live {st['live']:.1f} s + 2 s")
                     if vw != 1600 or vh % 2:
                         problems.append(f"size {vw}x{vh}")
