@@ -282,11 +282,11 @@ With the flag false, the compiled file has 2 columns and a blank gap where the b
 
 **['opened', 'merged', 'closed']**
 
-![['opened', 'merged', 'closed']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed.gif)
+https://github.com/user-attachments/assets/37354cab-1d77-4d6a-8dd7-6e2667ccb983
 
 **['opened', 'merged', 'closed', 'locked']**
 
-![['opened', 'merged', 'closed', 'locked']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed-locked.gif)
+https://github.com/user-attachments/assets/a9f3dacd-a15d-4f78-8e2c-6bb9715c2610
 
 *$ dbt run*
 

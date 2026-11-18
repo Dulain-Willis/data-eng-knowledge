@@ -108,7 +108,7 @@ A payments feed carries a `method` column that holds card and bank today, and la
 {% endmacro %}
 ```
 
-![Animation](_images/dbt_jinja_and_macros_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/5b68a55c-1b52-4a82-a1b2-4bee4aaa0a0b
 
 *$ dbt run*
 

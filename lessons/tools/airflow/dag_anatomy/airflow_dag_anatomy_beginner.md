@@ -372,11 +372,11 @@ The bar over a column carries the run's own state: lime while any task is still 
 
 **Exports side by side**
 
-![Exports side by side](_images/airflow_dag_anatomy_beginner_animation_1_exports-side-by-side.gif)
+https://github.com/user-attachments/assets/7de73f08-2a8b-4c6b-a7b2-6ab30c9964b9
 
 **Exports chained**
 
-![Exports chained](_images/airflow_dag_anatomy_beginner_animation_1_exports-chained.gif)
+https://github.com/user-attachments/assets/35bd6488-bdb9-488c-9a65-3d573180f82c
 
 Play the night above. At 00:00 on March 2 the first column appears and `get_bookings` and `get_reviews` turn lime together. `build_report` stays blank: the cell has no state until both tasks above it finish. At 00:10 `get_reviews` turns green and `build_report` still waits, because one of its 2 edges is unmet. At 00:20 the second edge is met, `build_report` passes through scheduled and queued and runs, and the column is all green at 00:35. On the night of March 3 `build_report` turns red at 00:35 and the bar over that column turns red with it: a run fails when a task at the end of its graph fails. Switch the dependencies to the serial file and `get_reviews` stays blank until `get_bookings` finishes at 00:20, then runs from 00:20 to 00:30; `build_report` starts at 00:30 instead of 00:20, so every column finishes 10 minutes later, at 00:45.
 

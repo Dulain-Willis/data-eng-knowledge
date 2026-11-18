@@ -310,7 +310,7 @@ A record with a key goes to the partition at `hash(key) mod partition count`, an
 
 **orders: 3 partitions**
 
-![orders: 3 partitions](_images/kafka_the_log_intermediate_animation_1_orders-3-partitions.gif)
+https://github.com/user-attachments/assets/47264c22-e6ef-47dc-b862-66fd50001bb6
 
 **orders-v2: 6 partitions**
 

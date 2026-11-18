@@ -58,7 +58,7 @@ The clock-reading version fails in a way that looks like success. Suppose the cl
 
 Ownership also decides whether a backfill can run several days at once. If each run touches only its own partition, 3 runs in flight at the same moment write 3 different slots and never see each other. The animation below plays a daily DAG whose start_date sits 3 days before the night begins, so catchup creates 3 runs the instant the scheduler looks, and the 3 extract cells, then the 3 load cells, move together. Nothing in the file serializes them and nothing needs to, because the Oct 29 run and the Oct 31 run have no partition in common. A fourth run appears when the Nov 1 window closes at midnight.
 
-![Animation](_images/airflow_tasks_and_data_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/2af95f71-b0b7-4637-9f31-bacae40f4a3e
 
 > **TIP**
 >

@@ -29,8 +29,7 @@ A DAG file names tasks. A task instance is the thing Airflow runs: one task, ins
 
 2 parties move a cell. The scheduler owns the top half of the table: it creates the cell as `none` when the run appears, moves it to `scheduled` once the tasks above it are done, and to `queued` when it hands the task to the worker pool. A worker owns the bottom half: it takes the task from the queue, writes `running`, executes the Python, and reports `success` or `failed` when the code returns or raises. The scheduler decides when a cell may run; the worker decides how it ends. Every later state in this lesson is one of these 2 parties telling the other something about a cell.
 
-![Animation](_images/airflow_task_lifecycle_beginner_animation_1.gif)
-
+https://github.com/user-attachments/assets/62d191dd-d22a-489e-b362-fece193c900e
 
 <br>
 
@@ -83,11 +82,11 @@ When `load` raises, the worker reports the failure along with the try number, 1,
 
 **load: retries=2**
 
-![load: retries=2](_images/airflow_task_lifecycle_beginner_animation_2_load-retries-2.gif)
+https://github.com/user-attachments/assets/577a7330-bf42-49c0-a92c-7d9fc9445589
 
 **load: retries=0**
 
-![load: retries=0](_images/airflow_task_lifecycle_beginner_animation_2_load-retries-0.gif)
+https://github.com/user-attachments/assets/f1954dcd-28dc-4e86-84aa-c4ca52b8d459
 
 | Try | Ends by | Tries left after it | State the cell gets |
 | --- | --- | --- | --- |
@@ -153,11 +152,11 @@ def pull_returns():
 
 **pull_returns raises**
 
-![pull_returns raises](_images/airflow_task_lifecycle_beginner_animation_3_pull-returns-raises.gif)
+https://github.com/user-attachments/assets/6a313d2f-1114-493b-a57a-a4402d454ea4
 
 **pull_returns skips**
 
-![pull_returns skips](_images/airflow_task_lifecycle_beginner_animation_3_pull-returns-skips.gif)
+https://github.com/user-attachments/assets/3f7afb21-99d7-45e0-996a-fc22cbb0bb4b
 
 pull_returns raised
 
@@ -223,11 +222,11 @@ Downstream is the box that decides whether the run recovers. Take `nightly_order
 
 **Downstream ticked**
 
-![Downstream ticked](_images/airflow_task_lifecycle_beginner_animation_4_downstream-ticked.gif)
+https://github.com/user-attachments/assets/38695d35-237a-4457-bc66-c98cff535337
 
 **Downstream off**
 
-![Downstream off](_images/airflow_task_lifecycle_beginner_animation_4_downstream-off.gif)
+https://github.com/user-attachments/assets/99a84b36-019b-44fc-a520-5e27af5650f4
 
 | Cell | Before the clear | Right after, Downstream ticked | Right after, Downstream off | End of night, ticked | End of night, off |
 | --- | --- | --- | --- | --- | --- |
