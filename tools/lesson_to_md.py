@@ -1478,6 +1478,7 @@ _BAR_GEOM_JS = """(block) => {
   return {x: r.x, y: r.y, w: r.width, h: r.height, restart: rel(restart), speed: rel(speed), bar: rel(bar),
           replay: !!block.querySelector('button[aria-label="Replay"]'), text: bar.innerText.replace(/\\s+/g, ' ')};
 }"""
+_PY_BAR_TOL = 20  # the Python player's controls start dimmer (fade-in) than in the last frame: a little more room
 _BAR_TOL = 14  # mean colour difference (0..255) of a control-bar button between a frame and the finished recording
 
 
@@ -1533,7 +1534,7 @@ def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
                           "-vf", f"fps={fps}," + vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
     frs = [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)]
     for i in range(len(frs) - 2):
-        if all(_bar_region_diff(frs[i + j], ref, vw, vh, geom) <= _BAR_TOL for j in range(3)):
+        if all(_bar_region_diff(frs[i + j], ref, vw, vh, geom) <= geom.get("tol", _BAR_TOL) for j in range(3)):
             return lo + i / fps
     raise RuntimeError("the player's control bar never showed at its expected spot in the recording")
 
@@ -1550,7 +1551,7 @@ def bar_start_check(path, geom):
     problems = []
     for i in range(3):
         d = _bar_region_diff(fr[i], ref[-1], w, h, geom)
-        if d > _BAR_TOL:
+        if d > geom.get("tol", _BAR_TOL):
             problems.append(f"frame {i} does not show the control bar (difference {d:.0f})")
     step = 7  # sampling stride in pixels: a page-text first frame turning into the player is a big jump, normal motion is not
     jump = sum(abs(a - b) for a, b in zip(fr[0][::step * 3 + 1], fr[2][::step * 3 + 1])) / len(fr[0][::step * 3 + 1])
@@ -1579,7 +1580,7 @@ def bar_end_check(path, geom):
     problems = []
     if not geom.get("ended"):
         problems.append("the playback never reached Replay")
-    if _bar_region_diff(fr[-1], fr[0], w, h, geom) > _BAR_TOL:
+    if _bar_region_diff(fr[-1], fr[0], w, h, geom) > geom.get("tol", _BAR_TOL):
         problems.append("last frame: control bar changes at the end (cut off?)")
     if _body_blank(fr[-1], w, h, geom):
         problems.append("last frame: the player body is blank")
@@ -1618,6 +1619,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         jump_mark = time.monotonic()
         page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
                       block.evaluate("b => b.getBoundingClientRect().top") - 10)
+        btype = block.get_attribute("data-note-block-type")
         geom = None
         while time.monotonic() - jump_mark < 25:  # the player is mounted once its control bar is
             geom = block.evaluate(_BAR_GEOM_JS)
@@ -1655,6 +1657,8 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             last_geom, h_max = g, max(h_max, g["h"])
         ctx.close()
         geom = dict(last_geom, h=h_max, ended=True)
+        if btype == "python_animation":
+            geom["tol"] = _PY_BAR_TOL
         vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
         x, y, w = (int(round(geom[c])) for c in "xyw")
         h = int(round(h_max))
