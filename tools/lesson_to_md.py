@@ -726,10 +726,10 @@ def exercises_markdown(challenges, images=None, start=0):
 # login), so none go into the Markdown. Animations are unaffected. Set True to bring back the
 # repair-the-DAG conversion below.
 INCLUDE_AIRFLOW_EXERCISES = False
-# The dbt and Kafka exercises (challenge_type "dbt" / "kafka"; their own forms such as
+# The dbt, Kafka, Spark and Python exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python"}
 
 
 def challenge_path(c):
@@ -1070,6 +1070,16 @@ def upload_animation(name, force=False):
     """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
     in tools/animation_urls.json and return it. Needs `gh auth login`. The token goes to curl through a
     mode-600 config file (never on the command line, where `ps` could show it) that is deleted afterwards."""
+    import fcntl  # several converter runs may upload at once: serialize the read-modify-write of the URL file
+    lock = open(URLS_FILE + ".lock", "w")
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    try:
+        return _upload_animation(name, force)
+    finally:
+        lock.close()
+
+
+def _upload_animation(name, force):
     urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
     if force or name not in urls:  # force: upload a re-recorded file as a NEW asset
         tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
@@ -1452,12 +1462,12 @@ def record_animation(browser, url, k, m, label, dest, box_css):
 #   start  the first video frame where the frame's static control-bar buttons (Restart, speed) are drawn
 #          like in the finished recording, i.e. the player is on screen; the site starts it on mount;
 #   end    the control bar's play button turns into "Replay" (the playback is over); the tail is 2 s after.
-BAR_PLAYER_TYPES = {"airflow_animation", "kafka_animation", "pipeline_animation"}
-_BAR_BOX = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame');
+BAR_PLAYER_TYPES = {"airflow_animation", "kafka_animation", "pipeline_animation", "python_animation"}
+_BAR_BOX = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame, .pmv');
     if (!f) return null; const r = f.getBoundingClientRect();
     return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
 _BAR_GEOM_JS = """(block) => {
-  const bs = [...block.querySelectorAll('button')]; const b0 = bs[0]; const f = b0 && b0.closest('.smv-frame');
+  const bs = [...block.querySelectorAll('button')]; const b0 = bs[0]; const f = b0 && b0.closest('.smv-frame, .pmv');
   if (!f) return null;
   const r = f.getBoundingClientRect();
   const rel = e => { if (!e) return null; const q = e.getBoundingClientRect(); return [q.x - r.x, q.y - r.y, q.width, q.height]; };
