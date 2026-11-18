@@ -173,8 +173,7 @@ orders partition 1 offset 2 is cart-4: shipped for a reader on the fraud team an
 
 Offsets are also how a reader keeps its place. A reader does not read a topic as a whole; it reads each partition from an offset, and after each record it has handled, its position in that partition is the offset of the next one. That position belongs to the reader, and reading never changes the log. A reader may ask the broker to store the number for it, which a later lesson covers, and the records stay as they were either way. 2 readers of the same partition hold 2 different numbers.
 
-![Animation](_images/kafka_the_log_beginner_animation_1.gif)
-
+https://github.com/user-attachments/assets/3a962270-c533-4c3c-b7b7-40d6293236ce
 
 <br>
 
@@ -315,8 +314,7 @@ A position belongs to the reader, and moving it changes nothing in the log. A fr
 
 Position means the next offset the reader will ask for. At 09:00 the scorer has handled offsets 0 to 3 and will ask for 4. At 10:00 the loader wakes for its hourly run, reads offsets 2 to 6 in one request and moves to 7, records the scorer finished half an hour earlier. The audit reader starts at 0 and by 10:05 has read all 9 records, 7 of which were on disk before it existed. The log column only grows, and the 3 position columns move at 3 different rates.
 
-![Animation](_images/kafka_the_log_beginner_animation_2.gif)
-
+https://github.com/user-attachments/assets/5f276903-a0b7-4e11-9ae3-40ce020a91b7
 
 <br>
 

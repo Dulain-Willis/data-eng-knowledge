@@ -198,15 +198,15 @@ The bounded loop is correct for 1 worker, and pipelines rarely have 1. Picture 1
 
 **Retry after 1 s**
 
-![Retry after 1 s](_images/pa_failure_modes_beginner_animation_1_retry-after-1-s.gif)
+https://github.com/user-attachments/assets/c316528b-4100-4177-ab9a-6388aa192d85
 
 **Exponential backoff**
 
-![Exponential backoff](_images/pa_failure_modes_beginner_animation_1_exponential-backoff.gif)
+https://github.com/user-attachments/assets/b6674d50-609b-4388-a476-ed861ae3f24d
 
 **Backoff + jitter**
 
-![Backoff + jitter](_images/pa_failure_modes_beginner_animation_1_backoff-jitter.gif)
+https://github.com/user-attachments/assets/18a8c855-641c-4f97-8ee1-fe29b92b7059
 
 Run the first variant and watch the arrivals. The original fault lasted 200 milliseconds. The service is then held at full capacity by retries for several seconds, and some workers are on their third or fourth attempt before the backlog clears. Every one of those extra calls was created by the clients' own retry policy. This is the thundering herd: a group of clients that fail together, wait the same amount, and return together.
 

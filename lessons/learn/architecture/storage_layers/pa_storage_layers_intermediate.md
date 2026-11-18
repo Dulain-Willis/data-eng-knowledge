@@ -313,11 +313,11 @@ Partitions and footer statistics save bytes only when the engine compares the qu
 
 **Filters on the columns**
 
-![Filters on the columns](_images/pa_storage_layers_intermediate_animation_1_filters-on-the-columns.gif)
+https://github.com/user-attachments/assets/7b6496f8-4730-4c98-8f17-15e2767be991
 
 **Functions on the columns**
 
-![Functions on the columns](_images/pa_storage_layers_intermediate_animation_1_functions-on-the-columns.gif)
+https://github.com/user-attachments/assets/c4e84164-8396-4efc-8c4c-a80d7e038c4f
 
 ```sql
 SELECT

@@ -452,7 +452,7 @@ dbt snapshot reads the relation, compares it with the snapshot table by unique_k
 | dbt_updated_at | the source row's updated_at at the time of the run |
 | dbt_scd_id | a hash of the key and updated_at, 1 per version |
 
-![Animation](_images/dbt_models_intermediate_animation_1.gif)
+https://github.com/user-attachments/assets/933f4e66-4cb9-4a3c-ace1-bb4c4fb608db
 
 *$ dbt build*
 

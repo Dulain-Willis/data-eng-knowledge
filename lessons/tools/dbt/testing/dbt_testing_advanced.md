@@ -196,11 +196,11 @@ dbt test --select "test_type:unit" runs every unit test and nothing else. In dbt
 
 **when score >= 70 then 'pass'**
 
-![when score >= 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+https://github.com/user-attachments/assets/e9e6712f-b30b-4ef5-ba9f-2e295a7a55c4
 
 **when score > 70 then 'pass'**
 
-![when score > 70 then 'pass'](_images/dbt_testing_advanced_animation_1_when-score-70-then-pass.gif)
+https://github.com/user-attachments/assets/a8e08b1a-8885-4c07-8a06-f9293c2d5ac1
 
 *$ dbt build*
 

@@ -487,12 +487,11 @@ The animation replays all 6 events through the `revenue_5m` job in arrival order
 
 **Allowed lateness 60 min**
 
-![Allowed lateness 60 min](_images/pa_schema_evolution_intermediate_animation_1_allowed-lateness-60-min.gif)
+https://github.com/user-attachments/assets/759fcb4f-9500-4ce0-87ff-17b1934c257b
 
 **No allowed lateness**
 
-![No allowed lateness](_images/pa_schema_evolution_intermediate_animation_1_no-allowed-lateness.gif)
-
+https://github.com/user-attachments/assets/44061f79-9855-4b15-9adb-5864a2307191
 
 <br>
 

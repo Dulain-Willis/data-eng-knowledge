@@ -151,11 +151,11 @@ Take `user-1`. The Java client computes murmur2 of the 6 bytes of `user-1` and g
 
 **Java client**
 
-![Java client](_images/kafka_producers_advanced_animation_1_java-client.gif)
+https://github.com/user-attachments/assets/7fd3ef66-841a-4a4b-a332-1d65779b722e
 
 **librdkafka client**
 
-![librdkafka client](_images/kafka_producers_advanced_animation_1_librdkafka-client.gif)
+https://github.com/user-attachments/assets/f499a0ef-9325-4ac9-8ba3-6d0b2e77f258
 
 The bytes matter as much as the function. Both libraries hash the serialized key, so 2 producers using the same library still disagree if 1 serializes the user id as the string `42` (2 bytes) and the other as a 4-byte integer. A topic's partitioning contract is 3 things together: the key's bytes, the hash function and the partition count, and any producer that changes 1 of the 3 is writing to a different place.
 
@@ -200,7 +200,7 @@ The pattern in the table is exact. A key stays when its hash mod 6 is 0, 1 or 2,
 
 **3 partitions**
 
-![3 partitions](_images/kafka_producers_advanced_animation_2_3-partitions.gif)
+https://github.com/user-attachments/assets/07661615-7473-43e1-be56-dd3e39f3f63e
 
 **6 partitions**
 

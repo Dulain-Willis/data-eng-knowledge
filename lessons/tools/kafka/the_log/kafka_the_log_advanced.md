@@ -134,11 +134,11 @@ The animation sends the same 6 records from offset 0, each tile showing its stam
 
 **from offset 0**
 
-![from offset 0](_images/kafka_the_log_advanced_animation_1_from-offset-0.gif)
+https://github.com/user-attachments/assets/e6fbd46e-3e61-486b-a1de-ed90ffdf266d
 
 **start at offset 3**
 
-![start at offset 3](_images/kafka_the_log_advanced_animation_1_start-at-offset-3.gif)
+https://github.com/user-attachments/assets/236ba679-b26a-4f4c-8fc7-c1036b158aa2
 
 > Where the timestamp is read again
 >

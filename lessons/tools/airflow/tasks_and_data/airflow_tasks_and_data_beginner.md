@@ -369,11 +369,11 @@ report("{{ ds }}")
 
 **Scheduled runs only**
 
-![Scheduled runs only](_images/airflow_tasks_and_data_beginner_animation_1_scheduled-runs-only.gif)
+https://github.com/user-attachments/assets/d2901046-ed54-418e-951e-0ad418e54d7f
 
 **Plus a manual run for fr**
 
-![Plus a manual run for fr](_images/airflow_tasks_and_data_beginner_animation_1_plus-a-manual-run-for-fr.gif)
+https://github.com/user-attachments/assets/63992402-b51d-4914-b4d5-d56ccf0edc66
 
 The UI keeps the result. Open a task instance and pick Rendered Templates: it shows every templated field with the string the worker produced for that run, which is the fastest check that `{{ params.region }}` rendered to `fr` rather than `all`, or that the XCom pull found a number rather than `None`.
 

@@ -1542,8 +1542,20 @@ def bar_start_check(path, geom):
         d = _bar_region_diff(fr[i], ref[-1], w, h, geom)
         if d > _BAR_TOL:
             problems.append(f"frame {i} does not show the control bar (difference {d:.0f})")
+    step = 7  # sampling stride in pixels: a page-text first frame turning into the player is a big jump, normal motion is not
+    jump = sum(abs(a - b) for a, b in zip(fr[0][::step * 3 + 1], fr[2][::step * 3 + 1])) / len(fr[0][::step * 3 + 1])
+    if jump > 5:
+        problems.append(f"frame 0 is not the player (jump of {jump:.0f} to frame 2)")
     if _body_blank(fr[2], w, h, geom):
         problems.append("the player body is blank in the first frames")
+    elif len(fr) >= 8:  # a half-drawn body (the player still mounting) shows much less than frame 7 does
+        s = w / geom["w"]
+        y1 = int(geom["bar"][1] * s)
+        ink = lambda f: sum(1 for y in range(int(y1 * .12), y1, 3) for x in range(0, w, 3) if sum(_px(f, w, x, y)) / 3 > 70)
+        ref_ink = ink(fr[7])
+        for i in range(3):
+            if ref_ink and ink(fr[i]) < 0.8 * ref_ink:
+                problems.append(f"frame {i}: the player body is still half drawn")
     return not problems, problems
 
 
@@ -1640,7 +1652,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
         webm = os.path.join(tmp, vids[0])
-        pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 6), 20)
+        pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
         start = pres + (mark - mount_t)
         live = last_seen - mark
         end = start + live + 2
@@ -1712,9 +1724,13 @@ def record_animations(url, out_dir, slug, info, only=None):
             # the player can grow while it plays (captions, tables): take the largest size seen so far
             box_css = {"w": box["w"], "h": box["h"]}
             ctx.close()
+            used = set()
             for m, label in enumerate(entry["labels"] or [None]):
                 name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
                                                       if label else "") + ".mp4"
+                while name in used:  # two modes whose labels slug alike (score >= 70 / score > 70): keep both files
+                    name = name[:-4] + "-2.mp4"
+                used.add(name)
                 dest = os.path.join(ANIM_DIR, name)
                 for attempt in range(3):
                     try:
@@ -1743,6 +1759,8 @@ def record_animations(url, out_dir, slug, info, only=None):
                         ANIM_STATS[name] = st
                         break
                     print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
+                    if bar and attempt >= 1:  # a window barely taller than the player can mis-place it: give it room (the crop stays the player)
+                        box_css["h"] += 160
                 else:
                     raise RuntimeError(f"{name}: could not record a passing video")
                 saved.setdefault(k, []).append((label, name))
