@@ -1484,29 +1484,59 @@ _BAR_GEOM_JS = """(block) => {
   const bar = f.querySelector('.smv-bar');
   if (!restart || !speed || !bar) return null;
   return {x: r.x, y: r.y, w: r.width, h: r.height, restart: rel(restart), speed: rel(speed), bar: rel(bar),
+          code: rel(f.querySelector('.pmv-code')),
           replay: !!block.querySelector('button[aria-label="Replay"]'), text: bar.innerText.replace(/\\s+/g, ' ')};
 }"""
 _PY_BAR_TOL = 20  # the Python player's controls start dimmer (fade-in) than in the last frame: a little more room
 _BAR_TOL = 14  # mean colour difference (0..255) of a control-bar button between a frame and the finished recording
 
 
-def _bar_region_diff(fr, ref, w, h, geom, ox=0.0, oy=0.0, scale=None):
-    """Worst mean absolute colour difference, over the Restart and speed buttons, between frame `fr` and
-    `ref` (both w x h rgb24, the player box with its top-left at (ox, oy)). 999 if a button is outside."""
+def _bar_region_diff(fr, ref, w, h, geom, ox=0.0, oy=0.0, scale=None, ref_geom=None):
+    """Worst mean absolute colour difference, over the Restart and speed buttons, between frame `fr` (buttons
+    where `geom` puts them) and `ref` (buttons where `ref_geom` puts them; default `geom`), both w x h rgb24,
+    the player box with its top-left at (ox, oy). The two differ for a player that grows while it plays: its
+    control bar sits lower at the end. 999 if a button is outside."""
     s = scale or (w / geom["w"])
+    rg = ref_geom or geom
     worst = 0
     for key in ("restart", "speed"):
         bx, by, bw, bh = geom[key]
+        rx, ry, _, _ = rg[key]
         x0, y0 = int(round(ox + bx * s)), int(round(oy + by * s))
         x1, y1 = int(round(x0 + bw * s)), int(round(y0 + bh * s))
-        if x0 < 0 or y0 < 0 or x1 > w or y1 > h:
+        rx0, ry0 = int(round(ox + rx * s)), int(round(oy + ry * s))
+        if x0 < 0 or y0 < 0 or x1 > w or y1 > h or rx0 < 0 or ry0 < 0 or rx0 + (x1 - x0) > w or ry0 + (y1 - y0) > h:
             return 999
         tot = 0
-        for y in range(y0, y1):
-            a, b = (y * w + x0) * 3, (y * w + x1) * 3
-            tot += sum(abs(p - q) for p, q in zip(fr[a:b], ref[a:b]))
+        for y in range(y1 - y0):
+            a, b = ((y0 + y) * w + x0) * 3, ((y0 + y) * w + x1) * 3
+            c = ((ry0 + y) * w + rx0) * 3
+            tot += sum(abs(p - q) for p, q in zip(fr[a:b], ref[c:c + (b - a)]))
         worst = max(worst, tot / ((x1 - x0) * (y1 - y0) * 3))
     return worst
+
+
+def _code_diff(fr, ref, w, h, geom):
+    """Python player only (geom has the code panel): mean colour difference between frame `fr` and `ref` over the
+    top of the code panel, which does not change while it plays (the page text, which can sit there in a frame
+    from before the player is on screen, differs a lot). 0 for other players."""
+    c = geom.get("code")
+    if not c:
+        return 0
+    s = w / geom["w"]
+    x0, y0 = int(c[0] * s), int(c[1] * s)
+    x1, y1 = min(w, int((c[0] + c[2]) * s)), min(h, int((c[1] + min(c[3], 120)) * s))
+    if x1 <= x0 or y1 <= y0:
+        return 999
+    tot = n = 0
+    for y in range(y0, y1, 3):
+        a, b = (y * w + x0) * 3, (y * w + x1) * 3
+        tot += sum(abs(p - q) for p, q in zip(fr[a:b:7], ref[a:b:7]))
+        n += len(fr[a:b:7])
+    return tot / max(n, 1)
+
+
+_CODE_TOL = 12
 
 
 def _bar_has_buttons(ref, w, h, geom):
@@ -1533,6 +1563,7 @@ def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
     vf = f"crop={w}:{h}:{x}:{y},scale=1600:-2:flags=lanczos"
     vw, vh = 1600, int(round(h * 1600 / w / 2)) * 2
     size = vw * vh * 3
+    g0 = dict(geom, **geom.get("start", {}))  # where the buttons were when the player mounted
     ref = subprocess.run(["ffmpeg", "-loglevel", "error", "-sseof", "-0.5", "-i", webm, "-vf", vf + ",fps=30",
                           "-frames:v", "15", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                          capture_output=True).stdout[-size:]
@@ -1542,7 +1573,8 @@ def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
                           "-vf", f"fps={fps}," + vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
     frs = [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)]
     for i in range(len(frs) - 2):
-        if all(_bar_region_diff(frs[i + j], ref, vw, vh, geom) <= geom.get("tol", _BAR_TOL) for j in range(3)):
+        if all(_bar_region_diff(frs[i + j], ref, vw, vh, g0, ref_geom=geom) <= geom.get("tol", _BAR_TOL)
+               and _code_diff(frs[i + j], ref, vw, vh, geom) <= _CODE_TOL for j in range(3)):
             return lo + i / fps
     raise RuntimeError("the player's control bar never showed at its expected spot in the recording")
 
@@ -1557,19 +1589,23 @@ def bar_start_check(path, geom):
     if not ref or not _bar_has_buttons(ref[0], w, h, geom):
         return False, ["last frame: no control bar"]
     problems = []
+    g0 = dict(geom, **geom.get("start", {}))  # the control bar at the start (a growing player has it higher up)
     for i in range(3):
-        d = _bar_region_diff(fr[i], ref[-1], w, h, geom)
+        d = _bar_region_diff(fr[i], ref[-1], w, h, g0, ref_geom=geom)
         if d > geom.get("tol", _BAR_TOL):
             problems.append(f"frame {i} does not show the control bar (difference {d:.0f})")
+        cd = _code_diff(fr[i], ref[-1], w, h, geom)
+        if cd > _CODE_TOL:
+            problems.append(f"frame {i} does not show the player's code panel (difference {cd:.0f})")
     step = 7  # sampling stride in pixels: a page-text first frame turning into the player is a big jump, normal motion is not
     jump = sum(abs(a - b) for a, b in zip(fr[0][::step * 3 + 1], fr[2][::step * 3 + 1])) / len(fr[0][::step * 3 + 1])
     if jump > 5:
         problems.append(f"frame 0 is not the player (jump of {jump:.0f} to frame 2)")
-    if _body_blank(fr[2], w, h, geom):
+    if _body_blank(fr[2], w, h, g0):
         problems.append("the player body is blank in the first frames")
     elif len(fr) >= 8:  # a half-drawn body (the player still mounting) shows much less than frame 7 does
         s = w / geom["w"]
-        y1 = int(geom["bar"][1] * s)
+        y1 = int(g0["bar"][1] * s)
         ink = lambda f: sum(1 for y in range(int(y1 * .12), y1, 3) for x in range(0, w, 3) if sum(_px(f, w, x, y)) / 3 > 70)
         ref_ink = ink(fr[7])
         for i in range(3):
@@ -1636,6 +1672,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             page.wait_for_timeout(50)
         if not geom:
             raise RuntimeError("the control bar never appeared")
+        start_geom = geom
         mount_t = mark = time.monotonic()
         play = block.locator('button[aria-label="Play"]')
         if m > 0 and play.count():  # a switched mode starts paused: the playback starts at this click
@@ -1665,6 +1702,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             last_geom, h_max = g, max(h_max, g["h"])
         ctx.close()
         geom = dict(last_geom, h=h_max, ended=True)
+        geom["start"] = {k: start_geom[k] for k in ("restart", "speed", "bar")}  # layout at mount (the player may grow)
         if btype == "python_animation":
             geom["tol"] = _PY_BAR_TOL
         vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
