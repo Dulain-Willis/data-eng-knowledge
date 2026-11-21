@@ -1113,6 +1113,14 @@ def _media_stats(path):
     return dur, out.count("pts_time") / dur
 
 
+def _max_gap(path):
+    """Longest stretch (s) in a video between two distinct frames (frames mpdecimate keeps): a frozen video."""
+    out = subprocess.run(["ffmpeg", "-i", path, "-vf", "mpdecimate,showinfo", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    ts = [float(m) for m in re.findall(r"pts_time:([0-9.]+)", out)]
+    return max((b - a for a, b in zip(ts, ts[1:])), default=0.0)
+
+
 def _wait_idle(block, page, began, cap=150):
     """Finish detector for a player with no step counter: its markup has not changed for 4 seconds
     (the cap is generous). Returns the time of the last change, plus nothing else to trim."""
@@ -1716,6 +1724,7 @@ def record_animations(url, out_dir, slug, info, only=None):
             except Exception:
                 pass
             bar = block.get_attribute("data-note-block-type") in BAR_PLAYER_TYPES
+            slow = block.get_attribute("data-note-block-type") == "python_animation"
             box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 # Seen once per lesson (see the four still-image cases): the site never mounts the
@@ -1762,7 +1771,14 @@ def record_animations(url, out_dir, slug, info, only=None):
                     start_ok, start_problems = (bar_start_check if bar else start_check)(dest, st["geom"])
                     end_ok, end_problems = (bar_end_check if bar else end_check)(dest, st["geom"])
                     problems = start_problems + end_problems
-                    if fps < 10:
+                    if slow:
+                        # The Python player's long slow stretches change little per frame (a progress bar, one cell per
+                        # step), so 10 distinct frames/s is too strict: demand motion at least 3 times a second on
+                        # average and no frozen stretch longer than 2 s (a stalled recording).
+                        gap = _max_gap(dest)
+                        if fps < 3 or gap > 2.0:
+                            problems.append(f"{fps:.1f} distinct frames/s, longest frozen stretch {gap:.1f} s")
+                    elif fps < 10:
                         problems.append(f"only {fps:.1f} distinct frames/s")
                     # A bar player's video can end up to 1 s early (the video clock lags on a loaded machine; the
                     # finished state is still on screen and the END CHECK covers it): keep at least a 1 s tail.
