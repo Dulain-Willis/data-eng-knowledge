@@ -418,6 +418,8 @@ Eve (1500), Ben (1250) and Cara (980) come out, in that order. The engine does n
 
 Sort by spend, keep the 3 largest
 
+![Top 3 result](_images/query_structure_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   name,
@@ -427,18 +429,11 @@ ORDER BY total_spent DESC
 LIMIT 3
 ```
 
-Result:
-
-```
-name | total_spent
-Eve | 1500
-Ben | 1250
-Cara | 980
-```
-
 **No ORDER BY**
 
 Keep 3 rows with no order specified
+
+![No ORDER BY result](_images/query_structure_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -448,18 +443,11 @@ FROM customers
 LIMIT 3
 ```
 
-Result:
-
-```
-name | total_spent
-Ann | 420
-Ben | 1250
-Cara | 980
-```
-
 **Page 2**
 
 Skip the first page, then keep 3
+
+![Page 2 result](_images/query_structure_intermediate_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -469,15 +457,6 @@ FROM customers
 ORDER BY total_spent DESC
 LIMIT 3
 OFFSET 3
-```
-
-Result:
-
-```
-name | total_spent
-Finn | 760
-Ann | 420
-Dev | 310
 ```
 
 The second version drops the `ORDER BY`, and the 3 rows it returns are whichever 3 the engine read first, the stored order on a table this small. Eve, the top spender, is absent. On a production table the set changes from run to run, and a report built on it goes wrong silently, because 3 rows did come back. `LIMIT` without `ORDER BY` is a sample, never a ranking.

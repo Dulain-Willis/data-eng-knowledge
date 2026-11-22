@@ -129,6 +129,8 @@ A shop takes orders on the web and in an app. Both systems record `coupon_code`,
 
 Keeps all 6 rows, including the 3 NULLs from orders placed without a coupon.
 
+![UNION ALL result](_images/null_values_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   coupon_code
@@ -140,24 +142,14 @@ SELECT
   coupon_code
 FROM app_orders
 ORDER BY coupon_code
-```
-
-Result:
-
-```
-coupon_code
-NULL
-NULL
-NULL
-SPRING
-SPRING
-WELCOME
 ```
 
 **UNION**
 
 Keeps all 6 rows, including the 3 NULLs from orders placed without a coupon.
 
+![UNION result](_images/null_values_advanced_switcher_1_2.png)
+
 ```sql
 SELECT
   coupon_code
@@ -171,21 +163,11 @@ FROM app_orders
 ORDER BY coupon_code
 ```
 
-Result:
-
-```
-coupon_code
-NULL
-NULL
-NULL
-SPRING
-SPRING
-WELCOME
-```
-
 **With source**
 
 Labels each row with its channel, so NULLs merge only inside a channel and 1 NULL row per channel survives.
+
+![With source result](_images/null_values_advanced_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -200,16 +182,6 @@ SELECT
   'app' AS channel
 FROM app_orders
 ORDER BY channel, coupon_code
-```
-
-Result:
-
-```
-coupon_code | channel
-NULL | app
-WELCOME | app
-NULL | web
-SPRING | web
 ```
 
 The UNION result has 1 NULL row standing in for 3 orders across 2 channels, and nothing in it says which. That's fine for a list of codes in use and wrong for anything that counts: counting coupon-free orders from that result gives 1. The third version shows the usual repair, a column recording where each row came from. Rows from different channels now differ in that column, so UNION can merge NULLs only when they share a source.
@@ -375,6 +347,8 @@ The difference matters most in change detection. `tier_changes` holds each custo
 
 Keeps only rows where both tiers are known and different.
 
+![Using <> result](_images/null_values_advanced_switcher_2_1.png)
+
 ```sql
 SELECT
   customer_id,
@@ -385,16 +359,11 @@ WHERE old_tier <> new_tier
 ORDER BY customer_id
 ```
 
-Result:
-
-```
-customer_id | old_tier | new_tier
-2 | Silver | Gold
-```
-
 **IS DISTINCT**
 
 Also keeps customers who gained a tier from NULL or lost theirs to NULL.
+
+![IS DISTINCT result](_images/null_values_advanced_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -404,15 +373,6 @@ SELECT
 FROM tier_changes
 WHERE old_tier IS DISTINCT FROM new_tier
 ORDER BY customer_id
-```
-
-Result:
-
-```
-customer_id | old_tier | new_tier
-2 | Silver | Gold
-3 | NULL | Gold
-4 | Gold | NULL
 ```
 
 With `<>`, customer 3's first tier and customer 4's lost tier both evaluate to NULL and drop out, so a change feed built on it never reports a customer joining or leaving the program. `IS DISTINCT FROM` returns customers 2, 3 and 4 and still skips customer 5, whose tier was unknown on both days.
@@ -447,22 +407,19 @@ ORDER BY line_id
 
 Sums the raw expression, and SUM skips line 2's NULL total.
 
+![No fix result](_images/null_values_advanced_switcher_3_1.png)
+
 ```sql
 SELECT
   SUM(unit_price * quantity - discount) AS revenue
 FROM order_lines
 ```
 
-Result:
-
-```
-revenue
-145
-```
-
 **Fix output**
 
 Wraps the computed total in COALESCE, so line 2 contributes 0.
+
+![Fix output result](_images/null_values_advanced_switcher_3_2.png)
 
 ```sql
 SELECT
@@ -470,28 +427,16 @@ SELECT
 FROM order_lines
 ```
 
-Result:
-
-```
-revenue
-145
-```
-
 **Fix input**
 
 Wraps the discount in COALESCE, so line 2's total is computed from known parts.
+
+![Fix input result](_images/null_values_advanced_switcher_3_3.png)
 
 ```sql
 SELECT
   SUM(unit_price * quantity - COALESCE(discount, 0)) AS revenue
 FROM order_lines
-```
-
-Result:
-
-```
-revenue
-175
 ```
 
 - **145** — revenue with COALESCE on the total
@@ -587,6 +532,8 @@ The filtering lessons showed the symptom: a `NOT IN` subquery that returns a sin
 
 Compares each artist with a list that contains a NULL, so no row can be TRUE.
 
+![NOT IN result](_images/null_values_advanced_switcher_4_1.png)
+
 ```sql
 SELECT
   artist_id,
@@ -600,15 +547,11 @@ WHERE artist_id NOT IN (
 ORDER BY artist_id
 ```
 
-Result:
-
-```
-artist_id | artist_name
-```
-
 **Filtered**
 
 Removes NULLs inside the subquery first, so the comparison chain can be TRUE again.
+
+![Filtered result](_images/null_values_advanced_switcher_4_2.png)
 
 ```sql
 SELECT
@@ -624,17 +567,11 @@ WHERE artist_id NOT IN (
 ORDER BY artist_id
 ```
 
-Result:
-
-```
-artist_id | artist_name
-2 | Kite
-4 | Ravel
-```
-
 **NOT EXISTS**
 
 Looks for a matching track row per artist, and a NULL id matches nothing, so it blocks no artist.
+
+![NOT EXISTS result](_images/null_values_advanced_switcher_4_3.png)
 
 ```sql
 SELECT
@@ -650,17 +587,11 @@ WHERE NOT EXISTS (
 ORDER BY a.artist_id
 ```
 
-Result:
-
-```
-artist_id | artist_name
-2 | Kite
-4 | Ravel
-```
-
 **EXCEPT**
 
 Subtracts one set of ids from another, and the NULL on the right finds no NULL on the left to remove.
+
+![EXCEPT result](_images/null_values_advanced_switcher_4_4.png)
 
 ```sql
 SELECT
@@ -673,14 +604,6 @@ SELECT
   artist_id
 FROM playlist_tracks
 ORDER BY artist_id
-```
-
-Result:
-
-```
-artist_id
-2
-4
 ```
 
 The last 3 versions agree here on Kite and Ravel, ids 2 and 4. They stop agreeing when the NULL sits on the left of the filter instead of inside the list.

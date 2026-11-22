@@ -129,6 +129,8 @@ The billing team's funnel logs every signup attempt in `all_signups` and every e
 
 Users with an unconfirmed signup, each listed once.
 
+![EXCEPT result](_images/query_structure_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   user_id
@@ -140,20 +142,14 @@ SELECT
   user_id
 FROM confirmed_signups
 ORDER BY user_id
-```
-
-Result:
-
-```
-user_id
-1
-3
 ```
 
 **Reversed**
 
 The same operator with the sides swapped: confirmations with no signup.
 
+![Reversed result](_images/query_structure_advanced_switcher_1_2.png)
+
 ```sql
 SELECT
   user_id
@@ -167,15 +163,11 @@ FROM all_signups
 ORDER BY user_id
 ```
 
-Result:
-
-```
-user_id
-```
-
 **Counted**
 
 EXCEPT ALL's result, rebuilt from numbered occurrences for engines without it.
+
+![Counted result](_images/query_structure_advanced_switcher_1_3.png)
 
 ```sql
 WITH a AS (
@@ -213,15 +205,6 @@ FROM (
   FROM c
 ) AS unmatched
 ORDER BY user_id
-```
-
-Result:
-
-```
-user_id
-1
-2
-3
 ```
 
 The first version returns users 1 and 3. User 2 does not appear, because `EXCEPT` removes every copy of a row that has any match on the right, and user 2 has one. The second version swaps the sides and returns nothing: both confirmed users also signed up, so subtracting the signups leaves no row. The order of the sides decides the question. The third version is the counted version. Written `EXCEPT ALL`, the operator subtracts occurrence counts, so 2 copies of user 2 on the left minus 1 on the right leaves 1: the March 10 attempt that nobody confirmed. PostgreSQL, Trino and DuckDB accept `EXCEPT ALL`. On an engine without it, the version numbers each occurrence with `ROW_NUMBER` and subtracts the pairs. That second attempt becomes the row (2, 2), which has no partner on the right and survives, so the version returns 1, 2 and 3.
@@ -277,6 +260,8 @@ The `users` table holds 5 registered users. `user_sessions` holds 4 session rows
 
 Registered users with at least one session.
 
+![Registered result](_images/query_structure_advanced_switcher_2_1.png)
+
 ```sql
 SELECT
   user_id
@@ -290,17 +275,11 @@ FROM user_sessions
 ORDER BY user_id
 ```
 
-Result:
-
-```
-user_id
-2
-4
-```
-
 **Paying**
 
 Users with both a session and a purchase, each listed once.
+
+![Paying result](_images/query_structure_advanced_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -315,17 +294,11 @@ FROM user_purchases
 ORDER BY user_id
 ```
 
-Result:
-
-```
-user_id
-2
-4
-```
-
 **Counted**
 
 INTERSECT ALL's result, rebuilt by numbering copies on each side.
+
+![Counted result](_images/query_structure_advanced_switcher_2_3.png)
 
 ```sql
 WITH s AS (
@@ -363,15 +336,6 @@ FROM (
   FROM p
 ) AS matched
 ORDER BY user_id
-```
-
-Result:
-
-```
-user_id
-2
-2
-4
 ```
 
 The first version returns 2 and 4, the registered users with at least one session. User 6 is dropped because the left side never produces it. The second version returns 2 and 4 again: users with both sessions and purchases. The third version returns 2, 2 and 4, the result `INTERSECT ALL` gives on engines that support it. Here it is rebuilt by numbering each user's rows on both sides and intersecting the numbered pairs. `INTERSECT ALL` keeps each row as many times as the smaller side holds it. User 2 appears 2 times in sessions and 3 times in purchases, so the pairs (2, 1) and (2, 2) match and (2, 3) has no partner. User 4 appears once on each side.

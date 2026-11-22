@@ -120,6 +120,8 @@ Whether the answer is right depends on which column you test with IS NULL. The r
 
 The test uses order_id, which every real order has, so NULL can only mean a padded row.
 
+![Key column result](_images/joins_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   c.name
@@ -129,16 +131,11 @@ LEFT JOIN orders AS o
 WHERE o.order_id IS NULL
 ```
 
-Result:
-
-```
-name
-Bob
-```
-
 **Total column**
 
 The test uses total, which a real order can leave empty, so a match with a missing total looks like no match.
+
+![Total column result](_images/joins_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -147,14 +144,6 @@ FROM customers AS c
 LEFT JOIN orders AS o
   ON c.cust_id = o.cust_id
 WHERE o.total IS NULL
-```
-
-Result:
-
-```
-name
-Bob
-Carol
 ```
 
 Carol has an order whose `total` was never recorded. The first version reports Bob as the only customer without orders, which is true. The second version reports Bob and Carol, and Carol's order is real: her row is a match that happens to carry a NULL, and the test cannot tell it from a padded row.
@@ -301,6 +290,8 @@ For a condition about the right table: put it in ON to keep every left row, or i
 
 A right-table condition in ON: every customer stays, and only shipped orders may pair.
 
+![Right: ON result](_images/joins_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   c.name,
@@ -312,18 +303,11 @@ LEFT JOIN orders AS o
     AND o.status = 'shipped'
 ```
 
-Result:
-
-```
-name | order_id | status
-Alice | O1 | shipped
-Bob | NULL | NULL
-Carol | NULL | NULL
-```
-
 **Right: WHERE**
 
 The same condition in WHERE: padded rows carry NULL status and are dropped.
+
+![Right: WHERE result](_images/joins_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -336,16 +320,11 @@ LEFT JOIN orders AS o
 WHERE o.status = 'shipped'
 ```
 
-Result:
-
-```
-name | order_id | status
-Alice | O1 | shipped
-```
-
 **Left: ON**
 
 A left-table condition in ON: every customer stays, but only Alice is allowed partners.
+
+![Left: ON result](_images/joins_intermediate_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -358,19 +337,11 @@ LEFT JOIN orders AS o
     AND c.name = 'Alice'
 ```
 
-Result:
-
-```
-name | order_id | status
-Alice | O1 | shipped
-Alice | O2 | cancelled
-Bob | NULL | NULL
-Carol | NULL | NULL
-```
-
 **Left: WHERE**
 
 The same condition in WHERE: customers other than Alice are removed after the join.
+
+![Left: WHERE result](_images/joins_intermediate_switcher_2_4.png)
 
 ```sql
 SELECT
@@ -381,14 +352,6 @@ FROM customers AS c
 LEFT JOIN orders AS o
   ON c.cust_id = o.cust_id
 WHERE c.name = 'Alice'
-```
-
-Result:
-
-```
-name | order_id | status
-Alice | O1 | shipped
-Alice | O2 | cancelled
 ```
 
 Run all 4 versions. The right-table condition in ON keeps 3 customers, with an order only for Alice, and in WHERE it keeps Alice alone. The left-table condition in ON keeps all 3 customers and gives Bob and Carol nothing to pair with, 4 rows in total because Alice pairs twice. In WHERE it keeps only Alice's 2 rows.
@@ -508,6 +471,8 @@ A LEFT JOIN early in the chain can be undone by an INNER JOIN later. The padded 
 
 Bob survives the LEFT JOIN to orders, then meets an INNER JOIN on a column that is NULL for him.
 
+![INNER last result](_images/joins_intermediate_switcher_3_1.png)
+
 ```sql
 SELECT
   c.name,
@@ -519,17 +484,11 @@ INNER JOIN products AS p
   ON o.prod_id = p.prod_id
 ```
 
-Result:
-
-```
-name | product_name
-Alice | Widget
-Alice | Gadget
-```
-
 **LEFT last**
 
 Both joins preserve rows, so Bob arrives at the end with NULL for the product.
+
+![LEFT last result](_images/joins_intermediate_switcher_3_2.png)
 
 ```sql
 SELECT
@@ -540,15 +499,6 @@ LEFT JOIN orders AS o
   ON c.cust_id = o.cust_id
 LEFT JOIN products AS p
   ON o.prod_id = p.prod_id
-```
-
-Result:
-
-```
-name | product_name
-Alice | Widget
-Alice | Gadget
-Bob | NULL
 ```
 
 In the first version Bob is preserved by the LEFT JOIN, arrives at the products join with `prod_id` NULL, matches nothing, and is dropped: 2 rows, both Alice. In the second version the products join is also a LEFT JOIN, so Bob comes through padded: 3 rows. Once a chain starts preserving rows, every later join that hangs off the preserved side's nullable columns must preserve them too, or the first LEFT JOIN was for nothing.
@@ -573,6 +523,8 @@ Each order total now appears twice, once per ticket, so a SUM over the column co
 
 Both children join at row level, and Alice's orders and tickets multiply into 4 rows before the SUM runs.
 
+![Two joins result](_images/joins_intermediate_switcher_4_1.png)
+
 ```sql
 SELECT
   c.name,
@@ -587,17 +539,11 @@ GROUP BY c.name
 ORDER BY c.name
 ```
 
-Result:
-
-```
-name | spent | tickets
-Alice | 160 | 4
-Bob | 20 | 0
-```
-
 **CTE first**
 
 Each child is reduced to 1 row per customer in a CTE, so the final joins are one-to-one and nothing inflates.
+
+![CTE first result](_images/joins_intermediate_switcher_4_2.png)
 
 ```sql
 WITH order_totals AS (
@@ -625,14 +571,6 @@ LEFT JOIN order_totals AS ot
 LEFT JOIN ticket_counts AS tc
   ON c.cust_id = tc.cust_id
 ORDER BY c.name
-```
-
-Result:
-
-```
-name | spent | tickets
-Alice | 80 | 2
-Bob | 20 | 0
 ```
 
 The first version reports Alice spending 160 and holding 4 tickets, both double the truth. The second reports 80 and 2. Bob has 1 order and no tickets, so he is right in both versions, which is how fan-out hides: the inflated rows belong to the busy customers, and busy customers are the ones nobody checks by hand.

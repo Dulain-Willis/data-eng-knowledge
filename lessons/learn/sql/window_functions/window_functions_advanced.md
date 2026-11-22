@@ -124,6 +124,8 @@ The planner groups window functions by their specification. Any 2 functions with
 
 Partitioning by user_id and by country are different keys, so the table is shuffled and sorted twice.
 
+![Two keys result](_images/window_functions_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   session_id,
@@ -141,23 +143,11 @@ FROM sessions
 ORDER BY session_id
 ```
 
-Result:
-
-```
-session_id | user_id | country | duration_s | session_seq | country_total
-1 | u1 | US | 120 | 1 | 1065
-2 | u1 | US | 300 | 2 | 1065
-3 | u2 | US | 45 | 1 | 1065
-4 | u2 | US | 600 | 2 | 1065
-5 | u3 | DE | 90 | 1 | 470
-6 | u3 | DE | 30 | 2 | 470
-7 | u4 | DE | 200 | 1 | 470
-8 | u4 | DE | 150 | 2 | 470
-```
-
 **One key**
 
 Both windows share PARTITION BY user_id ORDER BY started_at, so one shuffle and one sort feed both functions.
+
+![One key result](_images/window_functions_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -177,23 +167,11 @@ FROM sessions
 ORDER BY session_id
 ```
 
-Result:
-
-```
-session_id | user_id | country | duration_s | session_seq | user_running_s
-1 | u1 | US | 120 | 1 | 120
-2 | u1 | US | 300 | 2 | 420
-3 | u2 | US | 45 | 1 | 45
-4 | u2 | US | 600 | 2 | 645
-5 | u3 | DE | 90 | 1 | 90
-6 | u3 | DE | 30 | 2 | 120
-7 | u4 | DE | 200 | 1 | 200
-8 | u4 | DE | 150 | 2 | 350
-```
-
 **Filter first**
 
 WHERE runs before the window, so only the 4 US rows are shuffled and sorted, and the sequence counts US sessions only.
+
+![Filter first result](_images/window_functions_advanced_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -208,16 +186,6 @@ SELECT
 FROM sessions
 WHERE country = 'US'
 ORDER BY session_id
-```
-
-Result:
-
-```
-session_id | user_id | country | duration_s | session_seq
-1 | u1 | US | 120 | 1
-2 | u1 | US | 300 | 2
-3 | u2 | US | 45 | 1
-4 | u2 | US | 600 | 2
 ```
 
 The first version pays twice: one hash of the table on `user_id`, a second on `country`. If the per-country figure can come from a GROUP BY, its few rows broadcast-join back to the sessions at a fraction of the cost of a second shuffle of the full table, and the window pass on `user_id` stays the only big one.

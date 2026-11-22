@@ -165,6 +165,8 @@ LAST_VALUE ought to hand every row the bottom of the partition. Run it with ORDE
 
 The ordered window ends at the current row, so LAST_VALUE hands every row its own track.
 
+![Default result](_images/window_functions_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   artist,
@@ -177,20 +179,11 @@ SELECT
 FROM artist_tracks
 ```
 
-Result:
-
-```
-artist | track | streams | bottom_track
-Kite | Wind | 2500 | Wind
-Kite | Line | 500 | Line
-Nova | Orbit | 4000 | Orbit
-Nova | Dust | 3000 | Dust
-Nova | Halo | 1000 | Halo
-```
-
 **Full window**
 
 ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING stretches the window over the whole partition, so every row sees the true last track.
+
+![Full window result](_images/window_functions_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -205,20 +198,11 @@ SELECT
 FROM artist_tracks
 ```
 
-Result:
-
-```
-artist | track | streams | bottom_track
-Kite | Wind | 2500 | Line
-Kite | Line | 500 | Line
-Nova | Orbit | 4000 | Halo
-Nova | Dust | 3000 | Halo
-Nova | Halo | 1000 | Halo
-```
-
 **Flip order**
 
 Sorting ascending makes the smallest track the first row, so FIRST_VALUE returns it with no extra clause at all.
+
+![Flip order result](_images/window_functions_intermediate_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -230,17 +214,6 @@ SELECT
     ORDER BY streams
   ) AS bottom_track
 FROM artist_tracks
-```
-
-Result:
-
-```
-artist | track | streams | bottom_track
-Kite | Line | 500 | Line
-Kite | Wind | 2500 | Line
-Nova | Halo | 1000 | Halo
-Nova | Dust | 3000 | Halo
-Nova | Orbit | 4000 | Halo
 ```
 
 The first version returns Wind, Line, Orbit, Dust, Halo, one row's own track per row. The other 2 versions both return Line for every Kite row and Halo for every Nova row. The second version fixes the window's size, which is the subject of the next section; the third sidesteps the question by making the row you want the first one. Both are correct, and the third is shorter, so reach for it when a single reversed sort gets you there.
@@ -354,6 +327,8 @@ ROWS measures the frame in physical rows. RANGE measures it in values of the ORD
 
 Each row gets its own running total, and the 2 day-2 orders receive different totals in an order the engine chooses.
 
+![ROWS result](_images/window_functions_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   order_day,
@@ -365,19 +340,11 @@ SELECT
 FROM orders
 ```
 
-Result:
-
-```
-order_day | amount | running_total
-1 | 100 | 100
-2 | 200 | 300
-2 | 50 | 350
-3 | 300 | 650
-```
-
 **RANGE**
 
 The 2 day-2 orders are peers, so both frames include both rows and both report 350.
+
+![RANGE result](_images/window_functions_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -388,16 +355,6 @@ SELECT
     RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
   ) AS running_total
 FROM orders
-```
-
-Result:
-
-```
-order_day | amount | running_total
-1 | 100 | 100
-2 | 200 | 350
-2 | 50 | 350
-3 | 300 | 650
 ```
 
 Under ROWS, the 2 day-2 orders get different running totals. The one the engine sorts first reads 300 or 150, depending on which order that is, and the other reads 350, so a second run can swap them. Under RANGE both read 350, because both share the value 2 in order_day and each frame includes its peer. A running total by day should be identical for every order on that day, and RANGE delivers that. RANGE is also the default unit when OVER has an ORDER BY and no frame.

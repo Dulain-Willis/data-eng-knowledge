@@ -248,6 +248,8 @@ The `shipments` table records every pickup twice. `pickup_local` is what the war
 
 Casting to TIMESTAMP keeps the digits and nothing else, so the 3 pickups at 09:00 tie and the sort falls back to shipment_id.
 
+![Wall clock result](_images/data_types_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   shipment_id,
@@ -257,19 +259,11 @@ FROM shipments
 ORDER BY picked_up, shipment_id
 ```
 
-Result:
-
-```
-shipment_id | warehouse | picked_up
-4 | Berlin | 2024-03-15 07:30:00
-1 | New York | 2024-03-15 09:00:00
-2 | Berlin | 2024-03-15 09:00:00
-3 | Tokyo | 2024-03-15 09:00:00
-```
-
 **With zone**
 
 Casting to TIMESTAMP WITH TIME ZONE turns each reading into an instant, and the sort puts Tokyo first, then both Berlin pickups, then New York, 13 hours after Tokyo.
+
+![With zone result](_images/data_types_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -278,16 +272,6 @@ SELECT
   CAST(pickup_stamped AS TIMESTAMP WITH TIME ZONE) AS picked_up
 FROM shipments
 ORDER BY picked_up
-```
-
-Result:
-
-```
-shipment_id | warehouse | picked_up
-3 | Tokyo | 2024-03-15 09:00:00 +09:00
-4 | Berlin | 2024-03-15 07:30:00 +01:00
-2 | Berlin | 2024-03-15 09:00:00 +01:00
-1 | New York | 2024-03-15 09:00:00 -04:00
 ```
 
 With zones, shipment 4 drops from first to second: its 07:30 in Berlin is 06:30 UTC, and Tokyo's 09:00 is 00:00 UTC, which puts the Tokyo pickup 6 and a half hours earlier. Without zones the engine has no basis for that move, because the values it compares are the digits 07:30 and 09:00 and nothing more. Neither cast is wrong. The wall-clock version answers 'which pickups happened before the morning break', and the zoned version answers 'which pickup happened first'. The type you choose for a column states which of those questions it can answer.

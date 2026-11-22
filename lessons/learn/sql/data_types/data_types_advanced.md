@@ -66,6 +66,8 @@ Raw logs often land with every field as text. Keeping `watch_ms` as VARCHAR cost
 
 Orders by the VARCHAR column, comparing the text a character at a time.
 
+![As VARCHAR result](_images/data_types_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   view_id,
@@ -74,20 +76,11 @@ FROM raw_views
 ORDER BY watch_ms_text
 ```
 
-Result:
-
-```
-view_id | watch_ms_text
-2 | 15000
-4 | 31000
-3 | 4200
-5 | 800
-1 | 900
-```
-
 **As INTEGER**
 
 Casts to INTEGER first, so ORDER BY compares numeric values.
+
+![As INTEGER result](_images/data_types_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -95,17 +88,6 @@ SELECT
   CAST(watch_ms_text AS INTEGER) AS watch_ms
 FROM raw_views
 ORDER BY watch_ms
-```
-
-Result:
-
-```
-view_id | watch_ms
-5 | 800
-1 | 900
-3 | 4200
-2 | 15000
-4 | 31000
 ```
 
 The VARCHAR version returns 15000, 31000, 4200, 800, 900, the order a word list would file them in. The INTEGER version returns 800, 900, 4200, 15000, 31000. The cast fixes the order, and the worst-case rule from earlier decides which integer type it targets. A single view's milliseconds stay under INTEGER's ceiling. A column that adds views together keeps growing, so its worst case is its largest future total.

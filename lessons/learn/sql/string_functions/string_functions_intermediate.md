@@ -125,6 +125,8 @@ A payout export lists each artist's bank account, and the report may show only t
 
 A negative start counts from the right end, so -4 lands on the fourth character from the end for every row regardless of its length.
 
+![Negative result](_images/string_functions_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   artist_name,
@@ -132,18 +134,11 @@ SELECT
 FROM payouts
 ```
 
-Result:
-
-```
-artist_name | masked_account
-Low Tide | ****3000
-Paper Moons | ****6819
-Static Bloom | ****4300
-```
-
 **LENGTH math**
 
 LENGTH minus 3 is the position of the fourth character from the end, so this version returns the same 4 characters with more arithmetic.
+
+![LENGTH math result](_images/string_functions_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -155,18 +150,11 @@ SELECT
 FROM payouts
 ```
 
-Result:
-
-```
-artist_name | masked_account
-Low Tide | ****3000
-Paper Moons | ****6819
-Static Bloom | ****4300
-```
-
 **Off by one**
 
 LENGTH minus 4 is the position of the fifth character from the end, so this version leaks one extra digit in every row.
+
+![Off by one result](_images/string_functions_intermediate_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -176,15 +164,6 @@ SELECT
     SUBSTR(bank_account, LENGTH(bank_account) - 4)
   ) AS masked_account
 FROM payouts
-```
-
-Result:
-
-```
-artist_name | masked_account
-Low Tide | ****13000
-Paper Moons | ****26819
-Static Bloom | ****64300
 ```
 
 When the count is larger than what remains, SUBSTR hands back whatever is left, so `SUBSTR('LT', 1, 3)` is LT. For display that is harmless. For validation it hides a fault: a currency code that should read EUR arrives as EU, passes through every SUBSTR in the query, and nothing marks it short. LENGTH is the check when the length matters, and `WHERE LENGTH(currency_code) != 3` lists the short codes before any SUBSTR runs on them.
@@ -491,6 +470,8 @@ The artists table holds clean names, and the export's names carry stray spaces, 
 
 Only Paper Moons matches, because its export name carries no extra space; the other 2 artists come back with NULL amounts.
 
+![Raw join result](_images/string_functions_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   a.artist_name,
@@ -501,18 +482,11 @@ LEFT JOIN royalty_rows AS r
 ORDER BY a.artist_id
 ```
 
-Result:
-
-```
-artist_name | amount
-Low Tide | NULL
-Paper Moons | 980.5
-Static Bloom | NULL
-```
-
 **TRIM in ON**
 
 TRIM on the export side makes every name equal to its clean counterpart, and all 3 artists receive their amount.
+
+![TRIM in ON result](_images/string_functions_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -522,15 +496,6 @@ FROM artists AS a
 LEFT JOIN royalty_rows AS r
   ON a.artist_name = TRIM(r.artist_name)
 ORDER BY a.artist_id
-```
-
-Result:
-
-```
-artist_name | amount
-Low Tide | 1250
-Paper Moons | 980.5
-Static Bloom | 12400.75
 ```
 
 

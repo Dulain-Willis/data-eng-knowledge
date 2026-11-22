@@ -22,6 +22,8 @@ A warehouse system writes its stock levels to a CSV file, and the loader creates
 
 ORDER BY on the text column compares characters left to right.
 
+![Text sort result](_images/data_types_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   sku,
@@ -30,20 +32,11 @@ FROM stock
 ORDER BY qty_text
 ```
 
-Result:
-
-```
-sku | qty_text
-B-200 | 10
-C-300 | 100
-D-400 | 25
-E-500 | 3
-A-100 | 9
-```
-
 **Number sort**
 
 ORDER BY on the integer column compares magnitude.
+
+![Number sort result](_images/data_types_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -53,20 +46,11 @@ FROM stock
 ORDER BY qty
 ```
 
-Result:
-
-```
-sku | qty
-E-500 | 3
-A-100 | 9
-B-200 | 10
-D-400 | 25
-C-300 | 100
-```
-
 **Text filter**
 
 A filter on the text column keeps only the SKU whose first character beats '5'.
+
+![Text filter result](_images/data_types_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -74,13 +58,6 @@ SELECT
   qty_text
 FROM stock
 WHERE qty_text > '5'
-```
-
-Result:
-
-```
-sku | qty_text
-A-100 | 9
 ```
 
 Sorting `qty_text` compares one character at a time, the way a dictionary orders words, so '10' lands before '9' because the character '1' is smaller than '9', and '100' sits between '10' and '25'. The filter is worse: `qty_text > '5'` returns a single row, and the SKU holding 100 units disappears from a report meant to list well-stocked items. The integer column sorts and filters by magnitude with no surprises, because the database knows the values are numbers.

@@ -175,6 +175,8 @@ Every argument to CONCAT must be VARCHAR. Pass an INTEGER column straight in and
 
 CONCAT with 3 arguments: the first name, a space, the last name.
 
+![CONCAT result](_images/string_functions_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   host_id,
@@ -182,19 +184,11 @@ SELECT
 FROM hosts
 ```
 
-Result:
-
-```
-host_id | full_name
-1 | Maria Lopez
-2 | NULL
-3 | Amara Okafor
-4 | Lin Zhao
-```
-
 **Pipes**
 
 The || operator joining the same 3 pieces left to right, with the same result and the same NULL for Ken.
+
+![Pipes result](_images/string_functions_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -203,19 +197,11 @@ SELECT
 FROM hosts
 ```
 
-Result:
-
-```
-host_id | full_name
-1 | Maria Lopez
-2 | NULL
-3 | Amara Okafor
-4 | Lin Zhao
-```
-
 **With CAST**
 
 A sentence per host, where the integer listing_count becomes text through CAST before CONCAT sees it.
+
+![With CAST result](_images/string_functions_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -227,16 +213,6 @@ SELECT
     ' listings'
   ) AS summary
 FROM hosts
-```
-
-Result:
-
-```
-host_id | summary
-1 | Maria has 3 listings
-2 | Ken has 1 listings
-3 | Amara has 12 listings
-4 | Lin has 0 listings
 ```
 
 The third version shows 'Ken has 1 listings' with a plural that reads badly, and 'Lin has 0 listings' for a host with nothing published. Both strings are correct output: CONCAT assembles what it is given and applies no grammar. Deciding when to write 'listing' instead of 'listings' needs a conditional expression, which arrives in a later lesson.

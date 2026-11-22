@@ -195,26 +195,19 @@ product_id comes first and in_stock last because that is how the table was desig
 
 Every column of products, in the table's order, with no column names typed.
 
+![Star result](_images/query_structure_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   *
 FROM products
 ```
 
-Result:
-
-```
-product_id | product_name | category | price | in_stock
-1 | Desk Lamp | lighting | 24 | 1
-2 | Standing Desk | furniture | 349 | 1
-3 | Monitor Arm | accessories | 89.5 | 0
-4 | Office Chair | furniture | 199 | 1
-5 | USB Hub | accessories | 18.75 | 1
-```
-
 **Named**
 
 The 2 columns a price list needs, in the order the list wants them.
+
+![Named result](_images/query_structure_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -223,34 +216,16 @@ SELECT
 FROM products
 ```
 
-Result:
-
-```
-product_name | price
-Desk Lamp | 24
-Standing Desk | 349
-Monitor Arm | 89.5
-Office Chair | 199
-USB Hub | 18.75
-```
-
 **New table**
 
 The star on a table you have never opened shows its columns and sample values in 1 move.
+
+![New table result](_images/query_structure_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
   *
 FROM suppliers
-```
-
-Result:
-
-```
-supplier_id | supplier_name | country | lead_days
-1 | Brightline | Germany | 12
-2 | Oakform | Canada | 30
-3 | Portly | Taiwan | 9
 ```
 
 The third version is the star doing its real job. Nobody told you that suppliers has a lead_days column, and after 1 run you know it exists and what kind of values it holds: the days each supplier takes to deliver, 12 in the first row and 30 and 9 in the next 2. The next query against suppliers can name lead_days with confidence. Run the star once to learn a table's shape, then write a named list for the queries that do the work.

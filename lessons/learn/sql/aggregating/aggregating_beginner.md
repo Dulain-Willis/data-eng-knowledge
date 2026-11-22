@@ -119,22 +119,19 @@ Add a `country` column to the same 5 customers: 3 live in the US and 2 in the UK
 
 Every row counts, including the 2 customers with no email.
 
+![COUNT(*) result](_images/aggregating_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   COUNT(*) AS total_customers
 FROM customers
 ```
 
-Result:
-
-```
-total_customers
-5
-```
-
 **COUNT(col)**
 
 Only rows with a non-null email count.
+
+![COUNT(col) result](_images/aggregating_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -142,28 +139,16 @@ SELECT
 FROM customers
 ```
 
-Result:
-
-```
-customers_with_email
-3
-```
-
 **DISTINCT**
 
 Each distinct country counts once, however many customers live there.
+
+![DISTINCT result](_images/aggregating_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
   COUNT(DISTINCT country) AS countries
 FROM customers
-```
-
-Result:
-
-```
-countries
-2
 ```
 
 `COUNT(DISTINCT email)` on this table returns 3, the same as `COUNT(email)`, because the 3 present emails are all different. If 2 customers shared an address the distinct count would drop to 2 while the plain count stayed at 3, and the distinct form is the one that answers how many inboxes a campaign actually reaches. Distinct counting is also the most expensive of the 3 forms, since the engine has to hold every value it has seen to know whether the next one is new; on a column with millions of values that memory cost is real, and the intermediate tier covers the approximate version that trades a little accuracy for a lot of memory.

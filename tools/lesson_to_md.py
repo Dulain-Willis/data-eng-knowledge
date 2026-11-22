@@ -385,36 +385,50 @@ def switcher_panel(html):
 
 
 def switcher_markdown(tabs):
-    """Option A (owner-reviewed in draft PR #24): every tab stays as text. A bold label with the tab's name,
-    its caption, its SQL as a ```sql fence, then its result as text. `tabs` is [{"name", "caption", "sql",
-    "result"}] in tab order (switcher_panel plus the name from the tab button)."""
+    """Option B (owner decision): every tab stays as text and gets a screenshot. A bold label with the
+    tab's name, its caption, one 2x screenshot of the tab panel (tab bar, caption, code and the revealed
+    result table, see sql_switcher_tabs), then its SQL as a ```sql fence, the same "screenshot + fence" pair
+    as an executable_sql cell. `tabs` is [{"name", "caption", "sql", "result", "image"}] in tab order
+    (switcher_panel plus the tab button's name; "image" is the file name in _images, or None). A tab with
+    no image (run without --screenshots) falls back to Option A: its result as text after the fence."""
     parts = []
     for t in tabs:
         part = [f"**{t['name']}**"]
         if t["caption"]:
             part.append(t["caption"])
+        if t.get("image"):
+            part.append(f"![{t['name']} result](_images/{t['image']})")
         part.append(f"```sql\n{t['sql']}\n```")
-        if t["result"]:
+        if t["result"] and not t.get("image"):
             rows = "\n".join(" | ".join(r) for r in t["result"])
             part.append(f"Result:\n\n```\n{rows}\n```")
         parts.append("\n\n".join(part))
     return "\n\n".join(parts)
 
 
-def sql_switcher_tabs(url):
+def sql_switcher_tabs(url, out_dir=None, slug=None):
     """Click every tab of every sql_switcher block on the live page and return, per block, the list of
-    {"name", "caption", "sql", "result"}. The saved page HTML holds only the first tab's panel, so the
-    other tabs exist only after a click. Returns [] without playwright."""
+    {"name", "caption", "sql", "result", "image"}. The saved page HTML holds only the first tab's panel, so
+    the other tabs exist only after a click. Returns [] without playwright.
+
+    With out_dir (the --screenshots run), each tab is also shot: after the tab click the "Show result" button
+    is pressed exactly as for an executable_sql cell (_click_run; a tab switch collapses the result again, so
+    it is pressed for every tab) and the whole block, tab bar, caption, code and result table, is saved at 2x as
+    <slug>_switcher_<block>_<tab>.png (both numbers from 1). A tab whose shot fails has image None."""
     try:
         from playwright.sync_api import sync_playwright
     except ImportError:
         print("playwright not installed; tab panels not captured", file=sys.stderr)
         return []
+    img_dir = os.path.join(out_dir, "_images") if out_dir else None
+    if img_dir:
+        os.makedirs(img_dir, exist_ok=True)
     out = []
     with sync_playwright() as p:
       browser = p.chromium.launch()
       try:
-        page = browser.new_page(viewport={"width": 1100, "height": 900})
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
         page.goto(url, wait_until="domcontentloaded")
         page.wait_for_timeout(4000)
         blocks = page.locator('[data-note-block-type="sql_switcher"]')
@@ -426,10 +440,20 @@ def sql_switcher_tabs(url):
                 "els => els.map((e, i) => [i, !e.title && !e.getAttribute('aria-label'), e.innerText.trim()])"
                 ".filter(t => t[1]).map(t => [t[0], t[2]])")
             tabs = []
-            for idx, n in tab_buttons:
+            for k, (idx, n) in enumerate(tab_buttons):
                 block.locator("button").nth(idx).click()
                 page.wait_for_timeout(350)
-                tabs.append({"name": n, **switcher_panel(block.evaluate("e => e.outerHTML"))})
+                tab = {"name": n, **switcher_panel(block.evaluate("e => e.outerHTML")), "image": None}
+                if img_dir:
+                    try:
+                        _click_run(page, block, "executable_sql")
+                        page.evaluate(_HIDE_FIXED)
+                        name = f"{slug}_switcher_{i + 1}_{k + 1}.png"
+                        block.screenshot(path=os.path.join(img_dir, name))
+                        tab["image"] = name
+                    except Exception as e:
+                        print(f"warning: switcher {i + 1} tab {k + 1} ({n!r}) not captured: {e}", file=sys.stderr)
+                tabs.append(tab)
             out.append(tabs)
       finally:
         browser.close()
@@ -2262,8 +2286,8 @@ def main():
         done += n_cells
     n_regex = len(soup0.find_all(attrs={"data-note-block-type": "regex_cards"}))
     regex_images = record_regex_cards(url, out_dir, slug, n_regex) if "--screenshots" in sys.argv else []
-    switchers = (sql_switcher_tabs(url) if soup0.find(attrs={"data-note-block-type": "sql_switcher"})
-                 else [])
+    switchers = (sql_switcher_tabs(url, out_dir if "--screenshots" in sys.argv else None, slug)
+                 if soup0.find(attrs={"data-note-block-type": "sql_switcher"}) else [])
     path = os.path.join(out_dir, slug + ".md")
     tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
     with open(tmp_path, "w", encoding="utf-8") as f:

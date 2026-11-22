@@ -434,6 +434,8 @@ Now the stays from the opening. Suppose a stays table records arrival and depart
 
 Cast both ends to DATE first and the stays report 3, 1 and 7 nights, the calendar answer a host bills.
 
+![Nights result](_images/dates_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   stay_id,
@@ -447,18 +449,11 @@ SELECT
 FROM stays
 ```
 
-Result:
-
-```
-stay_id | checkin_at | checkout_at | nights
-1 | 2024-03-15 15:00:00 | 2024-03-18 11:00:00 | 3
-2 | 2024-03-10 16:30:00 | 2024-03-11 10:00:00 | 1
-3 | 2024-03-01 15:00:00 | 2024-03-08 15:00:00 | 7
-```
-
 **Hours**
 
 Leave the TIMESTAMPs as they are and ask for hours to get elapsed time: 68, 17 and 168, with the extra 30 minutes of stay 2 dropped.
+
+![Hours result](_images/dates_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -467,15 +462,6 @@ SELECT
   checkout_at,
   DATE_DIFF('hour', checkin_at, checkout_at) AS hours_stayed
 FROM stays
-```
-
-Result:
-
-```
-stay_id | checkin_at | checkout_at | hours_stayed
-1 | 2024-03-15 15:00:00 | 2024-03-18 11:00:00 | 68
-2 | 2024-03-10 16:30:00 | 2024-03-11 10:00:00 | 17
-3 | 2024-03-01 15:00:00 | 2024-03-08 15:00:00 | 168
 ```
 
 When the unit is day and the question is about calendar days, measure between DATEs. Measure between TIMESTAMPs when you want elapsed time at a finer grain than days, such as how long a host took to reply to a message.

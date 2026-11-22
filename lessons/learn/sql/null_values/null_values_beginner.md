@@ -128,6 +128,8 @@ A `WHERE` clause lets a row through when its condition evaluates to TRUE. FALSE 
 
 Orders whose region is US. Returns 2 rows, ORD-001 and ORD-005.
 
+![= 'US' result](_images/null_values_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   order_id,
@@ -137,17 +139,11 @@ FROM orders
 WHERE region = 'US'
 ```
 
-Result:
-
-```
-order_id | amount | region
-ORD-001 | 100 | US
-ORD-005 | 250 | US
-```
-
 **<> 'US'**
 
 Orders whose region is anything other than US. Returns 1 row, ORD-003, the EU order. The 2 orders with no region do not count as other than US.
+
+![<> 'US' result](_images/null_values_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -158,16 +154,11 @@ FROM orders
 WHERE region <> 'US'
 ```
 
-Result:
-
-```
-order_id | amount | region
-ORD-003 | 150 | EU
-```
-
 **both**
 
 Orders that are US or are not US. Returns 3 rows. ORD-002 and ORD-004 fail both halves, because UNKNOWN OR UNKNOWN is UNKNOWN.
+
+![both result](_images/null_values_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -177,15 +168,6 @@ SELECT
 FROM orders
 WHERE region = 'US'
   OR region <> 'US'
-```
-
-Result:
-
-```
-order_id | amount | region
-ORD-001 | 100 | US
-ORD-003 | 150 | EU
-ORD-005 | 250 | US
 ```
 
 In a two-valued world, the third query would return every row: a value either equals US or it does not. SQL returns 3 of 5. The 2 orders without a region are excluded by `= 'US'`, excluded by `<> 'US'`, and excluded by the combination, because an UNKNOWN joined to an UNKNOWN with OR stays UNKNOWN. Those rows did not fail the test. They were never able to pass it.
@@ -432,22 +414,19 @@ The margin forecast from the intro failed on exactly this point. Finance asked f
 
 The average among orders that carry a discount. Divides 50 by 3 and returns 16.67.
 
+![AVG result](_images/null_values_beginner_switcher_2_1.png)
+
 ```sql
 SELECT
   AVG(discount) AS avg_discount
 FROM orders
 ```
 
-Result:
-
-```
-avg_discount
-16.666666666666668
-```
-
 **SUM/COUNT(*)**
 
 The average across every order, with missing discounts counted as 0. Divides 50 by 5 and returns 10.
+
+![SUM/COUNT(*) result](_images/null_values_beginner_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -455,28 +434,16 @@ SELECT
 FROM orders
 ```
 
-Result:
-
-```
-avg_per_order
-10
-```
-
 **SUM/COUNT(x)**
 
 The same as AVG, written out. Divides 50 by COUNT(discount), which is 3, and returns 16.67. This is what AVG does internally.
+
+![SUM/COUNT(x) result](_images/null_values_beginner_switcher_2_3.png)
 
 ```sql
 SELECT
   1.0 * SUM(discount) / COUNT(discount) AS avg_where_present
 FROM orders
-```
-
-Result:
-
-```
-avg_where_present
-16.666666666666668
 ```
 
 The second form is the one the forecast needed, and it costs nothing extra: the sum is unchanged and the denominator switches to the row count. The choice between 16.67 and 10 is a business definition, so write the definition into the column name, `avg_discount_where_present` or `avg_discount_per_order`, and nobody downstream has to guess which question the number answers.
