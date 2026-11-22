@@ -361,7 +361,10 @@ def switcher_panel(html):
     content = soup.find(attrs={"data-note-content": True}) or soup
     caption = ""
     tables = soup.find_all("table")
-    code_table = next(t for t in tables if t.find("td", attrs={"data-ln": True}))
+    code_table = next((t for t in tables if t.find("td", attrs={"data-ln": True})), None)
+    if code_table is None:
+        print("warning: sql_switcher panel has no code table; fields left empty", file=sys.stderr)
+        return {"caption": "", "sql": "", "result": []}
     sql = "\n".join(tr.find_all("td")[-1].get_text() for tr in code_table.find_all("tr")
                     if tr.find_all("td")).strip("\n")
     # the caption is the first plain text div (no tab buttons, tables or nested divs): it sits between the
@@ -409,7 +412,8 @@ def sql_switcher_tabs(url):
         return []
     out = []
     with sync_playwright() as p:
-        browser = p.chromium.launch()
+      browser = p.chromium.launch()
+      try:
         page = browser.new_page(viewport={"width": 1100, "height": 900})
         page.goto(url, wait_until="domcontentloaded")
         page.wait_for_timeout(4000)
@@ -417,14 +421,17 @@ def sql_switcher_tabs(url):
         for i in range(blocks.count()):
             block = blocks.nth(i)
             block.scroll_into_view_if_needed()
-            names = block.locator("button").evaluate_all(  # the 3 icon buttons have a title; tabs do not
-                "els => els.filter(e => !e.title && !e.getAttribute('aria-label')).map(e => e.innerText.trim())")
+            # the 3 icon buttons have a title; tabs do not. Click by position: has_text would match substrings
+            tab_buttons = block.locator("button").evaluate_all(
+                "els => els.map((e, i) => [i, !e.title && !e.getAttribute('aria-label'), e.innerText.trim()])"
+                ".filter(t => t[1]).map(t => [t[0], t[2]])")
             tabs = []
-            for n in names:
-                block.locator("button", has_text=n).first.click()
+            for idx, n in tab_buttons:
+                block.locator("button").nth(idx).click()
                 page.wait_for_timeout(350)
                 tabs.append({"name": n, **switcher_panel(block.evaluate("e => e.outerHTML"))})
             out.append(tabs)
+      finally:
         browser.close()
     return out
 
@@ -501,8 +508,8 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
     switchers: per sql_switcher block in page order, its tabs (sql_switcher_tabs); empty means first tab only.
-    cells: file names of the run-output screenshots, one per executable_spark / executable_python block in page order
-    (record_cells); empty without --screenshots.
+    cells: {block kind: file names of its run-output screenshots, in page order} (record_cells, one call per kind;
+    a plain list is taken for every kind); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
     dropped = set()
@@ -521,6 +528,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
     diagrams_seen = animations_seen = cells_seen = regex_seen = switchers_seen = 0
+    kind_seen = dict.fromkeys(CELL_KINDS, 0)  # per kind: each kind has its own list of screenshots
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
@@ -552,7 +560,9 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             regex_seen += 1
             regex_cards(soup, block, tokens, name, regex_seen)
         elif kind in CELL_KINDS:
-            name = cells[cells_seen] if cells_seen < len(cells) else None
+            names = cells.get(kind, []) if isinstance(cells, dict) else cells
+            name = names[kind_seen[kind]] if kind_seen[kind] < len(names) else None
+            kind_seen[kind] += 1
             cells_seen += 1
             spark_cell(soup, block, tokens, name, cells_seen, CELL_FENCE[kind])
         elif kind == "sql_switcher":
@@ -2014,15 +2024,16 @@ def record_animations(url, out_dir, slug, info, only=None):
                     name = name[:-4] + "-2.mp4"
                 used.add(name)
                 dest = os.path.join(ANIM_DIR, name)
+                mode_box = dict(box_css)  # per mode: a retry's growth must not leak into the other modes
                 for attempt in range(3):
                     try:
-                        st = (record_bar_animation if bar else record_animation)(browser, url, k, m, label, dest, box_css)
+                        st = (record_bar_animation if bar else record_animation)(browser, url, k, m, label, dest, mode_box)
                     except Exception as e:  # a navigation timeout: wait and retry this one
                         print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}); retrying", file=sys.stderr)
                         time.sleep(10)
                         continue
                     if "error" in st:
-                        box_css["h"] = max(box_css["h"], st["need_h"])
+                        mode_box["h"] = max(mode_box["h"], st["need_h"])
                         continue
                     dur, fps = _media_stats(dest)
                     vw, vh = _video_size(dest)
@@ -2056,7 +2067,7 @@ def record_animations(url, out_dir, slug, info, only=None):
                         break
                     print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
                     if bar and attempt >= 1:  # a window barely taller than the player can mis-place it: give it room (the crop stays the player)
-                        box_css["h"] += 160
+                        mode_box["h"] += 160
                 else:
                     raise RuntimeError(f"{name}: could not record a passing video")
                 saved.setdefault(k, []).append((label, name))
@@ -2110,7 +2121,7 @@ def _click_run(page, block, kind):
     return before, block.inner_text()
 
 
-def record_cells(url, out_dir, slug, count, kind="executable_spark"):
+def record_cells(url, out_dir, slug, count, kind="executable_spark", start=0):
     """Click the run control of every runnable cell and save the whole cell as <slug>_cell_<n>.png.
 
     Returns the file names in page order (None for a cell that could not be captured). Warns
@@ -2147,7 +2158,7 @@ def record_cells(url, out_dir, slug, count, kind="executable_spark"):
                 print(f"warning: cell {i + 1} output looks like an error: {result.strip()[:120]!r}",
                       file=sys.stderr)
             page.evaluate(_HIDE_FIXED)
-            name = f"{slug}_cell_{i + 1}.png"
+            name = f"{slug}_cell_{start + i + 1}.png"  # start: cells of earlier kinds on a mixed page
             block.screenshot(path=os.path.join(img_dir, name))
             names.append(name)
         names += [None] * (count - len(names))
@@ -2243,9 +2254,12 @@ def main():
             if name.endswith(".mp4"):
                 upload_animation(name)
     soup0 = BeautifulSoup(html, "html.parser")
-    cell_kind = next((k for k in CELL_KINDS if soup0.find(attrs={"data-note-block-type": k})), "executable_spark")
-    n_cells = len(soup0.find_all(attrs={"data-note-block-type": cell_kind}))
-    cells = record_cells(url, out_dir, slug, n_cells, cell_kind) if "--screenshots" in sys.argv else []
+    cells, done = {}, 0  # every runnable kind on the page, each screenshotted with its own control
+    for cell_kind in CELL_KINDS:
+        n_cells = len(soup0.find_all(attrs={"data-note-block-type": cell_kind}))
+        if n_cells and "--screenshots" in sys.argv:
+            cells[cell_kind] = record_cells(url, out_dir, slug, n_cells, cell_kind, done)
+        done += n_cells
     n_regex = len(soup0.find_all(attrs={"data-note-block-type": "regex_cards"}))
     regex_images = record_regex_cards(url, out_dir, slug, n_regex) if "--screenshots" in sys.argv else []
     switchers = (sql_switcher_tabs(url) if soup0.find(attrs={"data-note-block-type": "sql_switcher"})
