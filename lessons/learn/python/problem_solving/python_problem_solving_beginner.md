@@ -620,7 +620,7 @@ The total is 0 and len(values) is 0, so the division fails. The function needs a
 
 ### Capstone: one problem, all 5 habits
 
-A logistics team asks: given a list of parcel weights in kilograms, how many parcels are over the 20 kilogram limit? Walk it through every section of this lesson before the drill below hands you a version with a mistake in it:
+A logistics team asks: given a list of parcel weights in kilograms, how many parcels are over the 20 kilogram limit? Walk it through every section of this lesson:
 
 - Steps: start a counter at 0, look at each weight, add 1 when it is more than 20, report the counter.
 - Pairs: [] gives 0, [20] gives 0 because 20 is not over 20, [25, 8, 31] gives 2.

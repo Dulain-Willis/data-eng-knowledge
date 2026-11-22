@@ -71,9 +71,9 @@ Python refuses its 35 reserved keywords as names with a `SyntaxError`, so `class
 
 ### A name that was never bound
 
-The most common error in a new programmer's first week is a `NameError`: the code reads a name that no assignment has bound yet, because of a typo, a capital letter, or an assignment that sits below the line that uses it. Python reports the exact name it could not find, and the fix is to match the spelling of the name that was bound. The program below computes a subtotal and stops on its last line.
+The most common error in a new programmer's first week is a `NameError`: the code reads a name that no assignment has bound yet, because of a typo, a capital letter, or an assignment that sits below the line that uses it. Python reports the exact name it could not find, and the fix is to match the spelling of the name that was bound.
 
-The error names `Subtotal_cents`, with a capital S, and that spelling appears nowhere on the left of an `=`. Reading the name in the message and searching the file for it is the whole technique, and it works the same way when the missing name is a variable assigned further down the file than the line that reads it.
+Reading the name in the message and searching the file for it is the whole technique, and it works the same way when the missing name is a variable assigned further down the file than the line that reads it.
 
 
 <br>
