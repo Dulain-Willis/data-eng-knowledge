@@ -1978,6 +1978,17 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
     return {"live": live, "box": {"x": x, "y": y, "w": w, "h": h}, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
 
 
+# A "static animation": an *_animation block whose player never gets controls (no steps). The site draws it
+# as a plain picture and its footer reads "These tables are what the query/program reads." That is
+# deliberate, so it is saved as a 2x PNG; no footer means the player probably failed to load.
+STATIC_ANIMATION_FOOTER_RE = re.compile(r"These tables are what the .{1,40}? reads", re.I)
+
+
+def is_static_animation(block_text):
+    """True if the block's text carries the footer the site shows for a deliberate still animation."""
+    return bool(STATIC_ANIMATION_FOOTER_RE.search(block_text or ""))
+
+
 def record_animations(url, out_dir, slug, info, only=None):
     """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
@@ -2019,8 +2030,8 @@ def record_animations(url, out_dir, slug, info, only=None):
             slow = block.get_attribute("data-note-block-type") == "python_animation"
             box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
-                # Seen once per lesson (see the four still-image cases): the site never mounts the
-                # player and leaves the code and seed table on screen. Keep that as a still image.
+                # Static animation (see is_static_animation): after scroll + wait the site still shows no
+                # player buttons, only the code and seed tables. Keep that as a still image.
                 page.wait_for_timeout(5000)
                 box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
@@ -2033,8 +2044,14 @@ def record_animations(url, out_dir, slug, info, only=None):
                         "width": bb["width"], "height": bb["height"], "scale": 2}})
                 with open(os.path.join(img_dir, name), "wb") as fh:
                     fh.write(base64.b64decode(shot["data"]))
+                static = is_static_animation(block.inner_text())
                 ctx.close()
-                print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
+                if static:
+                    print(f"static animation: {slug} animation {k + 1} has no player (no steps); saved a still image {name}")
+                else:
+                    print(f"WARNING: {slug} animation {k + 1} has no player controls and no 'These tables are what ... reads' "
+                          f"footer: likely a recording failure, not a static animation; saved a still image {name} anyway",
+                          file=sys.stderr)
                 saved.setdefault(k, []).append((None, name))
                 continue
             # the player can grow while it plays (captions, tables): take the largest size seen so far
