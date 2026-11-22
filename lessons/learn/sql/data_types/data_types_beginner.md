@@ -16,29 +16,72 @@ Every column carries a declared type, and that type is the database's contract a
 
 ### A count that sorts in the wrong order
 
-A warehouse system writes its stock levels to a CSV file, and the loader creates each column as text because CSV carries no type information. The `stock` table below keeps that export in `qty_text`, next to the same 5 counts stored as integers in `qty`. To a person reading them the values are identical: 9, 10, 100, 25 and 3. Run the 3 tabs and compare how the database treats the 2 columns.
+A warehouse system writes its stock levels to a CSV file, and the loader creates each column as text because CSV carries no type information. The `stock` table below keeps that export in `qty_text`, next to the same 5 counts stored as integers in `qty`. To a person reading them the values are identical: 9, 10, 100, 25 and 3. Run the 3 versions and compare how the database treats the 2 columns.
+
+**Text sort**
 
 ORDER BY on the text column compares characters left to right.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | sku, |
-|  | qty_text |
-|  | FROM stock |
-|  | ORDER BY qty_text |
+```sql
+SELECT
+  sku,
+  qty_text
+FROM stock
+ORDER BY qty_text
+```
 
-Result
+Result:
 
-| sku | qty_text |
-| --- | --- |
-| B-200 | 10 |
-| C-300 | 100 |
-| D-400 | 25 |
-| E-500 | 3 |
-| A-100 | 9 |
+```
+sku | qty_text
+B-200 | 10
+C-300 | 100
+D-400 | 25
+E-500 | 3
+A-100 | 9
+```
 
-5 rows
+**Number sort**
+
+ORDER BY on the integer column compares magnitude.
+
+```sql
+SELECT
+  sku,
+  qty
+FROM stock
+ORDER BY qty
+```
+
+Result:
+
+```
+sku | qty
+E-500 | 3
+A-100 | 9
+B-200 | 10
+D-400 | 25
+C-300 | 100
+```
+
+**Text filter**
+
+A filter on the text column keeps only the SKU whose first character beats '5'.
+
+```sql
+SELECT
+  sku,
+  qty_text
+FROM stock
+WHERE qty_text > '5'
+```
+
+Result:
+
+```
+sku | qty_text
+A-100 | 9
+```
 
 Sorting `qty_text` compares one character at a time, the way a dictionary orders words, so '10' lands before '9' because the character '1' is smaller than '9', and '100' sits between '10' and '25'. The filter is worse: `qty_text > '5'` returns a single row, and the SKU holding 100 units disappears from a report meant to list well-stocked items. The integer column sorts and filters by magnitude with no surprises, because the database knows the values are numbers.
 
