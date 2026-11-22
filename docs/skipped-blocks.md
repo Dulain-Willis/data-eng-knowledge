@@ -13,7 +13,7 @@
 | Airflow | 15 | 110 | `airflow`: run_ledger 35, unstick 22, dag_repair 20, grid_match 16, render_the_run 12, backfill_proof 3, night_shift 2 | **All left out** (`INCLUDE_AIRFLOW_EXERCISES = False`); with the switch on only `dag_repair` (20) would be kept and the other 90 left out |
 | dbt | 15 | 117 | `dbt`: compile_it 28, catch_the_defect 20, build_outcome 17, two_run_proof 16, select_the_nodes 15, model_it 15, draw_the_lineage 4, snapshot_timeline 2 | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Kafka | 15 | 114 | `kafka`: log_cleanup 20, delivery_trace 19, replica_trace 16, read_the_tape 14, connector_config 13, assign_the_group 10, route_the_keys 8, durability_dial 6, lag_board 4, crash_point 3, schema_rollout 1 | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
-| Learn: Spark | 45 | 600 | `spark`, no `form` key | **To be left out.** The Spark lessons are not in `main`, and the separate Spark PR was not open when checked (`gh pr list --state all` shows PRs 1 to 6 only; no Spark branch on the remote). |
+| Learn: Spark | 45 | 600 | `spark`, no `form` key | **Left out** (`SKIPPED_TOOL_EXERCISES`). The 45 Spark lessons are in `lessons/learn/spark/`; none of them has an `Exercise k of N` entry. |
 | Interview: Python | 60 | 169 | `python`, no `form` key; every one has `starter_code` with `{{ }}` blanks, `input_bindings` and `test_examples` (no seed tables, no tile bank) | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 
 - **Kept exercises** (574 in total) are one file per lesson, numbered continuously (`Exercise 1 of N` to `N of N`). Each has the task, the starting canvas if there is one, and the solution in a collapsed fold. Inline multiple-choice questions are not exercises; they stay in the lesson.
