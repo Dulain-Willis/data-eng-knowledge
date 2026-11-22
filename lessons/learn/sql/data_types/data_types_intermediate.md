@@ -242,7 +242,7 @@ A TIMESTAMP is a reading off a wall clock with the clock's location left out. `2
 
 ### Same digits, different instants
 
-The `shipments` table records every pickup twice. `pickup_local` is what the warehouse clock showed. `pickup_stamped` is the same reading with the warehouse's zone appended. Both are stored as text, so each query casts the column it needs. The 2 versions below differ in which column they cast and sort by. Pick the order you expect from each before you switch.
+The `shipments` table records every pickup twice. `pickup_local` is what the warehouse clock showed. `pickup_stamped` is the same reading with the warehouse's zone appended. Both are stored as text, so each query casts the column it needs. The 2 versions below differ in which column they cast and sort by. Pick the order you expect from each before you read its result.
 
 **Wall clock**
 
