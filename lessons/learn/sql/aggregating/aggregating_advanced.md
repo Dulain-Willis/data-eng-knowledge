@@ -31,36 +31,60 @@ Watch the animation in 2 moves. GROUP BY sorts the 8 rows into a pile per listen
 
 ARRAY_AGG keeps every value it receives. ana played Aurora twice, so Aurora appears twice in her array. Put DISTINCT inside the parentheses and each value appears once per group, the same way `COUNT(DISTINCT track)` counts each value once. NULLs are kept as well: a row whose `track` is NULL adds a NULL element, where `COUNT(track)` would have passed over it.
 
+**All values**
+
 Every play contributes an element, so ana's array repeats Aurora and matches her play count of 4.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | listener_id, |
-|  | ARRAY_AGG(track) AS tracks, |
-|  | COUNT(\*) AS play_count |
-|  | FROM plays |
-|  | GROUP BY listener_id |
-|  | ORDER BY listener_id |
+```sql
+SELECT
+  listener_id,
+  ARRAY_AGG(track) AS tracks,
+  COUNT(*) AS play_count
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
 
-Result
+Result:
 
-| listener_id | tracks | play_count |
-| --- | --- | --- |
-| ana | ["Aurora","Basalt","Cinder","Aurora"] | 4 |
-| ben | ["Delta","Ember","Fjord"] | 3 |
-| cy | ["Basalt"] | 1 |
+```
+listener_id | tracks | play_count
+ana | ["Aurora","Basalt","Cinder","Aurora"] | 4
+ben | ["Delta","Ember","Fjord"] | 3
+cy | ["Basalt"] | 1
+```
 
-3 rows
+**DISTINCT**
 
-Put the array beside a count of the same rows and the 2 always agree. In the first tab ana has 4 elements and a `play_count` of 4; the second tab shows 3 of each. That agreement doubles as a check. When an array is longer than you expected, the group holds rows you didn't expect, and reading the array shows you which ones.
+Repeats collapse: ana's array drops to 3 tracks, matching COUNT(DISTINCT track).
+
+```sql
+SELECT
+  listener_id,
+  ARRAY_AGG(DISTINCT track) AS distinct_tracks,
+  COUNT(DISTINCT track) AS distinct_count
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
+
+Result:
+
+```
+listener_id | distinct_tracks | distinct_count
+ana | ["Aurora","Basalt","Cinder"] | 3
+ben | ["Delta","Ember","Fjord"] | 3
+cy | ["Basalt"] | 1
+```
+
+Put the array beside a count of the same rows and the 2 always agree. In the first version ana has 4 elements and a `play_count` of 4; the second version shows 3 of each. That agreement doubles as a check. When an array is longer than you expected, the group holds rows you didn't expect, and reading the array shows you which ones.
 
 
 <br>
 
 ### The order inside is not fixed yet
 
-Look at the order of ana's tracks in either tab. It follows the sequence in which rows reached the aggregate, which depends on how the table was split across workers and which worker finished first. On a large table the same query can return the same elements in a different order on the next run, with no change to the data. Until you set the order explicitly, read an array from ARRAY_AGG as a collection: fine for checking what's in it or how many, wrong for asking which came first. The ORDER BY modifier, 2 sections ahead, sets that order.
+Look at the order of ana's tracks in either version. It follows the sequence in which rows reached the aggregate, which depends on how the table was split across workers and which worker finished first. On a large table the same query can return the same elements in a different order on the next run, with no change to the data. Until you set the order explicitly, read an array from ARRAY_AGG as a collection: fine for checking what's in it or how many, wrong for asking which came first. The ORDER BY modifier, 2 sections ahead, sets that order.
 
 
 <br>
@@ -200,26 +224,58 @@ ana reads 2 and NULL, and ben reads the reverse. cy reads 1 and NULL. Each NULL 
 
 MAP_AGG assumes each key arrives once per group. Feed it raw plays with `MAP_AGG(genre, track)` and ana sends pop twice with Aurora both times. She also sends rock twice, once with Basalt and once with Cinder. A map can hold rock only once, so MAP_AGG keeps one of the 2 values and discards the other without raising an error. Which value survives depends on the order the rows arrive, the same unstable order ARRAY_AGG showed. To keep everything, collect before you fold: an inner GROUP BY on listener and genre builds an array of tracks per genre, and MAP_AGG then maps each genre to its array. `MULTIMAP_AGG(key, value)` builds that same map of arrays in a single call.
 
+**MAP_AGG**
+
 One value per key: ana's rock entry keeps Basalt or Cinder and silently drops the other.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | listener_id, |
-|  | MAP_AGG(genre, track) AS track_by_genre |
-|  | FROM plays |
-|  | GROUP BY listener_id |
-|  | ORDER BY listener_id |
+```sql
+SELECT
+  listener_id,
+  MAP_AGG(genre, track) AS track_by_genre
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
 
-Result
+Result:
 
-| listener_id | track_by_genre |
-| --- | --- |
-| ana | {"pop":"Aurora","rock":"Basalt"} |
-| ben | {"jazz":"Delta","pop":"Ember"} |
-| cy | {"rock":"Basalt"} |
+```
+listener_id | track_by_genre
+ana | {"pop":"Aurora","rock":"Basalt"}
+ben | {"jazz":"Delta","pop":"Ember"}
+cy | {"rock":"Basalt"}
+```
 
-3 rows
+**Arrays first**
+
+Each genre's tracks are collected into an array first, so ana's rock entry holds both Basalt and Cinder.
+
+```sql
+WITH genre_tracks AS (
+  SELECT
+    listener_id,
+    genre,
+    ARRAY_AGG(track) AS tracks
+  FROM plays
+  GROUP BY listener_id, genre
+)
+
+SELECT
+  listener_id,
+  MAP_AGG(genre, tracks) AS tracks_by_genre
+FROM genre_tracks
+GROUP BY listener_id
+ORDER BY listener_id
+```
+
+Result:
+
+```
+listener_id | tracks_by_genre
+ana | {"pop":["Aurora","Aurora"],"rock":["Basalt","Cinder"]}
+ben | {"jazz":["Delta","Fjord"],"pop":["Ember"]}
+cy | {"rock":["Basalt"]}
+```
 
 | ✓ ARRAY_AGG | ✗ MAP_AGG |
 | --- | --- |
@@ -263,28 +319,73 @@ The map gets a 'placed' key and a 'shipped' key. MAP_AGG keeps one value for 'pl
 
 ARRAY_AGG accepts an ORDER BY inside its parentheses: `ARRAY_AGG(track ORDER BY played_at)`. Before appending anything, the aggregate sorts each group's rows by that expression, so position 1 holds the earliest play, position 2 the next, and so on. The sort happens per group, after GROUP BY has split the rows and before the array is built.
 
+**No ORDER BY**
+
 Elements follow the order rows reached the aggregate, which no part of the query controls.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | listener_id, |
-|  | ARRAY_AGG(track) AS tracks |
-|  | FROM plays |
-|  | GROUP BY listener_id |
-|  | ORDER BY listener_id |
+```sql
+SELECT
+  listener_id,
+  ARRAY_AGG(track) AS tracks
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
 
-Result
+Result:
 
-| listener_id | tracks |
-| --- | --- |
-| ana | ["Aurora","Basalt","Cinder","Aurora"] |
-| ben | ["Delta","Ember","Fjord"] |
-| cy | ["Basalt"] |
+```
+listener_id | tracks
+ana | ["Aurora","Basalt","Cinder","Aurora"]
+ben | ["Delta","Ember","Fjord"]
+cy | ["Basalt"]
+```
 
-3 rows
+**By time**
 
-The By time tab returns ana's morning as it happened: Aurora, Basalt, Cinder, then Aurora again. By length rearranges those 4 elements longest first: Cinder at 240000 ms, the 2 Aurora plays, then Basalt at 15000 ms. Across the 3 tabs the groups and the row count stay the same, and so does each array's length; only positions inside each array change.
+Each array is a listening session in sequence, earliest play first.
+
+```sql
+SELECT
+  listener_id,
+  ARRAY_AGG(track ORDER BY played_at) AS tracks
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
+
+Result:
+
+```
+listener_id | tracks
+ana | ["Aurora","Basalt","Cinder","Aurora"]
+ben | ["Delta","Ember","Fjord"]
+cy | ["Basalt"]
+```
+
+**By length**
+
+Each array runs from the longest play to the shortest.
+
+```sql
+SELECT
+  listener_id,
+  ARRAY_AGG(track ORDER BY ms_played DESC) AS tracks
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
+
+Result:
+
+```
+listener_id | tracks
+ana | ["Cinder","Aurora","Aurora","Basalt"]
+ben | ["Delta","Fjord","Ember"]
+cy | ["Basalt"]
+```
+
+The By time version returns ana's morning as it happened: Aurora, Basalt, Cinder, then Aurora again. By length rearranges those 4 elements longest first: Cinder at 240000 ms, the 2 Aurora plays, then Basalt at 15000 ms. Across the 3 versions the groups and the row count stay the same, and so does each array's length; only positions inside each array change.
 
 
 <br>
@@ -407,26 +508,49 @@ One pass over the table produces 3 different counts per listener, each with its 
 
 WHERE can count matching rows too, but it does so by removing the others before grouping. The difference shows up at zero. cy skipped nothing, so `WHERE skipped` removes every one of cy's rows, and a group with no rows produces no output row. COUNT_IF keeps cy's play in the group and reports 0.
 
+**WHERE**
+
 Rows are removed before grouping, so cy has no rows left and disappears from the result.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | listener_id, |
-|  | COUNT(\*) AS skips |
-|  | FROM plays |
-|  | WHERE skipped |
-|  | GROUP BY listener_id |
-|  | ORDER BY listener_id |
+```sql
+SELECT
+  listener_id,
+  COUNT(*) AS skips
+FROM plays
+WHERE skipped
+GROUP BY listener_id
+ORDER BY listener_id
+```
 
-Result
+Result:
 
-| listener_id | skips |
-| --- | --- |
-| ana | 1 |
-| ben | 2 |
+```
+listener_id | skips
+ana | 1
+ben | 2
+```
 
-2 rows
+**COUNT_IF**
+
+Every listener keeps a group, so cy appears with 0 skips.
+
+```sql
+SELECT
+  listener_id,
+  COUNT_IF(skipped) AS skips
+FROM plays
+GROUP BY listener_id
+ORDER BY listener_id
+```
+
+Result:
+
+```
+listener_id | skips
+ana | 1
+ben | 2
+cy | 0
+```
 
 Pick by the question. 'How many skips did each skipping listener make?' wants WHERE, and the smaller input makes it cheaper. 'What is every listener's skip count?' wants COUNT_IF, because a dashboard that silently omits zero-skip listeners reads as though they do not exist. WHERE is the better fit when a single filter should apply to every aggregate in the query at once.
 
@@ -578,28 +702,57 @@ Every row hands COUNT either 1 or 0, so it counts all 4. To count skips, wrap th
 
 CASE can also sit in GROUP BY, where it decides which group a row joins instead of what it contributes. The same split, plays under 30 seconds against the rest, comes out as 2 rows that way, and as 2 columns when each CASE sits inside its own aggregate.
 
+**As rows**
+
 CASE labels each row, GROUP BY makes a group per label, and the output has a row per bucket.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | CASE |
-|  | WHEN ms_played < 30000 THEN 'under 30s' |
-|  | ELSE '30s or more' |
-|  | END AS length_bucket, |
-|  | COUNT(\*) AS play_count |
-|  | FROM plays |
-|  | GROUP BY 1 |
-|  | ORDER BY length_bucket |
+```sql
+SELECT
+  CASE
+    WHEN ms_played < 30000 THEN 'under 30s'
+    ELSE '30s or more'
+  END AS length_bucket,
+  COUNT(*) AS play_count
+FROM plays
+GROUP BY 1
+ORDER BY length_bucket
+```
 
-Result
+Result:
 
-| length_bucket | play_count |
-| --- | --- |
-| 30s or more | 5 |
-| under 30s | 3 |
+```
+length_bucket | play_count
+30s or more | 5
+under 30s | 3
+```
 
-2 rows
+**As columns**
+
+Each SUM receives 1 or 0 from its own CASE, and the output is a single row with a column per bucket.
+
+```sql
+SELECT
+  SUM(
+    CASE
+      WHEN ms_played < 30000 THEN 1
+      ELSE 0
+    END
+  ) AS under_30s,
+  SUM(
+    CASE
+      WHEN ms_played >= 30000 THEN 1
+      ELSE 0
+    END
+  ) AS at_least_30s
+FROM plays
+```
+
+Result:
+
+```
+under_30s | at_least_30s
+3 | 5
+```
 
 | ✓ CASE in GROUP BY (rows) | ✗ CASE in the aggregate (columns) |
 | --- | --- |
