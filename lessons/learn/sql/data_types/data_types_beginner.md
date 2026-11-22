@@ -131,7 +131,7 @@ The ceiling applies to arithmetic as well as storage. In PostgreSQL, `SELECT 200
 
 ### Multiplying an integer column
 
-The practice database's `order_items` table stores `quantity` as an integer and `unit_price` as a floating-point `REAL`. A line total multiplies the 2, and the result takes the wider type, since an integer combined with a fractional number is promoted to the fractional type before the arithmetic runs. Supply the operator.
+The practice database's `order_items` table stores `quantity` as an integer and `unit_price` as a floating-point `REAL`. A line total multiplies the 2, and the result takes the wider type, since an integer combined with a fractional number is promoted to the fractional type before the arithmetic runs.
 
 A `quantity` of 3 at a price of 19.99 returns 59.97, because the product of an integer and a `REAL` is a `REAL`. The promotion runs in one direction only: the database widens the integer to match the fractional side and never truncates the fractional value to fit the integer, so mixing the 2 types in a division is the way to keep the fractional part. A `REAL` result is approximate, though, stored in binary to about 15 significant digits, so a sum over millions of line totals can drift by fractions of a cent. That drift is why money that has to reconcile is better held as integer cents.
 
