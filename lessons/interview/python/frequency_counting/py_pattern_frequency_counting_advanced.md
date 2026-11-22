@@ -30,7 +30,7 @@ Each cell an item touches holds that item's count plus the counts of every other
 
 The program below streams 8 events into a grid of 3 rows and 4 columns. Its hash, `((a * x + b) % 11) % 4`, is small enough to check by hand. Before the query loop runs, predict the estimate it prints for each of the 5 items, including item 8, which never appears in the stream.
 
-https://github.com/user-attachments/assets/fef368a2-4076-4c17-a0ae-b25253ef7349
+https://github.com/user-attachments/assets/596051fe-d5cd-45d5-97a0-1a65dabbf02b
 
 *Each event bumps 1 cell per row; each query takes the minimum of 3 cells.*
 

@@ -90,7 +90,7 @@ LRU has a weakness worth naming before the interviewer does. A batch job that re
 
 An inverted index maps each term to the set of documents that contain it, the reverse of the `doc_id` to text mapping you start with. Prompts disguise it as log search (find the lines that mention both `timeout` and `payments-api`), tag lookup, or product search. The shape repeats: many records, repeated queries about their contents, and a full scan per query that the prompt's numbers make too slow. `defaultdict(set)` fits because each term collects doc ids without duplicates, and set intersection answers AND.
 
-https://github.com/user-attachments/assets/c64d3f4d-ce10-4f8d-9e9a-65e45c024dd0
+https://github.com/user-attachments/assets/4aa007db-7734-425f-b9d1-56761019c81d
 
 *Build the term-to-doc-ids index, then answer AND queries shortest posting list first.*
 
@@ -204,7 +204,7 @@ print(config["db"]["port"])
 
 ### A recursive merge, traced
 
-https://github.com/user-attachments/assets/76e8eeb4-0f62-4f52-9b53-8a31e90e9f41
+https://github.com/user-attachments/assets/faeec9f1-df2e-46db-ae69-73f8c70f8997
 
 *Each nested dict on both sides opens a new call frame; scalars are overwritten in place.*
 
@@ -292,7 +292,7 @@ The prompt hands you `orders` and `customers` as Python lists and asks for their
 
 ### Build, probe, and 3 join types
 
-https://github.com/user-attachments/assets/86947f6d-b6d1-40d8-a6db-eb3b48e7208d
+https://github.com/user-attachments/assets/41658574-356f-474f-bd16-11f2ca1d48cf
 
 *Build on customers and probe with orders; the left and full branches are where unmatched rows get added.*
 

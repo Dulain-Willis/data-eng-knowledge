@@ -1644,6 +1644,12 @@ _BAR_GEOM_JS = """(block) => {
           code: rel(f.querySelector('.pmv-code')),
           replay: !!block.querySelector('button[aria-label="Replay"]'), text: bar.innerText.replace(/\\s+/g, ' ')};
 }"""
+_HIDE_AFTER_PLAYER = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame, .pmv');
+  const hide = e => { e.style.visibility = 'hidden'; };
+  if (f) for (let s = f.nextElementSibling; s; s = s.nextElementSibling) hide(s);   // the caption under the frame
+  else block.querySelectorAll(':scope > p').forEach(hide);                          // not mounted yet
+  for (let n = block; n && n !== document.body; n = n.parentElement)
+    for (let s = n.nextElementSibling; s; s = s.nextElementSibling) hide(s); }"""
 _PY_BAR_TOL = 20  # the Python player's controls start dimmer (fade-in) than in the last frame: a little more room
 _BAR_TOL = 14  # mean colour difference (0..255) of a control-bar button between a frame and the finished recording
 
@@ -1809,6 +1815,18 @@ def _duration(path):
                                 capture_output=True, text=True, check=True).stdout)
 
 
+def _opening_frame_problems(path):
+    """The opening-frames check of checks/animation_first_frames.py (no page text under the player, step
+    counter reading 1/N), applied to a fresh recording so a bad one is retried."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "animation_first_frames", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                               "checks", "animation_first_frames.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return sorted(set(x.split(": ", 1)[1] for x in mod.problems(path)))
+
+
 def record_bar_animation(browser, url, k, m, label, dest, box_css):
     """record_animation for the BAR_PLAYER_TYPES (same recorder settings: Playwright video, window = player
     height + 40, 2x via doubled viewport/record size and page zoom 2, crop + fps=30 + scale 1600 lanczos +
@@ -1826,6 +1844,8 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         page.wait_for_timeout(1000)
         block = page.locator(ANIMATION_SELECTOR).nth(k)
         page.evaluate(_HIDE_PINNED)
+        if block.get_attribute("data-note-block-type") == "python_animation":
+            page.evaluate(_HIDE_AFTER_PLAYER, block.element_handle())  # before the jump, so no frame shows the page text
         page.wait_for_timeout(300)
         gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
         page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})", gap)
@@ -1837,6 +1857,11 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
                       block.evaluate("b => b.getBoundingClientRect().top") - 10)
         btype = block.get_attribute("data-note-block-type")
+        if btype == "python_animation":
+            # The crop is the player's finished height, but the Python player grows while it plays, so at the start
+            # the page text that follows it would show below its control bar. Hide everything after the player (the
+            # layout stays, only the paint goes), so the strip under the player is empty at any moment.
+            page.evaluate(_HIDE_AFTER_PLAYER, block.element_handle())  # again: the player is mounted now
         geom = None
         while time.monotonic() - jump_mark < 25:  # the player is mounted once its control bar is
             geom = block.evaluate(_BAR_GEOM_JS)
@@ -1848,7 +1873,25 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         start_geom = geom
         mount_t = mark = time.monotonic()
         play = block.locator('button[aria-label="Play"]')
-        if m > 0 and play.count():  # a switched mode starts paused: the playback starts at this click
+        if btype == "python_animation" and m == 0:
+            # The Python player plays by itself from its mount, and the video can show its first painted frame several
+            # steps in (5/60, 3/107). Restart it and pause it at step 1, like a switched mode, so the recorded
+            # playback starts at a click of ours and the first frame reads 1/N.
+            block.locator('button[aria-label="Restart"]').first.click()
+            page.wait_for_timeout(300)
+            pause = block.locator('button[aria-label="Pause"]')
+            if pause.count():
+                pause.first.click()
+            for _ in range(6):  # the pause can land after step 2 has begun: step back to 1
+                page.wait_for_timeout(300)
+                cur = block.evaluate(_BAR_GEOM_JS)
+                if not cur or cur["text"].startswith("1/"):
+                    break
+                block.locator('button[aria-label="Previous step"]').first.click()
+            else:
+                raise RuntimeError("could not hold the player at step 1")
+            page.wait_for_timeout(2000)
+        if (m > 0 or (btype == "python_animation" and m == 0)) and play.count():  # a switched mode starts paused: the playback starts at this click
             play.first.click()
             mark = time.monotonic()
         last_geom, h_max, last_seen = geom, geom["h"], None
@@ -1886,7 +1929,11 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
         webm = os.path.join(tmp, vids[0])
         pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
-        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))  # a stubborn player: start a frame or two later
+        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))
+        if btype == "python_animation" and m == 0:
+            # the video clock lags the script clock by up to about a second: start well inside the 2 s paused stretch
+            # at step 1 (before our Play click), not at the click, or the first frame can already be at step 2
+            start = max(pres, start - 1.0)  # a stubborn player: start a frame or two later
         live = last_seen - mark
         end = start + live + 2
         os.makedirs(os.path.dirname(dest), exist_ok=True)
@@ -1987,6 +2034,7 @@ def record_animations(url, out_dir, slug, info, only=None):
                         # The Python player's long slow stretches change little per frame (a progress bar, one cell per
                         # step), so 10 distinct frames/s is too strict: demand motion at least 3 times a second on
                         # average and no frozen stretch longer than 2 s (a stalled recording).
+                        problems += _opening_frame_problems(dest)
                         sc = _start_corr(dest)
                         if sc < 0.8:
                             problems.append(f"frame 0 is not the player's code panel (match {sc:.2f}): page text or a shifted layout")

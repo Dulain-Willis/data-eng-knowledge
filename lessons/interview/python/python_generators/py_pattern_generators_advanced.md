@@ -345,7 +345,7 @@ At-least-once is the default because duplicates are repairable and loss is not. 
 
 A batching generator runs only when its upstream yields, which a list-driven test never exposes. When the log goes quiet, a partial batch waits for the row that would fill it, and the 2-second age limit is never checked. The fix is a heartbeat: when its poll timeout expires with no records, `poll()` yields `(now, None)`, which gives `batched()` a turn to flush stale rows. The animation shrinks the size limit to 3 rows and keeps the 2-second age limit.
 
-https://github.com/user-attachments/assets/7480862e-a1da-49cb-85dd-42227b199965
+https://github.com/user-attachments/assets/3b9b703c-6d65-40c5-8e72-c4ef2a42aa55
 
 *Size and age limits, with heartbeats from a quiet log.*
 
@@ -456,7 +456,7 @@ The lock serializes `next()`, so the shared source runs at single-thread speed. 
 
 A generator expression evaluates its outermost iterable at creation and everything else at consumption. A generator function binds its arguments at the call and runs its body at the first `next()`. Both rules move work, and errors, away from the line that looks responsible for them.
 
-https://github.com/user-attachments/assets/902b4687-cfb7-4615-b5b3-deb12e5d306c
+https://github.com/user-attachments/assets/6d037833-264e-4751-9ec4-b8a548e32ca7
 
 *Late-bound and parameter-bound filters over the same rows.*
 

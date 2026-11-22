@@ -282,7 +282,7 @@ The interview version uses table lineage. A nightly load wrote duplicate rows in
 
 ![Pipeline diagram 1](_images/py_pattern_stacks_queues_beginner_diagram_1.png)
 
-https://github.com/user-attachments/assets/97355974-f1ea-4329-8892-0e39f31e6c59
+https://github.com/user-attachments/assets/f3d003b8-03ce-4cc1-8d89-5ab575986d62
 
 *The level dict is both the visited check and the hop count.*
 

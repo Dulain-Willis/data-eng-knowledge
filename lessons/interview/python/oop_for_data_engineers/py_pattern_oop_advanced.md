@@ -26,7 +26,7 @@ Implement a descriptor with __set_name__, __get__ and __set__, and trace how loo
 
 The question usually arrives as a maintenance complaint. A `REGISTRY` dict in `connectors/__init__.py` maps URI schemes to classes, and every new connector waits on review of that single shared file. The fix moves registration into class creation. When Python finishes executing a `class` statement, `type.__new__` calls the nearest `__init_subclass__` defined above the new class in its MRO, passing the new class as `cls`. Any keyword written on the class line, such as `scheme="sftp"`, arrives as an argument to that hook. The base therefore sees every subclass the moment it exists, and no list needs editing.
 
-https://github.com/user-attachments/assets/c3f2ee41-d425-4b99-b65a-cd517b4aedc1
+https://github.com/user-attachments/assets/a3ba7c57-86c4-46b4-8952-93a1738d5692
 
 *The registry fills while the class statements run; SQLBase passes no scheme and stays out.*
 
@@ -180,7 +180,7 @@ Because of the layout conflict, a slotted record family needs a particular shape
 
 The request sounds cosmetic: let analysts write `rows | parse | dedupe | load` and have it run. The engineering underneath is binary operator dispatch. For `a | b`, Python calls `type(a).__or__(a, b)`. If that method is missing or returns the `NotImplemented` sentinel, Python tries the reflected form, `type(b).__ror__(b, a)`, and raises `TypeError` only when both decline. One rule reorders the attempt: when the type of `b` is a subclass of the type of `a` and overrides `__ror__`, the reflected method runs first, which lets a specialized stage type take over composition.
 
-https://github.com/user-attachments/assets/89b5acaf-64f8-4e02-b2f6-91e21623c56f
+https://github.com/user-attachments/assets/3dac33f1-e61e-4d18-86fd-9e40633dbd80
 
 *Composition builds new Pipe objects; data on the left reaches __ror__ and streams through the stages.*
 
@@ -284,7 +284,7 @@ The import raises `TypeError: OrdersSync: class name must end with 'Connector'`.
 
 A metaclass and `__init_subclass__` in the same hierarchy both fire, and interviewers check whether you know their order. Predict the 10 printed lines before playing the run.
 
-https://github.com/user-attachments/assets/60db28b5-0a43-4136-98eb-13f54606426c
+https://github.com/user-attachments/assets/73a41b0d-d374-46bb-828f-fee7b7c7fb78
 
 *The subclass hook fires inside type.__new__, between the metaclass's start and end lines.*
 

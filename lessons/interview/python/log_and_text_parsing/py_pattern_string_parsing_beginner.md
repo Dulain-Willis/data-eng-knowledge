@@ -351,7 +351,7 @@ Calling a function that contains yield returns a generator object and runs none 
 
 The program below puts 2 generator stages around csv.DictReader and prints from inside each stage. Predict whether pipeline built appears before or after the first read, and how many lines are read before the first parse.
 
-https://github.com/user-attachments/assets/49431ee9-c847-4a52-813b-58918ddbad8d
+https://github.com/user-attachments/assets/4e1c603f-abb6-498a-a073-7d0fba8c69aa
 
 *A row is parsed and added to totals before the generator reads the next one.*
 
@@ -442,7 +442,7 @@ Picture the payout job reading 1,000,000 rows, 3,000 of which fail conversion. W
 
 The program parses 5 payout lines and catches only the exceptions bad data raises. Predict which line numbers reach dead and which exception name each one records. Line 5 has a third field: think about what unpacking 3 values into 2 names does.
 
-https://github.com/user-attachments/assets/6eeda74a-e9d5-4250-a4e0-7ac29417eae6
+https://github.com/user-attachments/assets/a69b32ff-2f5a-4602-942f-b3c977b4dd62
 
 *Bad lines land in dead with their context while good lines keep flowing.*
 

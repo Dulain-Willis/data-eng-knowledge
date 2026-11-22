@@ -307,7 +307,7 @@ The caller reaches `except` at 20 ms holding nothing but initech's error. Globex
 
 With `return_exceptions=True`, an exception raised in a task is stored in the results list at that task's position, as an ordinary value, and `gather` returns normally once every task is done. The caller splits the list into successes to load and failures to retry. This run has 4 partners finishing in a scrambled order, 1 of them failing.
 
-https://github.com/user-attachments/assets/88d31588-1aa2-419e-ab4a-de1d32f0b4b8
+https://github.com/user-attachments/assets/341cc47d-7d58-49b2-a608-84e2291980cd
 
 *Failures come back as values, in argument order.*
 
@@ -401,7 +401,7 @@ A regular `with` block calls `__enter__` and `__exit__`, both plain methods. Ope
 
 An `async def` function that contains `yield` is an async generator. Each turn of an `async for` loop awaits the generator's `__anext__`, which runs its code up to the next `yield`, and that code may `await` along the way. Put a `fetchmany` call inside, yield the rows of each batch, and the consumer sees a plain row-by-row loop while memory holds a single batch. The animation streams 7 orders in batches of 3: predict how many times `fetchmany` runs.
 
-https://github.com/user-attachments/assets/03807ae3-d694-4408-a870-6571838898a9
+https://github.com/user-attachments/assets/57ca52d3-a5c5-4fb9-8a0c-4f3452607a53
 
 *Streams 7 rows in batches of 3 through a cursor that async with closes.*
 

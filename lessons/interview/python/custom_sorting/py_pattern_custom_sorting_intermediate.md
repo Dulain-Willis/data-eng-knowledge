@@ -37,7 +37,7 @@ Put numbers on it. The input is 200 GB of clickstream records keyed by `user_id`
 
 Each heap entry is a tuple of 3 fields: the record's sort key, the index of the run it came from, and its position in that run. Popping the heap yields the smallest record not yet emitted from any run, because every run is sorted and the heap holds each run's front. After emitting it, the merge pushes the next record from the same run. The heap never holds more than k entries, so the merge needs k entries plus k buffers of memory however large the input grows, and each record costs a pop and a push at O(log k), or O(N log k) for the whole merge.
 
-https://github.com/user-attachments/assets/02302d8e-9a67-4d8c-8f6f-dc026194a732
+https://github.com/user-attachments/assets/e8e6ca77-fa22-44cf-8ee9-457186a781f0
 
 *Lists stand in for run files; the run index settles the tie between the 9s.*
 
@@ -390,7 +390,7 @@ Columnar files record the minimum and maximum of every column, per file and per 
 
 A linear sort serves its leading column and does almost nothing for the next, because each value of the second column repeats across every slice of the first. When queries filter on either of 2 columns, Z-order interleaves them: it takes the bits of both values, alternates them into a single number and sorts by that number. For `x = 1` and `y = 2`, the bits `01` and `10` interleave as y1 x1 y0 x0 into `1001`, a z-value of 9. Points close in both columns get close z-values, so each file covers a small box of values instead of a full-height strip. In the run below, x and y stand for `user_id` and `merchant_id` on a 4-by-4 grid: 16 rows written as 4 files of 4.
 
-https://github.com/user-attachments/assets/da7713ad-5c15-4b01-8666-7486044ffa4c
+https://github.com/user-attachments/assets/aad3429b-6f6a-47c8-84d5-89e4070fe371
 
 *Sixteen rows in 4 files, sorted linearly and then by z-value.*
 

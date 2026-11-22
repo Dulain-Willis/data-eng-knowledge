@@ -43,7 +43,7 @@ Since 3.6 a CPython dict is 2 arrays. The **index array** has a slot per bucket,
 
 A rebuild happens when the usable entries run out. CPython 3.9 sizes the new table from 3 times the live count, rounded up to a power of two, which doubles it. Before playing the run, predict on which inserts the table is rebuilt as 22 keys go in, and how many entries those rebuilds copy in total.
 
-https://github.com/user-attachments/assets/71f66844-4745-4f1a-820c-b534c2cb02e4
+https://github.com/user-attachments/assets/97cf7d85-4828-4212-9d20-3e797547567c
 
 *Every rebuild copies the live entries into a table twice the size.*
 
@@ -60,7 +60,7 @@ After the first allocation, the first rebuild lands on insert 6 and copies 5 ent
 
 A key's hash picks its starting slot; when that slot is taken, the dict probes other slots until it finds the key or an empty slot. CPython's probe order mixes in the hash's high bits through a value called `perturb`, so keys that share a starting slot still scatter. Keys with identical full hashes follow the same probe sequence, so each insert or lookup has to walk past every one of them. The run below uses linear probing on an 8-slot toy table so every probe is visible. Predict the probe counts under the constant hash before playing it.
 
-https://github.com/user-attachments/assets/ef17be43-e3ca-4cc3-b0c5-ffd0a05f2d38
+https://github.com/user-attachments/assets/9a5e1311-075f-4f35-b6de-f649a88af9e8
 
 *Same 5 keys, same 8 slots, 2 hash functions.*
 
@@ -97,7 +97,7 @@ A key stays on its node only when h % N equals h % (N + 1). With uniformly sprea
 
 Hash nodes and keys onto the same circle of positions. A key belongs to the first node position at or after its own, wrapping from the top back to the start, which bisect_left finds on a sorted list in O(log P) for P positions. Each physical node holds several positions, its **virtual nodes**. A joining node claims only the arcs that end at its new positions, so the keys that move are the ones inside those arcs, and all of them move to the newcomer. The run places every position by hand on a ring of 100, so each owner can be checked on paper. Predict which keys D takes.
 
-https://github.com/user-attachments/assets/01253dd4-7b6c-4908-bdd8-6f9ca7470b73
+https://github.com/user-attachments/assets/62e35519-18aa-451d-a889-423d51e71004
 
 *Ring of 100 positions, 2 virtual nodes per server, then D joins.*
 
