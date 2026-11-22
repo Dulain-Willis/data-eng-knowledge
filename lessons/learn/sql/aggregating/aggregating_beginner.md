@@ -215,7 +215,7 @@ The `bonuses` table below has 3 employees. Two received a bonus and 1 has `NULL`
 
 ### Summing an expression
 
-The argument to `SUM` can be arithmetic over several columns, computed per row before the adding starts. An `order_items` table storing `quantity` and `unit_price` has no revenue column, and `SUM(quantity * unit_price)` builds it: each row's quantity times its price, then the products added within the group. `SUM(quantity) * SUM(unit_price)` is a different and wrong number, since it multiplies 2 totals that were never meant to meet. The practice `orders` table has a `profit` per order and a `region`; fill in the 2 aggregates that give total and average profit per region.
+The argument to `SUM` can be arithmetic over several columns, computed per row before the adding starts. An `order_items` table storing `quantity` and `unit_price` has no revenue column, and `SUM(quantity * unit_price)` builds it: each row's quantity times its price, then the products added within the group. `SUM(quantity) * SUM(unit_price)` is a different and wrong number, since it multiplies 2 totals that were never meant to meet.
 
 `SUM(profit)` and `AVG(profit)` in the same row let a reader spot the region whose high total comes from many small orders rather than a few large ones, the same volume-versus-size reading the 2 counts gave in the previous section.
 
@@ -326,7 +326,7 @@ The animation below combines both filters. 5 orders carry a status: 4 are comple
 
 https://github.com/user-attachments/assets/a6ea739b-94f9-4f6f-b839-94cd37727b58
 
-The result is 1 row, North with 3 completed orders. Moving the status test out of `WHERE` and into `HAVING` is possible only in a form such as `HAVING SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) = 0`, which asks a different question (regions with no pending orders at all) and does more work, since every row reaches the grouping stage. Filtering rows as early as possible is cheaper and, more often than not, what the report means. Assemble the same query from its pieces below; 1 tile does not belong.
+The result is 1 row, North with 3 completed orders. Moving the status test out of `WHERE` and into `HAVING` is possible only in a form such as `HAVING SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) = 0`, which asks a different question (regions with no pending orders at all) and does more work, since every row reaches the grouping stage. Filtering rows as early as possible is cheaper and, more often than not, what the report means.
 
 
 <br>
@@ -337,7 +337,7 @@ The result is 1 row, North with 3 completed orders. Moving the status test out o
 | --- | --- |
 | • Runs before GROUP BY, on individual rows<br><br>• Tests raw columns: status = 'completed', amount > 100<br><br>• Shrinks the data the grouping has to process<br><br>• Cannot reference COUNT, SUM or any other aggregate | • Runs after GROUP BY, on finished groups<br><br>• Tests aggregates: COUNT(\*) > 2, SUM(amount) < 1000<br><br>• Removes whole groups from the result<br><br>• Can test a grouping column too, but WHERE does that cheaper |
 
-A condition that could go in either place, such as `region = 'North'`, belongs in `WHERE`: the result is identical and the engine groups fewer rows. The practice `orders` table has a `region` and a `profit` per order; complete the query that keeps only regions with more than 1 order.
+A condition that could go in either place, such as `region = 'North'`, belongs in `WHERE`: the result is identical and the engine groups fewer rows.
 
 Every grouped query in this lesson follows the same skeleton: rows in, `WHERE` trims them, `GROUP BY` sets the grain, aggregates compute 1 value per group, `HAVING` trims the groups. The habits below are the ones that keep that skeleton correct on a table too large to check by eye.
 

@@ -186,7 +186,7 @@ SELECT
 FROM customers
 ```
 
-The practice database carries the same pattern. `order_items` holds `order_id`, which references `orders.order_id`, and `product_id`, which references `products.product_id`; each item row belongs to 1 order and names 1 product. Joining items to products follows the second edge, foreign key on the item side and primary key on the product side, and the blank below is that condition.
+The practice database carries the same pattern. `order_items` holds `order_id`, which references `orders.order_id`, and `product_id`, which references `products.product_id`; each item row belongs to 1 order and names 1 product. Joining items to products follows the second edge, foreign key on the item side and primary key on the product side.
 
 > **TIP**
 >
@@ -342,7 +342,7 @@ Nothing reports the drop; the only sign is a row count 1 lower than the orders t
 
 ### Where the join runs
 
-The logical execution order from earlier lessons places `FROM` and its joins first, then `WHERE`, then `GROUP BY`, then `SELECT`. The join builds the full set of matched pairs, and `WHERE` filters that set, so a condition like `o.total > 40` sees combined rows that already carry both a name and a total. The tiles below assemble a join followed by a filter over the practice database's `stores` and `retail_orders` tables, in the order the engine reads them.
+The logical execution order from earlier lessons places `FROM` and its joins first, then `WHERE`, then `GROUP BY`, then `SELECT`. The join builds the full set of matched pairs, and `WHERE` filters that set, so a condition like `o.total > 40` sees combined rows that already carry both a name and a total.
 
 The right key is `user_id` on both sides, the users primary key against the sessions foreign key, and the filter names the column the question asked about. The engine pairs first and filters second, so `s.pages_viewed` in the `WHERE` is a column of the paired row.
 

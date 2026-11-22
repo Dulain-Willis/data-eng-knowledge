@@ -222,7 +222,7 @@ WHERE total > (
 )
 ```
 
-Across the 6 orders the average is 50.0, so the inner query returns that single number and the outer `WHERE` becomes `total > 50.0`, keeping orders 1002 (75), 1005 (60) and 1006 (90). If the inner query returned 2 rows, the comparison would be between 1 value and 2, and the engine raises an error rather than guessing which to use. The blank below is the same construction over the practice database.
+Across the 6 orders the average is 50.0, so the inner query returns that single number and the outer `WHERE` becomes `total > 50.0`, keeping orders 1002 (75), 1005 (60) and 1006 (90). If the inner query returned 2 rows, the comparison would be between 1 value and 2, and the engine raises an error rather than guessing which to use.
 
 
 <br>
@@ -377,7 +377,7 @@ FROM suppliers
 ORDER BY id
 ```
 
-The `ORDER BY` at the end sorts the stacked result and applies to the whole union, never to the second `SELECT` alone; a query that needs each input kept together sorts the final result by `party_type` first. `LIMIT` behaves the same way and caps the combined result. The practice database splits notification sends between `push_notifs` and `push_notifs_2fa`. Both tables have the same columns, which is the shape the next widget stacks.
+The `ORDER BY` at the end sorts the stacked result and applies to the whole union, never to the second `SELECT` alone; a query that needs each input kept together sorts the final result by `party_type` first. `LIMIT` behaves the same way and caps the combined result.
 
 > Rules every UNION obeys
 >
