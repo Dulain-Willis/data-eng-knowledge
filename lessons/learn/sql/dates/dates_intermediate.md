@@ -55,6 +55,8 @@ A part is a number, so it works in `WHERE` like any other column. What a single 
 
 Month 12 matches December of every year: 3 rows from 2 different years.
 
+![Month only result](_images/dates_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   order_id,
@@ -63,18 +65,11 @@ FROM orders
 WHERE EXTRACT(MONTH FROM ordered_at) = 12
 ```
 
-Result:
-
-```
-order_id | ordered_at
-201 | 2022-12-05 10:00:00
-202 | 2022-12-24 16:45:00
-203 | 2023-12-24 17:10:00
-```
-
 **Year + month**
 
 Adding the year narrows the result to December 2023: 1 row.
+
+![Year + month result](_images/dates_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -83,13 +78,6 @@ SELECT
 FROM orders
 WHERE EXTRACT(MONTH FROM ordered_at) = 12
   AND EXTRACT(YEAR FROM ordered_at) = 2023
-```
-
-Result:
-
-```
-order_id | ordered_at
-203 | 2023-12-24 17:10:00
 ```
 
 That loss is sometimes the point. A report comparing every Christmas Eve filters on month 12 and day 24 and leaves the year out on purpose.
@@ -299,6 +287,8 @@ date_diff(unit, start, end) measures time passed. It counts how many complete un
 
 Counts complete 24-hour days. User 1 waited 2 hours, so the answer is 0.
 
+![Days passed result](_images/dates_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   user_id,
@@ -306,19 +296,11 @@ SELECT
 FROM signups
 ```
 
-Result:
-
-```
-user_id | days_passed
-1 | 0
-2 | 30
-3 | 29
-4 | 30
-```
-
 **Midnights**
 
 Casting to DATE first counts calendar days. User 1 now reads 1, the midnight between January 31 and February 1.
+
+![Midnights result](_images/dates_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -331,19 +313,11 @@ SELECT
 FROM signups
 ```
 
-Result:
-
-```
-user_id | midnights_crossed
-1 | 1
-2 | 30
-3 | 29
-4 | 30
-```
-
 **Months**
 
 Complete months passed beside month boundaries crossed. Users 1 and 2 crossed into February without completing a month.
+
+![Months result](_images/dates_intermediate_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -353,16 +327,6 @@ SELECT
     EXTRACT(YEAR FROM first_order_at) - EXTRACT(YEAR FROM signed_up_at)
   ) * 12 + EXTRACT(MONTH FROM first_order_at) - EXTRACT(MONTH FROM signed_up_at) AS month_boundaries
 FROM signups
-```
-
-Result:
-
-```
-user_id | months_passed | month_boundaries
-1 | 0 | 1
-2 | 0 | 1
-3 | 1 | 1
-4 | 0 | 0
 ```
 
 *User 3 shows another rule of date_diff. January 31 to February 29 counts as 1 complete month, because a start on day 31 completes its month on the last day of a shorter month.*
@@ -458,6 +422,8 @@ from_unixtime(seconds, zone) turns an epoch number into a TIMESTAMP WITH TIME ZO
 
 Milliseconds become seconds with the fraction kept, so event 2 shows its 250 milliseconds.
 
+![Divided result](_images/dates_intermediate_switcher_3_1.png)
+
 ```sql
 SELECT
   event_id,
@@ -466,18 +432,11 @@ SELECT
 FROM app_events
 ```
 
-Result:
-
-```
-event_id | event_ms | event_at
-1 | 1710513045000 | 2024-03-15 14:30:45 UTC
-2 | 1710513045250 | 2024-03-15 14:30:45.25 UTC
-3 | 1710460800000 | 2024-03-15 00:00:00 UTC
-```
-
 **Int divide**
 
 BIGINT division truncates before the conversion, so event 2 loses its 250 milliseconds.
+
+![Int divide result](_images/dates_intermediate_switcher_3_2.png)
 
 ```sql
 SELECT
@@ -486,33 +445,17 @@ SELECT
 FROM app_events
 ```
 
-Result:
-
-```
-event_id | event_at
-1 | 2024-03-15 14:30:45 UTC
-2 | 2024-03-15 14:30:45 UTC
-3 | 2024-03-15 00:00:00 UTC
-```
-
 **Not divided**
 
 Read as seconds, a milliseconds value lands beyond the year 50,000.
+
+![Not divided result](_images/dates_intermediate_switcher_3_3.png)
 
 ```sql
 SELECT
   event_id,
   FROM_UNIXTIME(CAST(event_ms AS DOUBLE), 'UTC') AS event_at
 FROM app_events
-```
-
-Result:
-
-```
-event_id | event_at
-1 | NULL
-2 | NULL
-3 | NULL
 ```
 
 > Questions to ask of an epoch column
@@ -603,6 +546,8 @@ A monthly revenue report is a GROUP BY on date parts. The grouping has to includ
 
 Two Marches fold into 1 row: 5 orders and 200 of revenue from 2 different years.
 
+![Month only result](_images/dates_intermediate_switcher_4_1.png)
+
 ```sql
 SELECT
   EXTRACT(MONTH FROM ordered_at) AS order_month,
@@ -613,17 +558,11 @@ GROUP BY EXTRACT(MONTH FROM ordered_at)
 ORDER BY order_month
 ```
 
-Result:
-
-```
-order_month | order_count | revenue
-2 | 1 | 25
-3 | 5 | 200
-```
-
 **Year + month**
 
 With the year in the key, March 2023 shows 2 orders and 100, and March 2024 shows 3 orders and 100.
+
+![Year + month result](_images/dates_intermediate_switcher_4_2.png)
 
 ```sql
 SELECT
@@ -634,15 +573,6 @@ SELECT
 FROM orders
 GROUP BY EXTRACT(YEAR FROM ordered_at), EXTRACT(MONTH FROM ordered_at)
 ORDER BY order_year, order_month
-```
-
-Result:
-
-```
-order_year | order_month | order_count | revenue
-2023 | 3 | 2 | 100
-2024 | 2 | 1 | 25
-2024 | 3 | 3 | 100
 ```
 
 
@@ -705,6 +635,8 @@ Grouping on 2 number columns per period leaves output that is clumsy to sort and
 
 Each date moves back to its Monday, so 3 orders from February 26 to March 3 share the week of February 26.
 
+![Week start result](_images/dates_intermediate_switcher_5_1.png)
+
 ```sql
 WITH dated AS (
   SELECT
@@ -722,18 +654,11 @@ GROUP BY DATE_ADD('day', 1 - DAY_OF_WEEK(order_date), order_date)
 ORDER BY week_start
 ```
 
-Result:
-
-```
-week_start | order_count | revenue
-2024-02-26 | 3 | 70
-2024-03-04 | 1 | 40
-2024-03-11 | 1 | 25
-```
-
 **Month start**
 
 Each date moves back to the 1st, so the 4 March orders share March 1 and the February order stands alone.
+
+![Month start result](_images/dates_intermediate_switcher_5_2.png)
 
 ```sql
 WITH dated AS (
@@ -750,14 +675,6 @@ SELECT
 FROM dated
 GROUP BY DATE_ADD('day', 1 - DAY(order_date), order_date)
 ORDER BY month_start
-```
-
-Result:
-
-```
-month_start | order_count | revenue
-2024-02-01 | 1 | 20
-2024-03-01 | 4 | 115
 ```
 
 The week of February 26 holds orders from both February and March, which is why weekly and monthly totals never line up row for row.

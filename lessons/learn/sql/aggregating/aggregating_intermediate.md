@@ -26,6 +26,8 @@ GROUP BY sets how many rows survive: 1 per distinct combination of the grouped c
 
 amount + 5 runs on each of the 6 orders, so 6 rows come back, 1 per order.
 
+![Row-level result](_images/aggregating_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   order_id,
@@ -34,21 +36,11 @@ SELECT
 FROM orders
 ```
 
-Result:
-
-```
-order_id | amount | amount_with_fee
-1 | 120 | 125
-2 | 80 | 85
-3 | 60 | 65
-4 | 300 | 305
-5 | 40 | 45
-6 | 90 | 95
-```
-
 **Aggregate**
 
 COUNT and SUM fold all 6 orders into a single row: 6 orders worth 690.
+
+![Aggregate result](_images/aggregating_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -57,16 +49,11 @@ SELECT
 FROM orders
 ```
 
-Result:
-
-```
-order_count | total
-6 | 690
-```
-
 **Grouped**
 
 GROUP BY customer_id folds the 6 orders into 3 rows, 1 per customer.
+
+![Grouped result](_images/aggregating_intermediate_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -75,15 +62,6 @@ SELECT
   SUM(amount) AS total
 FROM orders
 GROUP BY customer_id
-```
-
-Result:
-
-```
-customer_id | order_count | total
-C1 | 3 | 270
-C2 | 2 | 120
-C3 | 1 | 300
 ```
 
 
@@ -298,6 +276,8 @@ A standard error is a band, and around 2 estimates in 3 land inside it; almost a
 
 COUNT(DISTINCT) builds a set of user ids per artist and returns 4 listeners for Bolt, 3 for Aria and 2 for Cove.
 
+![Exact result](_images/aggregating_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   artist,
@@ -307,18 +287,11 @@ GROUP BY artist
 ORDER BY listeners DESC
 ```
 
-Result:
-
-```
-artist | listeners
-Bolt | 4
-Aria | 3
-Cove | 2
-```
-
 **Approximate**
 
 APPROX_DISTINCT builds a sketch per artist instead; on 12 rows it lands on the same 4, 3 and 2.
+
+![Approximate result](_images/aggregating_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -329,18 +302,11 @@ GROUP BY artist
 ORDER BY listeners DESC
 ```
 
-Result:
-
-```
-artist | listeners
-Bolt | 4
-Aria | 3
-Cove | 2
-```
-
 **Tighter**
 
 A second argument of 0.01 asks for a 1% standard error, which buys a larger sketch and the same answer here.
+
+![Tighter result](_images/aggregating_intermediate_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -349,15 +315,6 @@ SELECT
 FROM streams
 GROUP BY artist
 ORDER BY listeners DESC
-```
-
-Result:
-
-```
-artist | listeners
-Bolt | 4
-Aria | 3
-Cove | 2
 ```
 
 | ✓ Do | ✗ Don't |
@@ -412,6 +369,8 @@ You can sort by an alias, by the aggregate expression written again, by the posi
 
 ORDER BY the alias total_spent, which exists because SELECT runs before ORDER BY.
 
+![Alias result](_images/aggregating_intermediate_switcher_3_1.png)
+
 ```sql
 SELECT
   customer_id,
@@ -422,18 +381,11 @@ GROUP BY customer_id
 ORDER BY total_spent DESC
 ```
 
-Result:
-
-```
-customer_id | order_count | total_spent
-C3 | 1 | 300
-C1 | 3 | 270
-C2 | 2 | 120
-```
-
 **Expression**
 
 ORDER BY SUM(amount) repeats the aggregate; the engine computes it once and reuses it.
+
+![Expression result](_images/aggregating_intermediate_switcher_3_2.png)
 
 ```sql
 SELECT
@@ -445,18 +397,11 @@ GROUP BY customer_id
 ORDER BY SUM(amount) DESC
 ```
 
-Result:
-
-```
-customer_id | order_count | total_spent
-C3 | 1 | 300
-C1 | 3 | 270
-C2 | 2 | 120
-```
-
 **Position**
 
 ORDER BY 3 names the third selected column, total_spent, by its position.
+
+![Position result](_images/aggregating_intermediate_switcher_3_3.png)
 
 ```sql
 SELECT
@@ -468,18 +413,11 @@ GROUP BY customer_id
 ORDER BY 3 DESC
 ```
 
-Result:
-
-```
-customer_id | order_count | total_spent
-C3 | 1 | 300
-C1 | 3 | 270
-C2 | 2 | 120
-```
-
 **Unselected**
 
 ORDER BY SUM(amount) sorts by a total the result never shows: C3, C1, C2 with only their counts.
+
+![Unselected result](_images/aggregating_intermediate_switcher_3_4.png)
 
 ```sql
 SELECT
@@ -488,15 +426,6 @@ SELECT
 FROM orders
 GROUP BY customer_id
 ORDER BY SUM(amount) DESC
-```
-
-Result:
-
-```
-customer_id | order_count
-C3 | 1
-C1 | 3
-C2 | 2
 ```
 
 *Position numbers refer to the SELECT list of the same query, so adding a column before total_spent silently changes what ORDER BY 3 sorts by.*

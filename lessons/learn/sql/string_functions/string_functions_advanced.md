@@ -107,6 +107,8 @@ Spacing causes the quietest failures. Hand-written log lines often put a space a
 
 Splitting on ';' leaves the following space at the front of every later key, so this read has to ask for ' status', space first.
 
+![Raw ; result](_images/string_functions_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   line_id,
@@ -114,17 +116,11 @@ SELECT
 FROM app_log
 ```
 
-Result:
-
-```
-line_id | status
-1 | 502
-2 | 200
-```
-
 **REPLACE**
 
 REPLACE turns every '; ' into ';' before the split, so the keys come out clean and ['status'] works.
+
+![REPLACE result](_images/string_functions_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -133,31 +129,17 @@ SELECT
 FROM app_log
 ```
 
-Result:
-
-```
-line_id | status
-1 | 502
-2 | 200
-```
-
 **Wider delim**
 
 A delimiter can be several characters long. Splitting on '; ' works while every line puts exactly 1 space after each semicolon.
+
+![Wider delim result](_images/string_functions_advanced_switcher_1_3.png)
 
 ```sql
 SELECT
   line_id,
   SPLIT_TO_MAP(line, '; ', '=')['status'] AS status
 FROM app_log
-```
-
-Result:
-
-```
-line_id | status
-1 | 502
-2 | 200
 ```
 
 Whichever version the data calls for, the arguments keep their jobs: the text first, then the delimiter between entries, then the one between each key and its value. Swapping the last 2 on `'page=2&size=50'` makes it split on `=` instead. Ahead of `2&size` and `50` comes the entry `page`, which holds no `&`, so the query fails. Every value still comes back as VARCHAR, so a number read from the map needs a CAST before any arithmetic.
@@ -456,6 +438,8 @@ A hash function such as `SHA256(bytes)` returns its digest as 32 bytes of VARBIN
 
 Comparing the uppercase TO_HEX output with the lowercase text returns false for both rows, although the 2 digests describe identical bytes.
 
+![String = result](_images/string_functions_advanced_switcher_2_1.png)
+
 ```sql
 SELECT
   event_id,
@@ -464,17 +448,11 @@ SELECT
 FROM signatures
 ```
 
-Result:
-
-```
-event_id | hex_chars | digest_matches
-evt_101 | 64 | 0
-evt_102 | 64 | 0
-```
-
 **LOWER**
 
 Lowercasing the computed side puts both strings in the same case, and the comparison holds.
+
+![LOWER result](_images/string_functions_advanced_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -484,17 +462,11 @@ SELECT
 FROM signatures
 ```
 
-Result:
-
-```
-event_id | hex_chars | digest_matches
-evt_101 | 64 | 1
-evt_102 | 64 | 1
-```
-
 **Bytes =**
 
 FROM_HEX turns both texts back into bytes and compares those, so case stops mattering. Against a live hash, the right side is the SHA256 output itself.
+
+![Bytes = result](_images/string_functions_advanced_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -502,14 +474,6 @@ SELECT
   LENGTH(sent_digest) AS hex_chars,
   FROM_HEX(sent_digest) = FROM_HEX(computed_hex) AS digest_matches
 FROM signatures
-```
-
-Result:
-
-```
-event_id | hex_chars | digest_matches
-evt_101 | 64 | 1
-evt_102 | 64 | 1
 ```
 
 | ✓ Base64 | ✗ Hex |

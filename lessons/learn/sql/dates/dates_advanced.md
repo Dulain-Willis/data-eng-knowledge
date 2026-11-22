@@ -47,34 +47,24 @@ A fixed offset such as `-06:00` applies the same shift all year. A named zone su
 
 The named zone reads 01:30 before the jump and 03:30 after it: 1 hour of UTC time covers 2 hours of Chicago clock, because 02:00 to 03:00 never happened that night.
 
+![Named zone result](_images/dates_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   TIMESTAMP '2024-03-10 07:30:00 UTC' AT TIME ZONE 'America/Chicago' AS before_jump,
   TIMESTAMP '2024-03-10 08:30:00 UTC' AT TIME ZONE 'America/Chicago' AS after_jump
 ```
 
-Result:
-
-```
-before_jump | after_jump
-2024-03-10 01:30:00 America/Chicago | 2024-03-10 03:30:00 America/Chicago
-```
-
 **Fixed offset**
 
 The offset reads 01:30 and 02:30, and 02:30 is a time no Chicago clock showed on March 10, 2024.
+
+![Fixed offset result](_images/dates_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
   TIMESTAMP '2024-03-10 07:30:00 UTC' AT TIME ZONE '-06:00' AS before_jump,
   TIMESTAMP '2024-03-10 08:30:00 UTC' AT TIME ZONE '-06:00' AS after_jump
-```
-
-Result:
-
-```
-before_jump | after_jump
-2024-03-10 01:30:00 -06:00 | 2024-03-10 02:30:00 -06:00
 ```
 
 The jump in March has a mirror in November. On November 3, 2024, Chicago clocks reached 2:00 a.m. and fell back to 1:00 a.m., so every minute between 1:00 and 2:00 happened twice. Converting from UTC still gives a single answer per instant, as these 2 readings taken an hour apart show.
@@ -185,6 +175,8 @@ Grouping by `month(ordered_at)`, from the intermediate lesson, returns 3 for eve
 
 Returns 1 row: month 3 with 4 orders, placed a year apart and counted together.
 
+![month() result](_images/dates_advanced_switcher_2_1.png)
+
 ```sql
 SELECT
   MONTH(ordered_at) AS order_month,
@@ -194,16 +186,11 @@ GROUP BY MONTH(ordered_at)
 ORDER BY order_month
 ```
 
-Result:
-
-```
-order_month | orders
-3 | 4
-```
-
 **date_trunc**
 
 Returns 2 rows, 2023-03-01 and 2024-03-01, each with 2 orders.
+
+![date_trunc result](_images/dates_advanced_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -212,14 +199,6 @@ SELECT
 FROM orders
 GROUP BY DATE_TRUNC('month', ordered_at)
 ORDER BY order_month
-```
-
-Result:
-
-```
-order_month | orders
-2023-03-01 00:00:00 | 2
-2024-03-01 00:00:00 | 2
 ```
 
 The GROUP BY repeats the whole `date_trunc` expression because GROUP BY runs before the SELECT list names `order_month`. Change the unit string and the same query counts at another grain, such as week or quarter. Every key stays a timestamp, so later steps can filter on it or format it.
@@ -349,32 +328,22 @@ The text `03/04/2024` means March 4 to a US system and April 3 to most of Europe
 
 Reads month then day and returns 2024-03-04.
 
+![Month first result](_images/dates_advanced_switcher_3_1.png)
+
 ```sql
 SELECT
   DATE_PARSE('03/04/2024', '%m/%d/%Y') AS parsed
-```
-
-Result:
-
-```
-parsed
-2024-03-04 00:00:00
 ```
 
 **Day first**
 
 Reads day then month and returns 2024-04-03, a month later, with no error raised.
 
+![Day first result](_images/dates_advanced_switcher_3_2.png)
+
 ```sql
 SELECT
   DATE_PARSE('03/04/2024', '%d/%m/%Y') AS parsed
-```
-
-Result:
-
-```
-parsed
-2024-04-03 00:00:00
 ```
 
 > **TIP**
@@ -643,6 +612,8 @@ A formatted date is a `VARCHAR`, and text sorts character by character. `Apr` co
 
 Alphabetical order: Apr, Feb, Jan, Mar, Nov.
 
+![By label result](_images/dates_advanced_switcher_4_1.png)
+
 ```sql
 SELECT
   DATE_FORMAT(month_start, '%b %Y') AS month_label,
@@ -651,20 +622,11 @@ FROM monthly
 ORDER BY month_label
 ```
 
-Result:
-
-```
-month_label | revenue
-Apr 2024 | 101
-Feb 2024 | 95
-Jan 2024 | 120
-Mar 2024 | 143
-Nov 2024 | 160
-```
-
 **By date**
 
 Calendar order: Jan, Feb, Mar, Apr, Nov, because the sort reads the date.
+
+![By date result](_images/dates_advanced_switcher_4_2.png)
 
 ```sql
 SELECT
@@ -672,17 +634,6 @@ SELECT
   revenue
 FROM monthly
 ORDER BY month_start
-```
-
-Result:
-
-```
-month_label | revenue
-Jan 2024 | 120
-Feb 2024 | 95
-Mar 2024 | 143
-Apr 2024 | 101
-Nov 2024 | 160
 ```
 
 > **TIP**

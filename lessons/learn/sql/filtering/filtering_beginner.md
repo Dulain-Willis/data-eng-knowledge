@@ -109,6 +109,8 @@ This time 5 rows pass, and they are the exact 5 that failed the first query: Ose
 
 Exact match keeps the 3 Engineering rows.
 
+![Match result](_images/filtering_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   emp_name,
@@ -117,18 +119,11 @@ FROM employees
 WHERE department = 'Engineering'
 ```
 
-Result:
-
-```
-emp_name | department
-Chen | Engineering
-Patel | Engineering
-Kim | Engineering
-```
-
 **Exclude**
 
 The same literal with != keeps the other 5.
+
+![Exclude result](_images/filtering_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -138,20 +133,11 @@ FROM employees
 WHERE department != 'Engineering'
 ```
 
-Result:
-
-```
-emp_name | department
-Osei | Marketing
-Tanaka | Marketing
-Ruiz | Sales
-Adams | Sales
-Novak | HR
-```
-
 **Lowercase**
 
 One lowercase letter and the match finds 0 rows.
+
+![Lowercase result](_images/filtering_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -159,12 +145,6 @@ SELECT
   department
 FROM employees
 WHERE department = 'engineering'
-```
-
-Result:
-
-```
-emp_name | department
 ```
 
 The third version is the mistake that costs the most time in practice, because the query runs without complaint and returns an empty result. The syntax is valid. The literal `'engineering'` matches none of the 8 stored values, so the result is correct and useless at the same time. When a text filter returns 0 rows unexpectedly, the first thing to check is the spelling and casing of the literal against the values the column really holds, which a quick `SELECT department FROM employees` with no filter will show.

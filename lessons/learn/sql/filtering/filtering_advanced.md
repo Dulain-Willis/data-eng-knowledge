@@ -151,6 +151,8 @@ The status check belongs inside the subquery. There it redefines which partner r
 
 Stores with no order of any kind. Fern Studio and Pixel Prints come back.
 
+![No orders result](_images/filtering_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   st.store_id,
@@ -164,17 +166,11 @@ WHERE NOT EXISTS (
 )
 ```
 
-Result:
-
-```
-store_id | store_name
-2 | Fern Studio
-4 | Pixel Prints
-```
-
 **No paid**
 
 Stores with no paid order. Tidal Tees joins them, since its only order was refunded.
+
+![No paid result](_images/filtering_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -190,18 +186,11 @@ WHERE NOT EXISTS (
 )
 ```
 
-Result:
-
-```
-store_id | store_name
-2 | Fern Studio
-4 | Pixel Prints
-5 | Tidal Tees
-```
-
 **Paid only**
 
 Stores with a paid order and no refunded one. Only North Knits passes both checks.
+
+![Paid only result](_images/filtering_advanced_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -222,13 +211,6 @@ WHERE EXISTS (
     WHERE od.store_id = st.store_id
       AND od.status = 'refunded'
   )
-```
-
-Result:
-
-```
-store_id | store_name
-3 | North Knits
 ```
 
 The third version shows why these filters compose well: each EXISTS or NOT EXISTS is an independent yes-or-no check on the same outer row, so you combine them with AND and OR, grouped by parentheses, the way you would any other condition. Maple Mugs fails there because refunded order 102 makes its NOT EXISTS FALSE.
@@ -330,6 +312,8 @@ For store 2, the NOT EXISTS subquery tests each order in turn: 1 = 2 is FALSE, 1
 
 Returns 0 rows: the NULL store_id makes every non-matching comparison unknown.
 
+![NOT IN result](_images/filtering_advanced_switcher_2_1.png)
+
 ```sql
 SELECT
   store_id,
@@ -342,15 +326,11 @@ WHERE store_id NOT IN (
 )
 ```
 
-Result:
-
-```
-store_id | store_name
-```
-
 **NOT EXISTS**
 
 Returns Fern Studio and Pixel Prints, the 2 stores with no orders.
+
+![NOT EXISTS result](_images/filtering_advanced_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -365,17 +345,11 @@ WHERE NOT EXISTS (
 )
 ```
 
-Result:
-
-```
-store_id | store_name
-2 | Fern Studio
-4 | Pixel Prints
-```
-
 **IN**
 
 Returns 0 rows: the NULL store_id makes every non-matching comparison unknown.
+
+![IN result](_images/filtering_advanced_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -387,12 +361,6 @@ WHERE store_id NOT IN (
     store_id
   FROM orders
 )
-```
-
-Result:
-
-```
-store_id | store_name
 ```
 
 > NULL sources that break exclusion filters

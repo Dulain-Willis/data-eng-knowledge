@@ -118,6 +118,8 @@ The examples below run 3 formulations over the same tables. The orders table sto
 
 Customer identifier to customer identifier, integer to integer. Four matched pairs.
 
+![Right key result](_images/joins_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   c.name,
@@ -128,19 +130,11 @@ INNER JOIN orders AS o
   ON c.customer_id = o.customer_id
 ```
 
-Result:
-
-```
-name | order_id | total
-Alice | 101 | 50
-Alice | 102 | 30
-Bob | 103 | 75
-Carol | 104 | 20
-```
-
 **Wrong key**
 
 Order identifier to customer identifier. The query runs, and no pair passes.
+
+![Wrong key result](_images/joins_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -152,15 +146,11 @@ INNER JOIN orders AS o
   ON c.customer_id = o.order_id
 ```
 
-Result:
-
-```
-name | order_id | total
-```
-
 **Cast text**
 
 The text copy of the customer identifier, cast to an integer before the comparison.
+
+![Cast text result](_images/joins_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -170,16 +160,6 @@ SELECT
 FROM customers AS c
 INNER JOIN orders AS o
   ON c.customer_id = CAST(o.customer_code AS INTEGER)
-```
-
-Result:
-
-```
-name | order_id | total
-Alice | 101 | 50
-Alice | 102 | 30
-Bob | 103 | 75
-Carol | 104 | 20
 ```
 
 The first and third versions return the same 4 rows, because `CAST(o.customer_code AS INTEGER)` turns `'1'` into 1 and the comparison proceeds on integers. The second returns 0 rows: no order number between 101 and 104 equals a customer number between 1 and 4, and nothing in the engine knew the condition was meaningless. On production tables the same mistake returns a result set that looks reasonable and is random.

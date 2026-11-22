@@ -483,6 +483,8 @@ Both paths count, per playlist, the tracks longer than 180 seconds. The UNNEST p
 
 Each playlist row is answered in place, and playlist 103's empty array returns 0.
 
+![lambdas result](_images/complex_data_advanced_switcher_1_1.png)
+
 ```sql
 SELECT
   playlist_id,
@@ -491,18 +493,11 @@ FROM playlists
 ORDER BY playlist_id
 ```
 
-Result:
-
-```
-playlist_id | long_tracks
-101 | 2
-102 | 2
-103 | 0
-```
-
 **unnest**
 
 Rows are grouped back by playlist, and playlist 103 has no rows to group, so it is missing.
+
+![unnest result](_images/complex_data_advanced_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -512,14 +507,6 @@ FROM playlists AS p
 CROSS JOIN UNNEST(p.durations_sec) AS t(sec)
 GROUP BY p.playlist_id
 ORDER BY p.playlist_id
-```
-
-Result:
-
-```
-playlist_id | long_tracks
-101 | 2
-102 | 2
 ```
 
 Playlists 101 and 102 show 2 long tracks in both versions. The row that vanishes from the second version is the dangerous part: any average, ratio or join built on it excludes every playlist with an empty array, and nothing in the output says so.

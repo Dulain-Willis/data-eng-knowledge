@@ -28,22 +28,19 @@ The table can answer 3 different questions with `SUM`, and the clause around it 
 
 Collapses all 6 rows into 1 total.
 
+![Plain SUM result](_images/window_functions_beginner_switcher_1_1.png)
+
 ```sql
 SELECT
   SUM(salary) AS total_payroll
 FROM employees
 ```
 
-Result:
-
-```
-total_payroll
-605000
-```
-
 **GROUP BY**
 
 Collapses the 6 rows into 1 per department, 3 in all.
+
+![GROUP BY result](_images/window_functions_beginner_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -54,18 +51,11 @@ GROUP BY department
 ORDER BY department
 ```
 
-Result:
-
-```
-department | dept_total
-Engineering | 250000
-Marketing | 185000
-Sales | 170000
-```
-
 **SUM OVER ()**
 
 Keeps all 6 rows and attaches the company total to each.
+
+![SUM OVER () result](_images/window_functions_beginner_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -75,18 +65,6 @@ SELECT
   SUM(salary) OVER () AS total_payroll
 FROM employees
 ORDER BY employee_id
-```
-
-Result:
-
-```
-emp_name | department | salary | total_payroll
-Alice | Engineering | 120000 | 605000
-Carol | Engineering | 130000 | 605000
-Dave | Sales | 80000 | 605000
-Eve | Sales | 90000 | 605000
-Frank | Marketing | 95000 | 605000
-Grace | Marketing | 90000 | 605000
 ```
 
 The repeated 605,000 in the third version looks wrong to a spreadsheet eye, but it follows directly from how the window is defined. The window for an empty `OVER ()` is every row the query holds at that point, so `SUM` reads all 6 salaries once, arrives at 605,000, and the engine writes that value into the new column on all 6 rows. Each row's value is computed from the window that row belongs to, and no row borrows the figure from a neighbour. Once the total is on the row, ordinary arithmetic can use it: `100.0 * salary / SUM(salary) OVER ()` gives Carol 21.5 percent of payroll and Dave 13.2 percent, in the same `SELECT` list, with no second query.

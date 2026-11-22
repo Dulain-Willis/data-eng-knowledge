@@ -34,6 +34,8 @@ Listings 103 and 104 get NULL for `has_wifi`, and that NULL causes trouble once 
 
 Negates contains directly. Both listings without wifi hold a NULL slot, both conditions are NULL, and the result is empty.
 
+![NOT contains result](_images/complex_data_intermediate_switcher_1_1.png)
+
 ```sql
 WITH listings AS (
   SELECT
@@ -49,15 +51,11 @@ FROM listings
 WHERE NOT CONTAINS(amenities, 'wifi')
 ```
 
-Result:
-
-```
-listing_id | amenities
-```
-
 **COALESCE**
 
 Replaces NULL with false before the NOT, so listings 103 and 104 pass the filter.
+
+![COALESCE result](_images/complex_data_intermediate_switcher_1_2.png)
 
 ```sql
 WITH listings AS (
@@ -72,14 +70,6 @@ SELECT
   amenities
 FROM listings
 WHERE NOT COALESCE(CONTAINS(amenities, 'wifi'), FALSE)
-```
-
-Result:
-
-```
-listing_id | amenities
-103 | ["kitchen",null,"parking"]
-104 | ["hot_tub","kitchen",null]
 ```
 
 
@@ -636,6 +626,8 @@ Numbers come out as text, and text compares character by character. Sorting gues
 
 Sorts VARCHAR values: listing 102 with 10 guests lands last.
 
+![Text sort result](_images/complex_data_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   JSON_EXTRACT_SCALAR(payload, '$.listing_id') AS listing_id,
@@ -644,19 +636,11 @@ FROM listing_events
 ORDER BY max_guests DESC
 ```
 
-Result:
-
-```
-listing_id | max_guests
-104 | 6
-101 | 4
-103 | 2
-102 | 10
-```
-
 **Cast first**
 
 Sorts INTEGER values: listing 102 comes first.
+
+![Cast first result](_images/complex_data_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -667,16 +651,6 @@ SELECT
   ) AS max_guests
 FROM listing_events
 ORDER BY max_guests DESC
-```
-
-Result:
-
-```
-listing_id | max_guests
-102 | 10
-104 | 6
-101 | 4
-103 | 2
 ```
 
 CAST stops the whole query when one value will not convert, and event 4's price is TBD. `TRY_CAST` returns NULL for that row and lets the others through. Wrapped around the extraction, it gives a column that aggregates cleanly, and `COUNT` over that column reports how many rows had a usable price.

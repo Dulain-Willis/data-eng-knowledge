@@ -145,6 +145,8 @@ Parentheses override the rule: whatever sits inside them resolves before anythin
 
 No parentheses, so AND groups first and OR joins the group to the spending test.
 
+![Implicit result](_images/filtering_intermediate_switcher_1_1.png)
+
 ```sql
 SELECT
   user_id,
@@ -157,19 +159,11 @@ WHERE country = 'US'
   OR total_spent > 1000
 ```
 
-Result:
-
-```
-user_id | country | status | total_spent
-user_42 | US | active | 500
-user_89 | US | active | 750
-user_156 | CA | inactive | 1200
-user_203 | UK | inactive | 1500
-```
-
 **Grouped**
 
 Parentheses around the OR, so every kept row must be from the US.
+
+![Grouped result](_images/filtering_intermediate_switcher_1_2.png)
 
 ```sql
 SELECT
@@ -185,17 +179,11 @@ WHERE country = 'US'
   )
 ```
 
-Result:
-
-```
-user_id | country | status | total_spent
-user_42 | US | active | 500
-user_89 | US | active | 750
-```
-
 **Explicit**
 
 Parentheses that match the default reading and return the same rows as the first tab.
+
+![Explicit result](_images/filtering_intermediate_switcher_1_3.png)
 
 ```sql
 SELECT
@@ -209,16 +197,6 @@ WHERE (
     AND status = 'active'
   )
   OR total_spent > 1000
-```
-
-Result:
-
-```
-user_id | country | status | total_spent
-user_42 | US | active | 500
-user_89 | US | active | 750
-user_156 | CA | inactive | 1200
-user_203 | UK | inactive | 1500
 ```
 
 The grouped version returns 2 rows, users 42 and 89, since now every kept row must be from the US. The third version returns the same 4 rows as the first, and that is its value: parentheses that match the default reading change nothing in the result and spare the next reader from recalling the rule. A reviewer scanning the first version has to know the rule to know what it returns; a reviewer scanning the third does not.
@@ -290,6 +268,8 @@ The listings table below holds 6 titles. The 3 versions search it with a prefix 
 
 Titles that begin with Lake, with anything or nothing after it.
 
+![Prefix result](_images/filtering_intermediate_switcher_2_1.png)
+
 ```sql
 SELECT
   listing_id,
@@ -299,18 +279,11 @@ FROM listings
 WHERE title LIKE 'Lake%'
 ```
 
-Result:
-
-```
-listing_id | title | city
-1 | Lakeview Cabin | Tahoe
-2 | Lakeside Loft | Austin
-6 | Lake | Geneva
-```
-
 **Contains**
 
 Titles with Lake anywhere, still case sensitive.
+
+![Contains result](_images/filtering_intermediate_switcher_2_2.png)
 
 ```sql
 SELECT
@@ -321,19 +294,11 @@ FROM listings
 WHERE title LIKE '%Lake%'
 ```
 
-Result:
-
-```
-listing_id | title | city
-1 | Lakeview Cabin | Tahoe
-2 | Lakeside Loft | Austin
-3 | Downtown Lake Studio | Chicago
-6 | Lake | Geneva
-```
-
 **Any first**
 
 Titles whose second to fourth characters are ake, whatever the first character is.
+
+![Any first result](_images/filtering_intermediate_switcher_2_3.png)
 
 ```sql
 SELECT
@@ -342,16 +307,6 @@ SELECT
   city
 FROM listings
 WHERE title LIKE '_ake%'
-```
-
-Result:
-
-```
-listing_id | title | city
-1 | Lakeview Cabin | Tahoe
-2 | Lakeside Loft | Austin
-4 | lake house retreat | Tahoe
-6 | Lake | Geneva
 ```
 
 The prefix pattern returns 3 rows, and listing 6 is one of them: the title 'Lake' leaves nothing after the prefix, and % matches nothing without complaint. The contains pattern adds listing 3, where Lake sits mid-title, for 4 rows. The third pattern also returns 4 rows but swaps listing 3 for listing 4, because the underscore accepts the lower case l that the capital L in the other 2 patterns rejected. The underscore accepts the D in 'Downtown Lake Studio' too, but the next 3 characters are own where the pattern requires ake, and the Lake later in the title does not help, because the pattern has no leading %.
@@ -411,6 +366,8 @@ LIMIT cuts the result to its first n rows. OFFSET skips the first m rows before 
 
 Skip nothing and keep the first 3 rows of the sorted result.
 
+![Page 1 result](_images/filtering_intermediate_switcher_3_1.png)
+
 ```sql
 SELECT
   product_id,
@@ -422,18 +379,11 @@ LIMIT 3
 OFFSET 0
 ```
 
-Result:
-
-```
-product_id | name | price
-2 | Monitor | 310
-7 | Chair | 310
-5 | Headset | 120
-```
-
 **Page 2**
 
 Skip 3 rows and keep the next 3.
+
+![Page 2 result](_images/filtering_intermediate_switcher_3_2.png)
 
 ```sql
 SELECT
@@ -446,18 +396,11 @@ LIMIT 3
 OFFSET 3
 ```
 
-Result:
-
-```
-product_id | name | price
-3 | Keyboard | 90
-6 | Webcam | 90
-1 | Desk Lamp | 45
-```
-
 **Page 3**
 
 Skip 6 rows and keep whatever is left, up to 3.
+
+![Page 3 result](_images/filtering_intermediate_switcher_3_3.png)
 
 ```sql
 SELECT
@@ -468,14 +411,6 @@ FROM products
 ORDER BY price DESC, product_id
 LIMIT 3
 OFFSET 6
-```
-
-Result:
-
-```
-product_id | name | price
-4 | Mouse | 45
-8 | Cable | 12
 ```
 
 | page | OFFSET | LIMIT | product_id returned |
@@ -602,6 +537,8 @@ A timestamp column carries a time of day, and the bound TIMESTAMP '2024-03-31 00
 
 Both bounds included, with the upper bound at midnight on the last day of the quarter.
 
+![BETWEEN result](_images/filtering_intermediate_switcher_4_1.png)
+
 ```sql
 SELECT
   event_id,
@@ -611,18 +548,11 @@ WHERE CAST(occurred_at AS TIMESTAMP) BETWEEN TIMESTAMP '2024-01-01 00:00:00'
 AND TIMESTAMP '2024-03-31 00:00:00'
 ```
 
-Result:
-
-```
-event_id | occurred_at
-1 | 2024-01-01 00:00:00
-2 | 2024-02-14 09:15:00
-3 | 2024-03-31 00:00:00
-```
-
 **Half-open**
 
 Lower bound included, upper bound excluded and set to the first instant of the next quarter.
+
+![Half-open result](_images/filtering_intermediate_switcher_4_2.png)
 
 ```sql
 SELECT
@@ -631,16 +561,6 @@ SELECT
 FROM events
 WHERE CAST(occurred_at AS TIMESTAMP) >= TIMESTAMP '2024-01-01 00:00:00'
   AND CAST(occurred_at AS TIMESTAMP) < TIMESTAMP '2024-04-01 00:00:00'
-```
-
-Result:
-
-```
-event_id | occurred_at
-1 | 2024-01-01 00:00:00
-2 | 2024-02-14 09:15:00
-3 | 2024-03-31 00:00:00
-4 | 2024-03-31 18:20:00
 ```
 
 The BETWEEN version returns 3 events and loses event 4, which happened at 18:20 on March 31, inside the quarter by any sensible definition. The half-open version returns 4. Its lower bound is included and its upper bound is excluded, set to the first instant of the next period, so every moment of March 31 passes. Event 5 at midnight on April 1 falls out of both, which is right, since it opens the next quarter. Writing the upper bound as 23:59:59 instead rescues whole seconds but still drops an event stamped 23:59:59.500.
