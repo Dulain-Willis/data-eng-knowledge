@@ -127,5 +127,15 @@
   "python_data_structures": "learn/python/data_structures",
   "python_problem_solving": "learn/python/problem_solving",
   "python_complexity": "learn/python/complexity",
-  "python_functional": "learn/python/functional_programming"
+  "python_functional": "learn/python/functional_programming",
+  "query_structure": "learn/sql/query_structure",
+  "data_types": "learn/sql/data_types",
+  "filtering": "learn/sql/filtering",
+  "aggregating": "learn/sql/aggregating",
+  "null_values": "learn/sql/null_values",
+  "joins": "learn/sql/joins",
+  "string_functions": "learn/sql/string_functions",
+  "dates": "learn/sql/dates",
+  "complex_data": "learn/sql/complex_data",
+  "window_functions": "learn/sql/window_functions"
 }
