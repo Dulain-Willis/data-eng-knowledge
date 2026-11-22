@@ -145,33 +145,93 @@ https://github.com/user-attachments/assets/0cf0753d-51b1-4951-95bb-8eefb5d981d2
 
 ### Where the condition sits changes the question
 
-The status check belongs inside the subquery. There it redefines which partner rows count, so a store whose only order was refunded has no paid partner and stays. A condition in the outer WHERE filters the stores themselves, and stores has no status column to test. Each of the 3 tabs below asks a different question of the same 2 tables, which this section aliases as st and od.
+The status check belongs inside the subquery. There it redefines which partner rows count, so a store whose only order was refunded has no paid partner and stays. A condition in the outer WHERE filters the stores themselves, and stores has no status column to test. Each of the 3 versions below asks a different question of the same 2 tables, which this section aliases as st and od.
+
+**No orders**
 
 Stores with no order of any kind. Fern Studio and Pixel Prints come back.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | st.store_id, |
-|  | st.store_name |
-|  | FROM stores AS st |
-|  | WHERE NOT EXISTS ( |
-|  | SELECT |
-|  | 1 |
-|  | FROM orders AS od |
-|  | WHERE od.store_id = st.store_id |
-|  | ) |
+```sql
+SELECT
+  st.store_id,
+  st.store_name
+FROM stores AS st
+WHERE NOT EXISTS (
+  SELECT
+    1
+  FROM orders AS od
+  WHERE od.store_id = st.store_id
+)
+```
 
-Result
+Result:
 
-| store_id | store_name |
-| --- | --- |
-| 2 | Fern Studio |
-| 4 | Pixel Prints |
+```
+store_id | store_name
+2 | Fern Studio
+4 | Pixel Prints
+```
 
-2 rows
+**No paid**
 
-The third tab shows why these filters compose well: each EXISTS or NOT EXISTS is an independent yes-or-no check on the same outer row, so you combine them with AND and OR, grouped by parentheses, the way you would any other condition. Maple Mugs fails there because refunded order 102 makes its NOT EXISTS FALSE.
+Stores with no paid order. Tidal Tees joins them, since its only order was refunded.
+
+```sql
+SELECT
+  st.store_id,
+  st.store_name
+FROM stores AS st
+WHERE NOT EXISTS (
+  SELECT
+    1
+  FROM orders AS od
+  WHERE od.store_id = st.store_id
+    AND od.status = 'paid'
+)
+```
+
+Result:
+
+```
+store_id | store_name
+2 | Fern Studio
+4 | Pixel Prints
+5 | Tidal Tees
+```
+
+**Paid only**
+
+Stores with a paid order and no refunded one. Only North Knits passes both checks.
+
+```sql
+SELECT
+  st.store_id,
+  st.store_name
+FROM stores AS st
+WHERE EXISTS (
+    SELECT
+      1
+    FROM orders AS od
+    WHERE od.store_id = st.store_id
+      AND od.status = 'paid'
+  )
+  AND NOT EXISTS (
+    SELECT
+      1
+    FROM orders AS od
+    WHERE od.store_id = st.store_id
+      AND od.status = 'refunded'
+  )
+```
+
+Result:
+
+```
+store_id | store_name
+3 | North Knits
+```
+
+The third version shows why these filters compose well: each EXISTS or NOT EXISTS is an independent yes-or-no check on the same outer row, so you combine them with AND and OR, grouped by parentheses, the way you would any other condition. Maple Mugs fails there because refunded order 102 makes its NOT EXISTS FALSE.
 
 
 <br>
@@ -266,26 +326,74 @@ https://github.com/user-attachments/assets/7de8c965-f723-4eee-a12f-bdf24d04453b
 
 For store 2, the NOT EXISTS subquery tests each order in turn: 1 = 2 is FALSE, 1 = 2 is FALSE, 3 = 2 is FALSE, 5 = 2 is FALSE and NULL = 2 is NULL. The inner WHERE also keeps only TRUE rows, so the subquery returns nothing and `NOT EXISTS` is TRUE. An unknown comparison can never make a subquery nonempty, so the NULL order has no effect. `IN` is safe for the opposite reason: it expands to comparisons joined by OR, and once a value matches, the OR is TRUE whatever else the list holds.
 
+**NOT IN**
+
 Returns 0 rows: the NULL store_id makes every non-matching comparison unknown.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | store_id, |
-|  | store_name |
-|  | FROM stores |
-|  | WHERE store_id NOT IN ( |
-|  | SELECT |
-|  | store_id |
-|  | FROM orders |
-|  | ) |
+```sql
+SELECT
+  store_id,
+  store_name
+FROM stores
+WHERE store_id NOT IN (
+  SELECT
+    store_id
+  FROM orders
+)
+```
 
-Result
+Result:
 
-| store_id | store_name |
-| --- | --- |
+```
+store_id | store_name
+```
 
-0 rows
+**NOT EXISTS**
+
+Returns Fern Studio and Pixel Prints, the 2 stores with no orders.
+
+```sql
+SELECT
+  store_id,
+  store_name
+FROM stores
+WHERE NOT EXISTS (
+  SELECT
+    *
+  FROM orders
+  WHERE orders.store_id = stores.store_id
+)
+```
+
+Result:
+
+```
+store_id | store_name
+2 | Fern Studio
+4 | Pixel Prints
+```
+
+**IN**
+
+Returns 0 rows: the NULL store_id makes every non-matching comparison unknown.
+
+```sql
+SELECT
+  store_id,
+  store_name
+FROM stores
+WHERE store_id NOT IN (
+  SELECT
+    store_id
+  FROM orders
+)
+```
+
+Result:
+
+```
+store_id | store_name
+```
 
 > NULL sources that break exclusion filters
 >
