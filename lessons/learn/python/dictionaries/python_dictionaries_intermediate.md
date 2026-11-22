@@ -316,7 +316,7 @@ print(record["meta"], full["items"] is record["items"])
 
 ### Copy at the boundary
 
-Functions are where shared state bites. A dict passed as an argument is the caller's object, so a function that adds a field to it, or to anything nested inside it, edits the caller's data. A function that returns a modified record should copy each level it changes before changing it. The function below tags replayed events and was meant to leave its input alone.
+Functions are where shared state bites. A dict passed as an argument is the caller's object, so a function that adds a field to it, or to anything nested inside it, edits the caller's data. A function that returns a modified record should copy each level it changes before changing it.
 
 
 <br>

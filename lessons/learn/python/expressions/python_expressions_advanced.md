@@ -596,7 +596,7 @@ The walrus wraps the whole comparison, so wide holds True, and row_count > 2 mak
 
 </details>
 
-A pipeline step like this one usually breaks through a small edit, and most such edits are one of 3 slips: a guard moved to the right of the division it protects, so the division runs first; a revoke written with |, which can only turn bits on, where & ~ was needed; and a float result checked with == after it took a different arithmetic path from its target. The next program contains one of each.
+A pipeline step like this one usually breaks through a small edit, and most such edits are one of 3 slips: a guard moved to the right of the division it protects, so the division runs first; a revoke written with |, which can only turn bits on, where & ~ was needed; and a float result checked with == after it took a different arithmetic path from its target.
 
 
 <br>

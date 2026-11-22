@@ -134,7 +134,7 @@ The set blocks the second b1 and the list records each first arrival in order.
 
 </details>
 
-The drill below depends on how each collection starts and grows. An empty list is `[]` and grows with `append`, which puts the item in the next free slot. An empty set is `set()`, since `{}` builds an empty dict, and it grows with `add`, which files the item by its value. A set has no `append` and a list has no `add`, so pairing a collection with the other one's method stops the program with an `AttributeError`.
+An empty list is `[]` and grows with `append`, which puts the item in the next free slot. An empty set is `set()`, since `{}` builds an empty dict, and it grows with `add`, which files the item by its value. A set has no `append` and a list has no `add`, so pairing a collection with the other one's method stops the program with an `AttributeError`.
 
 | Question | list | set |
 | --- | --- | --- |
@@ -617,7 +617,7 @@ The set blocks the second b1 and the list records each first arrival in order.
 
 </details>
 
-That capstone kept a set beside a list so each answered its own question. The next one hands you a need and no code. Run the 4 questions on it in order, and when 2 types both satisfy every answer, prefer the one that refuses what the program never does: a type that blocks an unwanted edit turns a silent mistake into an error on the line that made it.
+Run the 4 questions in order, and when 2 types both satisfy every answer, prefer the one that refuses what the program never does: a type that blocks an unwanted edit turns a silent mistake into an error on the line that made it.
 
 **A program stores the 7 day names and later reads the name for day number 3 with names[3]. The program never edits the day names after they are stored. Which collection fits best?**
 
