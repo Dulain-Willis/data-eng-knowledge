@@ -45,7 +45,7 @@ def frames(path):
     H = round(int(h[1]) * W / int(h[0])) if len(h) == 2 else 0
     H -= H % 2  # scale=-2 rounds to even
     size = W * H
-    return [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)][:FRAMES], H
+    return ([raw[i * size:(i + 1) * size] for i in range(len(raw) // size)][:FRAMES] if size else []), H
 
 
 def counter_box(fr, H):
@@ -86,7 +86,7 @@ def reads_one(fr, box):
 
 def problems(path):
     fs, H = frames(path)
-    if len(fs) < FRAMES:
+    if not H or len(fs) < FRAMES:
         return ["t=0: video shorter than 1 s or unreadable"]
     out = []
     for k, fr in enumerate(fs):

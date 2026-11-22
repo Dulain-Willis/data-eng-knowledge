@@ -35,7 +35,7 @@ The one-line `gather` draft from the backfill question schedules every fetch at 
 
 Try it before playing the run below. The 6 pages share a `Semaphore(2)`, and page `p` sleeps `0.1 * p` seconds to stand in for network latency. Predict which page starts third, what every `in flight` count reads after the first 2 starts, and what the last line prints.
 
-https://github.com/user-attachments/assets/3be00020-caab-4cb3-a751-42b897bdb47f
+https://github.com/user-attachments/assets/5024223e-0c11-4cc6-96aa-4d23c050ade7
 
 *Semaphore(2) over 6 pages: the in-flight count never passes 2.*
 
@@ -274,7 +274,7 @@ An `async def` function that contains `yield` is an async generator. Calling it 
 
 In the run below, `FakeCursor` serves 10 rows and the batch size is 4. Before playing it, predict the order of the `fetched` and `loaded` lines, the size of the last batch, and the total.
 
-https://github.com/user-attachments/assets/496fe159-59aa-422b-8640-0b76ddeee742
+https://github.com/user-attachments/assets/e2fedaef-d822-4cf3-93a1-bca5e8da7336
 
 *Only 1 batch of at most 4 rows exists at a time while 10 rows stream through.*
 

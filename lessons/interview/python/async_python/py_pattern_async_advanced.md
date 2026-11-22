@@ -28,7 +28,7 @@ The question usually arrives as a failure story: a loader fans out 24 hourly par
 
 The animation below runs both shapes on Python 3.9, which predates `TaskGroup`. The first half uses plain `gather`. The second half hand-rolls the TaskGroup contract with `asyncio.wait` and `FIRST_EXCEPTION`: wait for the first failure, cancel every task still pending, wait for those cancellations to land, then re-raise. Predict the 4 printed lines before you play it.
 
-https://github.com/user-attachments/assets/3a61a777-6e69-48d0-bd15-b09b391acdb6
+https://github.com/user-attachments/assets/abaa039f-4743-4ba5-9ebb-e089a6a4bfaa
 
 `b wrote rows` prints after `gather raised`: the orphan finished its write while the caller sat in its error handler. In the group version, `d cancelled` prints before `group raised`, because the group refuses to return until every child has stopped. That ordering is the contract: by the time the error reaches you, nothing from the batch is still running.
 

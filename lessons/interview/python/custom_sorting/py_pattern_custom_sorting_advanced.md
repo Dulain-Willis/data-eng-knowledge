@@ -49,7 +49,7 @@ The counts come out as `[1, 2, 1, 2]`, and the running total turns them into sta
 
 A 32-bit `advertiser_id` has over 4 billion possible values, far too many for a single counting pass, but it is also exactly 4 bytes. Least-significant-digit radix sort runs a stable counting sort on one digit at a time, lowest digit first. With 8-bit digits each pass has 256 buckets, and 4 passes cover the key. Correctness rests on stability: after the pass on digit d, records are ordered by their lowest d digits, and the pass on digit d + 1 keeps that order among records that tie on the new digit. The animation uses base 10 and 3-digit keys so every pass fits on screen.
 
-https://github.com/user-attachments/assets/bbea7c53-804e-474b-9e5a-263cf4c22034
+https://github.com/user-attachments/assets/c1f4f77d-d3cb-4d83-9f71-3834e2635db9
 
 *Each pass buckets by one decimal digit, ones first; appending to buckets keeps every pass stable.*
 
@@ -167,7 +167,7 @@ Sorting the clicks once leaves a longer-lived decision: which order the files ke
 
 Each column goes to the layer that matches its shape. Partitioning on `advertiser_id` would create a directory per advertiser per day, millions of small files that cost more to list and open than they save, while `click_date` yields 365 directories a year. Sorting on `click_id` would let support lookups prune perfectly, but each lookup fetches a single row, while each of the 400 daily fraud reviews would otherwise scan a whole day; the sort key goes to the workload whose skipped bytes add up to the most. That choice leaves `click_id` random within every row group, so each group's `click_id` min and max span nearly the full range and the statistics rule nothing out. That gap is what the Bloom filter fills.
 
-https://github.com/user-attachments/assets/3669c1cd-f1f5-43fd-afc7-9fd2327b85ee
+https://github.com/user-attachments/assets/20f1002d-368a-476b-8f73-121acae3788e
 
 *Advertiser IDs in row groups of 3: count the groups whose min/max range overlaps 40 to 49, first unsorted, then sorted.*
 
@@ -224,7 +224,7 @@ A sorting network is a fixed list of compare-exchange steps on fixed positions: 
 
 SIMD instructions apply one operation to every lane of a vector register. A 256-bit register holds 8 32-bit integers, and a vector min or max produces 8 lane-wise results in one instruction. Load 8 registers and run the 8-input network across them, register against register, and the 19 comparators become 38 instructions that sort 8 independent groups of 8 keys, one group per lane. The animation shrinks this to 4 registers of 4 lanes with the 5-comparator network. Each register is a row; read the result down each column.
 
-https://github.com/user-attachments/assets/bc20eefd-8bf1-486c-8e61-6f75d6d83c78
+https://github.com/user-attachments/assets/07b46186-1ce7-4fef-842f-761cfbe8edab
 
 *Rows are registers and columns are lanes; each comparator is one lane-wise min and one lane-wise max.*
 
@@ -291,7 +291,7 @@ The question usually arrives as 'should we sort this table?', and every algorith
 
 Return to the clicks table: 2 TB a day, with scans priced at an assumed $5 per TB. Sorting each day by `advertiser_id` adds about $120 of compute. Sorting by `region` costs around $90. It still range-partitions on a composite key such as `(region, click_id)`, since 8 distinct values alone would load 8 of the 100 reducers with 250 GB each, and the $30 saving comes only from the shorter local key: one counting pass over 8 regions where a 32-bit key needs 4 radix passes. Without a sort, fraud review and the dashboard scan the full day. Sorting by `advertiser_id` cuts each fraud review to 0.05 TB, and sorting by `region` cuts each dashboard run to roughly 0.3 TB, a bit over its 1/8 share because regions differ in size. Each support lookup reads its 131 row groups, about 0.0168 TB, under every layout, since the `click_id` Bloom filters stay in all 3.
 
-https://github.com/user-attachments/assets/e4e4d788-659d-4b67-aa04-2a601127bf6d
+https://github.com/user-attachments/assets/19cb525a-5748-45e2-ae45-63f161ab9d9c
 
 *Daily cost of each candidate layout: read spend across all 3 workloads plus the cost of the sort.*
 
