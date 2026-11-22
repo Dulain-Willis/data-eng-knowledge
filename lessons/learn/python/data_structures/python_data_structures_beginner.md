@@ -567,7 +567,7 @@ The questions narrow the field one at a time. Take a version number such as 3.9.
 
 Real tasks mix types, and the mix follows the same questions. The animation walks a list of click events, uses a set to remember which users have already appeared, and builds a list of each user's first event. The list preserves arrival order, the set answers `not in` without scanning, and the dict inside each event holds that event's fields by name.
 
-https://github.com/user-attachments/assets/c2a2f96f-9aa7-4a5c-bc11-baa69e3e76e1
+https://github.com/user-attachments/assets/25a5d8d6-f469-4ed6-b2bc-c5fe49447dac
 
 *From 5 events by 3 distinct users, the list ends with exactly one event per user, in the order they first appeared.*
 

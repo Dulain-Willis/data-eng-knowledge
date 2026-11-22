@@ -203,7 +203,7 @@ for play in plays:
 
 A dict goes straight to the value stored under a key without walking the other entries. So spend 1 pass over the catalog building index, a dict that maps each track_id to its track record. Then make 1 pass over the plays, each doing a single index.get(play["track_id"]). Because .get returns None for a missing key, a play that points at an unknown track shows up as a missing match instead of stopping the loop with a KeyError.
 
-https://github.com/user-attachments/assets/7d562e5a-ae4b-4b0a-9142-e0ca4a0966e4
+https://github.com/user-attachments/assets/6394c484-7d79-4275-9a87-d1919a459735
 
 *Build the index from tracks once, then look up each play; play 104 finds nothing.*
 

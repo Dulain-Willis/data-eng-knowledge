@@ -542,7 +542,7 @@ The `calls` list shows which calls ran the body: 3 of the 5 did, and the other 2
 
 Generators, map and filter all return iterators: objects that compute their next item only when something calls next() on them. Chain them, and each stage pulls from the stage before it. The consumer at the end requests a single item, the request travels back to the source, that item travels forward through every stage, and the source produces nothing more until the next request.
 
-https://github.com/user-attachments/assets/f20b23e3-12b8-4c3f-b90c-121e71f30487
+https://github.com/user-attachments/assets/d0a2b7a8-0f86-4a71-84dc-581f00853357
 
 *Each next() pulls a single event through both stages; cy:0 is never read because nothing asks for it*
 

@@ -18,7 +18,7 @@ A **two-pointer** solution keeps 2 indexes into one sequence and moves them base
 
 A palindrome reads the same in both directions: character 0 must equal the last character, character 1 must equal the second to last, and so on inward. Put `left` at the start and `right` at the end, compare the 2 characters, then step both pointers toward the middle. The first mismatch ends the check, and if the pointers meet without one, every mirrored pair matched.
 
-https://github.com/user-attachments/assets/28e18ec2-884c-41b5-9a0b-9cf5bb37f106
+https://github.com/user-attachments/assets/f213603d-d8ff-4f3a-8bc8-37055081731d
 
 On `"racecar"` the loop starts by comparing indexes 0 and 6, then moves inward 1 step at a time to 1 and 5 and finally to 2 and 4. After that `left` and `right` both sit at 3, the `while` test fails, and the middle `e` needs no partner. On `"hello"` the very first comparison of `h` against `o` returns `False`. The 3 letters between them are never read.
 

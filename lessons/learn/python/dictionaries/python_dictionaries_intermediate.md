@@ -256,7 +256,7 @@ Complete the loop so every event prints its city or `unknown`, including the eve
 
 A dict of lists answers questions like which orders each customer placed. The loop needs a list under the key before it can append, and `setdefault(key, [])` supplies it: on a customer's first order it stores a new empty list and returns it, and on every later order it returns the list already stored. `.append` then grows that stored list in place.
 
-https://github.com/user-attachments/assets/44c6bcf5-d315-4caf-bf58-629112c85c94
+https://github.com/user-attachments/assets/46ab971d-5b37-485e-9433-29b9e246821e
 
 *setdefault stores an empty list on a customer's first order and returns the stored list every time after.*
 
