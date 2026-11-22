@@ -184,7 +184,7 @@ That split decides where each line belongs. Code in the decorator's own body run
 
 The animation decorates 2 functions, `load_orders` through the assignment and `load_users` through `@`, then calls both. Watch `calls` grow as each wrapper runs, and check the last printed line: after decoration, `load_orders.__name__` is the wrapper's name.
 
-https://github.com/user-attachments/assets/10927309-52be-41d3-95c4-c2aa64f5c015
+https://github.com/user-attachments/assets/75110e20-914a-4612-9b53-df59ea8e46f7
 
 *The assignment and the @ line give the same result: a wrapper bound to the original name.*
 

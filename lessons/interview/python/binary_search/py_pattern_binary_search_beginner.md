@@ -326,7 +326,7 @@ A rotated list has a single drop, the only place where a large value is followed
 | nums[lo] <= nums[mid] | left | nums[lo] <= target < nums[mid] | hi = mid - 1 | lo = mid + 1 |
 | otherwise | right | nums[mid] < target <= nums[hi] | lo = mid + 1 | hi = mid - 1 |
 
-https://github.com/user-attachments/assets/f8fd45d9-ec4c-414e-8253-af9f4a7de271
+https://github.com/user-attachments/assets/36899fc1-6597-41db-a03f-815a7c8c7139
 
 *Each pass finds the sorted half, then checks the target against its endpoints; the calls print 1, 4 and -1.*
 
