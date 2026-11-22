@@ -43,19 +43,27 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
-    "executable_spark", "executable_python", "regex_cards",
+    "executable_spark", "executable_python", "executable_sql", "regex_cards",
 }
 # Runnable cells: block type -> how the run control is found. Spark has a "Run" button and draws its
 # output with JavaScript; Python cells have a ">>>" button that reveals the output the page already holds.
-CELL_KINDS = ("executable_spark", "executable_python")
+CELL_KINDS = ("executable_spark", "executable_python", "executable_sql")
+CELL_FENCE = {"executable_spark": "python", "executable_python": "python", "executable_sql": "sql"}
 # Interactive exercise with no answers in the page, so what's left is a dangling question.
 # Dropped. (multiple_choice used to be here; its answers ARE in the page's embedded JSON.)
-SKIPPED_BLOCKS = {"schema_story", "placed_challenge"}  # placed_challenge: empty stub for Airflow exercises
+# placed_challenge: empty stub for Airflow exercises; sql_parsons: a drag-the-tiles exercise (Learn SQL), left out with the SQL exercises
+SKIPPED_BLOCKS = {"schema_story", "placed_challenge", "sql_parsons"}
 GENERIC_BLOCKS = {
     "lesson_title", "learning_objectives", "section_header", "h3", "body_text",
     "rich_text", "static_table", "side_by_side_tables", "comparison",
     "note_text", "rich_info_list", "h4", "full_width",
 }
+
+
+# Animation players: every "*_animation" block, plus table_visualization (Learn SQL, aggregating_beginner),
+# which is the same player under another block type name.
+ANIMATION_RE = re.compile(r"(_animation|^table_visualization)$")
+ANIMATION_SELECTOR = '[data-note-block-type$="_animation"], [data-note-block-type="table_visualization"]'
 
 
 def block_type(tag):
@@ -321,7 +329,7 @@ def tick_cross(soup, block, tokens):
     block.replace_with(marker)
 
 
-def spark_cell(soup, block, tokens, image_name, number):
+def spark_cell(soup, block, tokens, image_name, number, lang="python"):
     """A runnable PySpark cell: a screenshot of the cell after Run (tables, code and output), then the
     code as a ```python fence. The page draws the editor and result with JavaScript, so the image
     can only be a screenshot (see record_cells); the fence keeps the code as text, because long
@@ -338,7 +346,7 @@ def spark_cell(soup, block, tokens, image_name, number):
     shot = (f"![Run output {number}](_images/{image_name})" if image_name
             else f"[Run output {number}: not captured. Re-run with --screenshots]")
     token = f"@@SPARK-CELL-{len(tokens)}@@"
-    tokens[token] = f"{shot}\n\n```python\n{code}\n```"
+    tokens[token] = f"{shot}\n\n```{lang}\n{code}\n```"
     marker = soup.new_tag("p")
     marker.string = token
     block.replace_with(marker)
@@ -374,7 +382,7 @@ def animation_info(html):
     """
     soup = parse(html)
     out = []
-    for block in soup.find_all(attrs={"data-note-block-type": re.compile(r"_animation$")}):
+    for block in soup.find_all(attrs={"data-note-block-type": ANIMATION_RE}):
         labels = [b.get_text(strip=True) for b in block.find_all("button", attrs={"role": "radio"})]
         caption = ""
         for para in block.find_all("p"):
@@ -438,7 +446,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
-        if kind not in CUSTOM_BLOCKS | GENERIC_BLOCKS and not kind.endswith("_animation"):
+        if kind not in CUSTOM_BLOCKS | GENERIC_BLOCKS | SKIPPED_BLOCKS and not ANIMATION_RE.search(kind):
             print(f"warning: no rule for block type '{kind}'; used generic conversion",
                   file=sys.stderr)
         if kind in SKIPPED_BLOCKS:
@@ -468,7 +476,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         elif kind in CELL_KINDS:
             name = cells[cells_seen] if cells_seen < len(cells) else None
             cells_seen += 1
-            spark_cell(soup, block, tokens, name, cells_seen)
+            spark_cell(soup, block, tokens, name, cells_seen, CELL_FENCE[kind])
         elif kind == "static_code":
             code_block(soup, block)
         elif kind == "big_number":
@@ -485,7 +493,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             info_list(soup, block)
         elif kind in ("best_practices", "comparison"):
             tick_cross(soup, block, tokens)
-        elif kind.endswith("_animation"):
+        elif ANIMATION_RE.search(kind):
             info = animation_infos[animations_seen] if animations_seen < len(animation_infos) else {}
             animation(soup, block, tokens, info, (animations or {}).get(animations_seen))
             animations_seen += 1
@@ -1429,7 +1437,7 @@ def record_animation(browser, url, k, m, label, dest, box_css):
         page.wait_for_timeout(3000)
         page.evaluate("document.documentElement.style.zoom = 2")
         page.wait_for_timeout(1000)
-        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        block = page.locator(ANIMATION_SELECTOR).nth(k)
         # All setup happens while the player is still below the fold: the site starts playing the moment
         # the player scrolls into view, so that jump is the start of the recording (nothing of step 1 is lost).
         page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
@@ -1727,7 +1735,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         page.wait_for_timeout(3000)
         page.evaluate("document.documentElement.style.zoom = 2")
         page.wait_for_timeout(1000)
-        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        block = page.locator(ANIMATION_SELECTOR).nth(k)
         page.evaluate(_HIDE_PINNED)
         page.wait_for_timeout(300)
         gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
@@ -1831,7 +1839,7 @@ def record_animations(url, out_dir, slug, info, only=None):
             page = ctx.new_page()
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
             page.wait_for_timeout(3000)
-            block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+            block = page.locator(ANIMATION_SELECTOR).nth(k)
             block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
             try:  # Spark animations mount their controls only once in view
                 block.locator("button").first.wait_for(state="attached", timeout=10000)
@@ -1930,7 +1938,7 @@ _CELL_ERROR = re.compile(r"Traceback|Error\b|Exception\b", re.I)
 def _click_run(page, block, kind):
     """Press the cell's run control. Spark: the "Run" button, and the output is drawn by JavaScript, so
     wait until the cell text changes and then stays quiet for 1.5 s. Python: the ">>>" button reveals the
-    output the page already holds; wait until the cell grows taller. Returns (text before, text after)."""
+    output the page already holds; wait until the cell grows taller. SQL: the "Show result" icon button (see below). Returns (text before, text after)."""
     before = block.inner_text()
     if kind == "executable_spark":
         block.get_by_role("button", name="Run", exact=True).click()
@@ -1945,9 +1953,12 @@ def _click_run(page, block, kind):
                 break
         return before, last
     h0 = block.bounding_box()["height"]
-    buttons = block.get_by_role("button", name=">>>", exact=True)
+    # SQL: 3 icon-only buttons, "Animate this query", "Edit and run this query" and "Show result" (the
+    # table icon, third); "Show result" reveals the result the page already holds.
+    label = "Show result" if kind == "executable_sql" else ">>>"
+    buttons = block.get_by_role("button", name=label, exact=True)
     if buttons.count() != 1:
-        print(f"warning: cell has {buttons.count()} '>>>' buttons, expected 1", file=sys.stderr)
+        print(f"warning: cell has {buttons.count()} '{label}' buttons, expected 1", file=sys.stderr)
     buttons.first.click()
     began = time.monotonic()
     grew = False
@@ -1957,7 +1968,7 @@ def _click_run(page, block, kind):
             grew = True
             break
     if not grew:
-        print("warning: cell did not grow after '>>>' (output not revealed?)", file=sys.stderr)
+        print(f"warning: cell did not grow after '{label}' (output not revealed?)", file=sys.stderr)
     page.wait_for_timeout(1200)  # let the open animation finish
     return before, block.inner_text()
 
