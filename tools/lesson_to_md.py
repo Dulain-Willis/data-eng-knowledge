@@ -729,7 +729,7 @@ INCLUDE_AIRFLOW_EXERCISES = False
 # The dbt, Kafka, Spark and Python exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python", "sql"}
 
 
 def challenge_path(c):
@@ -1812,6 +1812,7 @@ def record_animations(url, out_dir, slug, info, only=None):
                 box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 name = f"{slug}_animation_{k + 1}.png"
+                page.evaluate(_HIDE_FIXED)  # the pinned "Ask AI" button would sit on top of the still
                 bb = block.bounding_box()
                 shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
                     "format": "png", "captureBeyondViewport": True, "clip": {

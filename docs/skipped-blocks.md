@@ -1,6 +1,6 @@
 # What the converter skips
 
-`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for all 120 lessons in `lessons/` plus the 45 Spark slugs and the 60 Interview Python slugs (Interview Python checked 2026-11-17). For all 120 lessons the count equals the "N challenges" number in the header line, and for the 90 learn/interview lessons it also equals the number of `Exercise k of N` entries in the file.
+`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for all 120 lessons in `lessons/` plus the 45 Spark slugs, the 60 Interview Python slugs (checked 2026-11-17) and the 48 Interview SQL slugs (checked 2026-11-21). For all 120 lessons the count equals the "N challenges" number in the header line, and for the 90 learn/interview lessons it also equals the number of `Exercise k of N` entries in the file.
 
 ## Exercises, by area
 
@@ -15,6 +15,7 @@
 | Kafka | 15 | 114 | `kafka`: log_cleanup 20, delivery_trace 19, replica_trace 16, read_the_tape 14, connector_config 13, assign_the_group 10, route_the_keys 8, durability_dial 6, lag_board 4, crash_point 3, schema_rollout 1 | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Learn: Spark | 45 | 600 | `spark`, no `form` key | **To be left out.** The Spark lessons are not in `main`, and the separate Spark PR was not open when checked (`gh pr list --state all` shows PRs 1 to 6 only; no Spark branch on the remote). |
 | Interview: Python | 60 | 169 | `python`, no `form` key; every one has `starter_code` with `{{ }}` blanks, `input_bindings` and `test_examples` (no seed tables, no tile bank) | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
+| Interview: SQL | 48 | 147 | `sql`, no `form` key; every one has `starter_sql` (99 with `{{ }}` blanks), `data_tables` and `sampleData` | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 
 - **Kept exercises** (574 in total) are one file per lesson, numbered continuously (`Exercise 1 of N` to `N of N`). Each has the task, the starting canvas if there is one, and the solution in a collapsed fold. Inline multiple-choice questions are not exercises; they stay in the lesson.
 - **Spark exercises** (600, 45 lessons x 3 tiers, none has a `form` key; all have PySpark `starter_code`):
@@ -95,6 +96,65 @@
   | `py_pattern_async_advanced` | async_python | 11 | 2 |
 
   </details>
+- **Interview SQL exercises** (147 in 48 lessons, 2 to 5 per lesson; all `sql`; 99 have `{{ }}` blanks in `starter_sql`, the other 48 are write-the-query tasks; all carry seed tables). Per lesson, with the animations each lesson keeps (counted as animation blocks on the live page):
+
+  <details><summary>Per-lesson counts</summary>
+
+  | Lesson | Card folder | Exercises left out | Animations kept |
+  |---|---|---|---|
+  | `sql_pattern_top_n_per_group_beginner` | top_n_per_group | 4 | 1 |
+  | `sql_pattern_top_n_per_group_intermediate` | top_n_per_group | 4 | 3 |
+  | `sql_pattern_top_n_per_group_advanced` | top_n_per_group | 4 | 3 |
+  | `sql_pattern_running_totals_beginner` | running_totals | 4 | 2 |
+  | `sql_pattern_running_totals_intermediate` | running_totals | 4 | 4 |
+  | `sql_pattern_running_totals_advanced` | running_totals | 5 | 3 |
+  | `sql_pattern_period_over_period_beginner` | period_over_period | 4 | 3 |
+  | `sql_pattern_period_over_period_intermediate` | period_over_period | 4 | 3 |
+  | `sql_pattern_period_over_period_advanced` | period_over_period | 2 | 2 |
+  | `sql_pattern_self_join_beginner` | self_join | 4 | 2 |
+  | `sql_pattern_self_join_intermediate` | self_join | 5 | 3 |
+  | `sql_pattern_self_join_advanced` | self_join | 2 | 3 |
+  | `sql_pattern_anti_join_beginner` | anti_join | 4 | 2 |
+  | `sql_pattern_anti_join_intermediate` | anti_join | 4 | 5 |
+  | `sql_pattern_anti_join_advanced` | anti_join | 2 | 4 |
+  | `sql_pattern_gaps_and_islands_beginner` | gaps_and_islands | 4 | 2 |
+  | `sql_pattern_gaps_and_islands_intermediate` | gaps_and_islands | 4 | 2 |
+  | `sql_pattern_gaps_and_islands_advanced` | gaps_and_islands | 2 | 4 |
+  | `sql_pattern_retention_beginner` | retention_queries | 4 | 1 |
+  | `sql_pattern_retention_intermediate` | retention_queries | 2 | 6 |
+  | `sql_pattern_retention_advanced` | retention_queries | 2 | 2 |
+  | `sql_pattern_conditional_agg_beginner` | conditional_aggregation | 4 | 5 |
+  | `sql_pattern_conditional_agg_intermediate` | conditional_aggregation | 4 | 3 |
+  | `sql_pattern_conditional_agg_advanced` | conditional_aggregation | 2 | 3 |
+  | `sql_pattern_multi_table_joins_beginner` | multi_table_joins | 4 | 3 |
+  | `sql_pattern_multi_table_joins_intermediate` | multi_table_joins | 2 | 2 |
+  | `sql_pattern_multi_table_joins_advanced` | multi_table_joins | 2 | 1 |
+  | `sql_pattern_ctes_beginner` | with_clauses | 4 | 3 |
+  | `sql_pattern_ctes_intermediate` | with_clauses | 2 | 2 |
+  | `sql_pattern_ctes_advanced` | with_clauses | 2 | 2 |
+  | `sql_pattern_null_handling_beginner` | null_handling | 5 | 3 |
+  | `sql_pattern_null_handling_intermediate` | null_handling | 2 | 5 |
+  | `sql_pattern_null_handling_advanced` | null_handling | 2 | 3 |
+  | `sql_pattern_date_arithmetic_beginner` | date_arithmetic | 4 | 4 |
+  | `sql_pattern_date_arithmetic_intermediate` | date_arithmetic | 2 | 2 |
+  | `sql_pattern_date_arithmetic_advanced` | date_arithmetic | 2 | 3 |
+  | `sql_pattern_string_manipulation_beginner` | string_manipulation | 2 | 3 |
+  | `sql_pattern_string_manipulation_intermediate` | string_manipulation | 2 | 2 |
+  | `sql_pattern_string_manipulation_advanced` | string_manipulation | 2 | 1 |
+  | `sql_pattern_deduplication_beginner` | deduplication | 4 | 5 |
+  | `sql_pattern_deduplication_intermediate` | deduplication | 2 | 1 |
+  | `sql_pattern_deduplication_advanced` | deduplication | 2 | 3 |
+  | `sql_pattern_type_casting_beginner` | type_casting | 2 | 1 |
+  | `sql_pattern_type_casting_intermediate` | type_casting | 2 | 6 |
+  | `sql_pattern_type_casting_advanced` | type_casting | 2 | 1 |
+  | `sql_pattern_semi_structured_beginner` | semi_structured_data | 4 | 1 |
+  | `sql_pattern_semi_structured_intermediate` | semi_structured_data | 4 | 1 |
+  | `sql_pattern_semi_structured_advanced` | semi_structured_data | 2 | 1 |
+
+  </details>
+
+  Totals: 147 exercises left out, 130 animation blocks kept (129 MP4 videos and 1 still image: `sql_pattern_ctes_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, like the four Spark still-image cases).
+  One sentence was trimmed by hand in the Markdown (not by the converter): in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. Re-running the converter on that lesson brings the clause back.
 - **Airflow today:** the `dag_repair` conversion code (20 exercises, in 4 lessons) still exists in `main()` but is switched off, so Airflow lessons contain no exercises. Reason recorded in the code: the exercises are buggy and Run/Submit need a login.
 - **Header line:** every lesson starts with `<tier>·<area> · N min · N challenges`. The converter leaves it as is, so for Airflow, dbt, Kafka (and Spark) lessons it states a number of exercises that are not in the file.
 
@@ -129,7 +189,7 @@ The two data-modeling entries do nothing today: `drops.json` is applied only whe
 | To change | Edit |
 |---|---|
 | Bring Airflow exercises back | `INCLUDE_AIRFLOW_EXERCISES` in `tools/lesson_to_md.py` (only `dag_repair` has conversion code; the other forms have none) |
-| Leave out (or bring back) a tool's exercises | `SKIPPED_TOOL_EXERCISES` (matched on `challenge_type`; currently `dbt`, `kafka`, `spark`, `python`) |
+| Leave out (or bring back) a tool's exercises | `SKIPPED_TOOL_EXERCISES` (matched on `challenge_type`; currently `dbt`, `kafka`, `spark`, `python`, `sql`) |
 | Drop a block type | `SKIPPED_BLOCKS` |
 | Drop one paragraph that points at a removed exercise | add an entry to `tools/drops.json` |
 | Drop the tool resources panel | the `[data-tool-partner-panel]` rule in `clean()` |
