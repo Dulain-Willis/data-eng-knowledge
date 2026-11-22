@@ -204,7 +204,7 @@ https://github.com/user-attachments/assets/07661615-7473-43e1-be56-dd3e39f3f63e
 
 **6 partitions**
 
-![6 partitions](_images/kafka_producers_advanced_animation_2_6-partitions.gif)
+https://github.com/user-attachments/assets/70120ea9-bfde-4656-8605-9d5d8b430def
 
 
 <br>
