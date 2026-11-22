@@ -412,37 +412,82 @@ The animation sorts 6 customers by `total_spent` descending and keeps 3.
 
 https://github.com/user-attachments/assets/622db2f0-90cb-4581-a733-c88b3a7d7c45
 
-Eve (1500), Ben (1250) and Cara (980) come out, in that order. The engine does not need to finish sorting the other 3 to produce them: a `LIMIT` above a sort lets the planner keep only the 3 largest values seen so far in a bounded heap, which is why `ORDER BY ... LIMIT 10` over 100 million rows finishes in seconds while a bare `ORDER BY` spills the whole table to disk. The switcher below runs 3 formulations over the same rows.
+Eve (1500), Ben (1250) and Cara (980) come out, in that order. The engine does not need to finish sorting the other 3 to produce them: a `LIMIT` above a sort lets the planner keep only the 3 largest values seen so far in a bounded heap, which is why `ORDER BY ... LIMIT 10` over 100 million rows finishes in seconds while a bare `ORDER BY` spills the whole table to disk. The examples below run 3 formulations over the same rows.
+
+**Top 3**
 
 Sort by spend, keep the 3 largest
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | name, |
-|  | total_spent |
-|  | FROM customers |
-|  | ORDER BY total_spent DESC |
-|  | LIMIT 3 |
+```sql
+SELECT
+  name,
+  total_spent
+FROM customers
+ORDER BY total_spent DESC
+LIMIT 3
+```
 
-Result
+Result:
 
-| name | total_spent |
-| --- | --- |
-| Eve | 1500 |
-| Ben | 1250 |
-| Cara | 980 |
+```
+name | total_spent
+Eve | 1500
+Ben | 1250
+Cara | 980
+```
 
-3 rows
+**No ORDER BY**
 
-The second tab drops the `ORDER BY`, and the 3 rows it returns are whichever 3 the engine read first, the stored order on a table this small. Eve, the top spender, is absent. On a production table the set changes from run to run, and a report built on it goes wrong silently, because 3 rows did come back. `LIMIT` without `ORDER BY` is a sample, never a ranking.
+Keep 3 rows with no order specified
+
+```sql
+SELECT
+  name,
+  total_spent
+FROM customers
+LIMIT 3
+```
+
+Result:
+
+```
+name | total_spent
+Ann | 420
+Ben | 1250
+Cara | 980
+```
+
+**Page 2**
+
+Skip the first page, then keep 3
+
+```sql
+SELECT
+  name,
+  total_spent
+FROM customers
+ORDER BY total_spent DESC
+LIMIT 3
+OFFSET 3
+```
+
+Result:
+
+```
+name | total_spent
+Finn | 760
+Ann | 420
+Dev | 310
+```
+
+The second version drops the `ORDER BY`, and the 3 rows it returns are whichever 3 the engine read first, the stored order on a table this small. Eve, the top spender, is absent. On a production table the set changes from run to run, and a report built on it goes wrong silently, because 3 rows did come back. `LIMIT` without `ORDER BY` is a sample, never a ranking.
 
 
 <br>
 
 ### Paging with OFFSET
 
-The third tab adds `OFFSET 3`: skip 3 rows of the sorted result, then take 3, so page 2 holds Finn (760), Ann (420) and Dev (310). Page k of size n is `LIMIT n OFFSET (k - 1) * n`. The engine still sorts and then discards the skipped rows, so page 1,000 at 50 rows a page is a 50,000-row sort and discard, and every later page costs more. Ties break the pages too: with 2 customers both at 760 and only `ORDER BY total_spent`, the engine may put either first on each run, so a customer can appear on page 2 and again on page 3, or on neither.
+The third version adds `OFFSET 3`: skip 3 rows of the sorted result, then take 3, so page 2 holds Finn (760), Ann (420) and Dev (310). Page k of size n is `LIMIT n OFFSET (k - 1) * n`. The engine still sorts and then discards the skipped rows, so page 1,000 at 50 rows a page is a 50,000-row sort and discard, and every later page costs more. Ties break the pages too: with 2 customers both at 760 and only `ORDER BY total_spent`, the engine may put either first on each run, so a customer can appear on page 2 and again on page 3, or on neither.
 
 The fix for ties is a unique tiebreaker column, almost always the primary key: `ORDER BY total_spent DESC, id`. The fix for deep pages is keyset pagination, which remembers the last row of the previous page and asks for the rows after it, so the engine seeks to that row instead of sorting and discarding everything above it.
 
