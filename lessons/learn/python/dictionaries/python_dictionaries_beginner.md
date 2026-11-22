@@ -359,7 +359,7 @@ print(len(cart))
 
 Exercise: [Removing Items](_exercises/python_dictionaries_beginner_exercise_3.md)
 
-Real programs mix the removal tools, and the order of the calls decides what each one finds. Trace this session cleanup line by line before you run it:
+Real programs mix the removal tools, and the order of the calls decides what each one finds. Trace this session cleanup line by line:
 
 ![Run output 10](_images/python_dictionaries_beginner_cell_10.png)
 

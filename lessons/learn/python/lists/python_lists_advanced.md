@@ -693,7 +693,7 @@ a is data, reversed in place; sorted made b a separate list before the reverse.
 
 Exercise: [A plan with undo](_exercises/python_lists_advanced_exercise_1.md)
 
-The last problems use everything from the earlier sections. You'll see shallow and deep copies, including one made by a comprehension, next to a stack of saved states and calls that either change a list or return a new one. Trace each name to the object it points at before you answer.
+This last problem uses everything from the earlier sections. It has shallow and deep copies, including one made by a comprehension, next to a stack of saved states and calls that either change a list or return a new one. Trace each name to the object it points at before you answer.
 
 **What does this program print?**
 

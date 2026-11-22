@@ -358,7 +358,7 @@
   </details>
 
   Totals: 811 exercises left out, 151 animation blocks kept (151 MP4 videos), 548 run cells kept as a screenshot of the whole cell after the `>>>` button was clicked plus the code as a ```` ```python ```` fence, 1 regex-cards block (`python_strings_advanced`) kept as a screenshot of the stacked cards plus the pattern text as bullets.
-- **Learn Python exercise placeholders (decided; replaces the PR #25 drop / keep / trim defaults).** The text that only referred to an exercise now lives in a placeholder file, and the lesson links to it where the exercise sat. Layout: `lessons/learn/python/<card>/_exercises/<slug>_exercise_<n>.md` (31 files in 10 card folders, same `_exercises/` convention as the other lessons; the real exercises are not mapped yet, so each file says so and holds the moved text). The lesson line is `Exercise: [name](_exercises/<slug>_exercise_<n>.md)`. Spots, moved text and the 8 sentence trims are kept by hand in `tools/python_exercises.json`; `tools/python_exercise_placeholders.py` applies them (idempotent) and `tools/lesson_to_md.py` calls it after writing any Learn Python lesson, so a re-run reproduces the committed result. Headings lose the word: `Practice` and `Capstones` headings are removed, `Capstone: X` / `Practice: X` become `X` (a heading the drop list had removed is put back as `X`). The 27 dropped blocks still come from `tools/drops.json` (comment key `_comment_python_learn`); their text is in the placeholders. Of the 56 PR #25 places, 35 (27 drops, 8 trims) moved to placeholders, 4 were heading-only (11, 51, 52, 54: heading renamed or removed, link added), and 17 stay in the lessons because they teach something or point at a question/run cell that is still in the lesson; the list is in `docs/OWNER-REVIEW.md` item 3. Multiple-choice questions and run cells are lesson content and stay inline.
+- **Learn Python exercise placeholders (decided; replaces the PR #25 drop / keep / trim defaults).** The text that only referred to an exercise now lives in a placeholder file, and the lesson links to it where the exercise sat. Layout: `lessons/learn/python/<card>/_exercises/<slug>_exercise_<n>.md` (31 files in 10 card folders, same `_exercises/` convention as the other lessons; the real exercises are not mapped yet, so each file says so and holds the moved text). The lesson line is `Exercise: [name](_exercises/<slug>_exercise_<n>.md)`. Spots, moved text and the 8 sentence trims are kept by hand in `tools/python_exercises.json`; `tools/python_exercise_placeholders.py` applies them (idempotent) and `tools/lesson_to_md.py` calls it after writing any Learn Python lesson, so a re-run reproduces the committed result. Headings lose the word: `Practice` and `Capstones` headings are removed, `Capstone: X` / `Practice: X` become `X` (a heading the drop list had removed is put back as `X`). The 27 dropped blocks still come from `tools/drops.json` (comment key `_comment_python_learn`); their text is in the placeholders. Of the 56 PR #25 places, 35 (27 drops, 8 trims) moved to placeholders, 4 were heading-only (11, 51, 52, 54: heading renamed or removed, link added), and 17 stay in the lessons because they teach something or point at a question/run cell that is still in the lesson. All 17 are now decided: 11 are fine as they are and 5 got repeatable sentence trims (places 10, 47, 50 and 53 changed text; 49 needed no edit), applied from `tools/python_exercises.json`; the script now raises if a trim's old text is missing and its new text is absent. Multiple-choice questions and run cells are lesson content and stay inline.
 
   <details><summary>Drops (27 places)</summary>
 
@@ -391,7 +391,7 @@
 
   </details>
 
-  <details><summary>Hand trims (8 places)</summary>
+  <details><summary>Hand trims (12 places)</summary>
 
   | Place | Lesson | Change |
   |---|---|---|
@@ -403,6 +403,10 @@
   | 29 | `python_problem_solving_beginner` | "... before the drill below hands you a version with a mistake in it:" became "... of this lesson:" |
   | 30 | `python_data_structures_beginner` | cut "The drill below depends on how each collection starts and grows." |
   | 36 | `python_data_structures_beginner` | cut "That capstone kept a set beside a list so each answered its own question. The next one hands you a need and no code."; "Run the 4 questions on it in order" became "Run the 4 questions in order" (so "it" does not dangle) |
+  | 10 | `python_foundations_intermediate` | "The capstone pulls the 5 sections" became "The script below pulls the 5 sections" |
+  | 47 | `python_strings_advanced` | cut " In that same width of 6, `/a` starts 2 characters in, with 2 spaces after it." (the paragraph now ends at "prints `\| GET \|`.") |
+  | 50 | `python_lists_advanced` | "The last problems use everything from the earlier sections. You'll see shallow and deep copies" became "This last problem uses everything from the earlier sections. It has shallow and deep copies" |
+  | 53 | `python_dictionaries_beginner` | "Trace this session cleanup line by line before you run it:" became "Trace this session cleanup line by line:" |
 
   </details>
 

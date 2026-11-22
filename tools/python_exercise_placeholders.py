@@ -16,6 +16,7 @@ Exercise fields (all optional except name and moved):
   heading_new   new heading line (null: the heading goes away, it was only "Practice"/"Capstone")
   before/after  prefix of the block the link goes before / after (default: where the heading was)
   trim          [[find, replace]] edits to the lesson text, for sentences cut out of longer paragraphs
+  trim_only     true: the entry only carries trims (no placement, no placeholder; keep it last)
   moved         text moved into the placeholder (dropped blocks and trimmed sentences)
 Headings that are left over ("### Practice", "### Practice: x", "### Capstone: x") get the same
 rule: the word goes, a bare heading is removed.
@@ -96,11 +97,15 @@ def apply_lesson(path, exercises=None):
     placed = 0
     for ex in exercises:
         for find, repl in ex.get("trim", []):
+            if find not in text and repl and repl not in text:
+                raise ValueError(f"{slug}: trim text not found (neither old nor new): {find!r}")
             text = text.replace(find, repl)
     blocks = parse_blocks(text)
     # positions are found on the untouched block list, then edited from the end backwards
     ops = []  # (index, kind, new blocks)
     for n, ex in enumerate(exercises, 1):
+        if ex.get("trim_only"):
+            continue  # sentence trims only, no placeholder
         rel = f"_exercises/{slug}_exercise_{n}.md"
         link = f"Exercise: [{ex['name']}]({rel})"
         if any(link in b for b, _ in blocks):

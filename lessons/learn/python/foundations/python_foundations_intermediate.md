@@ -560,7 +560,7 @@ The 2 work together. Try an expression in the shell until it gives the value you
 
 Exercise: [Trying Code in the Interactive Shell](_exercises/python_foundations_intermediate_exercise_5.md)
 
-The capstone pulls the 5 sections into one short script: an import, an indented block, a value standing in for user input, and a bug that produces a traceback. Predict the traceback first, then decide the fix.
+The script below pulls the 5 sections into one short script: an import, an indented block, a value standing in for user input, and a bug that produces a traceback. Predict the traceback first, then decide the fix.
 
 **The variable typed stands in for what input() returned. Where does this script fail, and what fixes it?**
 
