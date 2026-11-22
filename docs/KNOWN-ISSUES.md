@@ -10,9 +10,3 @@
 - Learn SQL tab screenshots (site's own UI; recorded as-is):
   - `aggregating_advanced_switcher_2_2.png` (Arrays, first tab): one result cell is truncated by the app (`rock=[Basalt, Ci…`).
   - `dates_intermediate_switcher_2_3.png` (Months tab): the last word of line 6 (`month_boundaries`) sits under the code box's buttons, so the bottom of the letters is covered.
-- `spark_storage_formats_advanced_animation_1` ends at step 10/19 with the diagram zoomed out (the site's own player; recorded as-is).
-- About 20 older animations show the tooltip "Replay" over the start of the final caption (cosmetic).
-- Four Spark animations and two SQL ones (`sql_pattern_ctes_advanced` animation 1, `complex_data_advanced` animation 1) are still PNGs: the live site never mounts their player.
-- Hand edits that a converter re-run would undo: the Learn SQL hand trims (9 cuts in 5 lessons, listed in `docs/skipped-blocks.md`), `sql_pattern_running_totals_beginner`, and the three Learn SQL exercise-reference moves. The Learn Python trims are repeatable (`tools/python_exercises.json`).
-- MP4s are not committed. Local copies are in `~/animation-mp4s/` only, so a lost hosted asset means re-recording.
-- Spark PR #8 was merged as a merge commit, so its old GIF blobs stay in history (repo about 714 MB stored).
