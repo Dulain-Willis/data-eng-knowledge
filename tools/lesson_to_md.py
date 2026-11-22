@@ -729,7 +729,7 @@ INCLUDE_AIRFLOW_EXERCISES = False
 # The dbt, Kafka, Spark and Python exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python", "sql"}
 
 
 def challenge_path(c):
