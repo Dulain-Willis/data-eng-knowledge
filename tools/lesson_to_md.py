@@ -1713,7 +1713,7 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
         webm = os.path.join(tmp, vids[0])
         pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
-        start = pres + (mark - mount_t)
+        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))  # a stubborn player: start a frame or two later
         live = last_seen - mark
         end = start + live + 2
         os.makedirs(os.path.dirname(dest), exist_ok=True)
