@@ -171,27 +171,75 @@ FROM hosts
 
 Every argument to CONCAT must be VARCHAR. Pass an INTEGER column straight in and the query fails with a type error before it reads a row, because the database will not guess whether 12 should become '12' or something else. CAST(listing_count AS VARCHAR) turns 12 into the 2-character string '12', and CONCAT accepts it. The 3 versions below build a label 3 ways over the same hosts table; the third one needs the CAST because listing_count is a number.
 
+**CONCAT**
+
 CONCAT with 3 arguments: the first name, a space, the last name.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | host_id, |
-|  | CONCAT(first_name, ' ', last_name) AS full_name |
-|  | FROM hosts |
+```sql
+SELECT
+  host_id,
+  CONCAT(first_name, ' ', last_name) AS full_name
+FROM hosts
+```
 
-Result
+Result:
 
-| host_id | full_name |
-| --- | --- |
-| 1 | Maria Lopez |
-| 2 | NULL |
-| 3 | Amara Okafor |
-| 4 | Lin Zhao |
+```
+host_id | full_name
+1 | Maria Lopez
+2 | NULL
+3 | Amara Okafor
+4 | Lin Zhao
+```
 
-4 rows
+**Pipes**
 
-The third tab shows 'Ken has 1 listings' with a plural that reads badly, and 'Lin has 0 listings' for a host with nothing published. Both strings are correct output: CONCAT assembles what it is given and applies no grammar. Deciding when to write 'listing' instead of 'listings' needs a conditional expression, which arrives in a later lesson.
+The || operator joining the same 3 pieces left to right, with the same result and the same NULL for Ken.
+
+```sql
+SELECT
+  host_id,
+  first_name || ' ' || last_name AS full_name
+FROM hosts
+```
+
+Result:
+
+```
+host_id | full_name
+1 | Maria Lopez
+2 | NULL
+3 | Amara Okafor
+4 | Lin Zhao
+```
+
+**With CAST**
+
+A sentence per host, where the integer listing_count becomes text through CAST before CONCAT sees it.
+
+```sql
+SELECT
+  host_id,
+  CONCAT(
+    first_name,
+    ' has ',
+    CAST(listing_count AS VARCHAR),
+    ' listings'
+  ) AS summary
+FROM hosts
+```
+
+Result:
+
+```
+host_id | summary
+1 | Maria has 3 listings
+2 | Ken has 1 listings
+3 | Amara has 12 listings
+4 | Lin has 0 listings
+```
+
+The third version shows 'Ken has 1 listings' with a plural that reads badly, and 'Lin has 0 listings' for a host with nothing published. Both strings are correct output: CONCAT assembles what it is given and applies no grammar. Deciding when to write 'listing' instead of 'listings' needs a conditional expression, which arrives in a later lesson.
 
 > **TIP**
 >
