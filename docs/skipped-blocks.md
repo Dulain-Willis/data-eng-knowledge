@@ -156,7 +156,7 @@
   </details>
 
   Totals: 147 exercises left out, 130 animation blocks kept (129 MP4 videos and 1 still image: `sql_pattern_ctes_advanced` animation 1 is a static animation: the site shows no player for this block (no steps), so it is a deliberate still, saved as a PNG of its code and seed table; the other 5 static animations are in `complex_data_advanced` and 4 Spark lessons, see `static_animation` in BLOCK-TYPES.md).
-  One sentence was trimmed by hand in the Markdown (not by the converter): in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. Re-running the converter on that lesson brings the clause back.
+  One sentence is cut by `tools/sql_exercises.json` rather than the drop mechanism: in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. The cut is an entry in `tools/sql_exercises.json`, applied by `tools/lesson_to_md.py` after the lesson is written, so a re-run keeps it.
 - **Learn SQL exercises** (515 in 30 lessons, 10 cards x 3 tiers; all `sql`). Per lesson, with the run cells (`executable_sql`, 191 in all) that stay, the drag-the-tiles blocks (`sql_parsons`) left out, the animation blocks kept (all MP4 except 1 still) and the tab blocks (`sql_switcher`, every tab kept as text, see below):
 
   <details><summary>Per-lesson counts</summary>
@@ -265,7 +265,7 @@
 
   </details>
 
-- **Learn SQL drops and trims.** Drops are in `tools/drops.json` under the comment key `_comment_sql_learn` (14 places): the drag-the-tiles puzzles and the prose that only introduces or explains them. The trims are hand edits of the Markdown in their own commit ("Learn SQL hand trims"); re-running the converter on those lessons brings the sentences back. Three Learn SQL spots that only referred to a dropped exercise were moved to placeholder files by hand, the same convention as Learn Python (`lessons/learn/sql/<card>/_exercises/<slug>_exercise_1.md`, not produced by the converter; re-running it on these lessons brings the sentences back): `aggregating_beginner` (the `profit` per region exercise and its explanation), `complex_data_advanced` (heading "Capstone: long tracks by id" is now "Long tracks by id"), `query_structure_advanced` (the "Assemble the subtraction" intro).
+- **Learn SQL drops and trims.** Drops are in `tools/drops.json` under the comment key `_comment_sql_learn` (14 places): the drag-the-tiles puzzles and the prose that only introduces or explains them. The sentences that only pointed at a removed exercise are cut by `tools/sql_exercises.json` (exact old and new text per place), applied by `tools/python_exercise_placeholders.py`, which `tools/lesson_to_md.py` runs after writing a Learn SQL lesson (the same mechanism as Learn Python; idempotent, and it raises if neither the old nor the new text is found), so a re-run of the converter reproduces them. Where only part of a paragraph pointed at an exercise, the pointing words are cut and the teaching words stay in the lesson (nothing goes to a placeholder). Where a whole block was exercise text, it was moved to a placeholder file (`lessons/learn/sql/<card>/_exercises/<slug>_exercise_<n>.md`, same format as Learn Python) with an `Exercise:` link where the exercise sat: `aggregating_beginner` (link only; the neighbouring `SUM(profit)` and `AVG(profit)` paragraph teaches and stays in the lesson, reworded to open with "With a `profit` and a `region` on each order"), `complex_data_advanced` (heading "Capstone: long tracks by id" is now "Long tracks by id"; the exercise description and the "final query" paragraph are in the placeholder), `query_structure_advanced` (the `EXCEPT ALL` sentence stays in the lesson, only "Arrange the tiles..." was cut; the "List every signup attempt..." description is in the placeholder).
 
   <details><summary>Drops (14 places)</summary>
 
@@ -288,7 +288,7 @@
 
   </details>
 
-  <details><summary>Hand trims (10 sentences in 5 lessons)</summary>
+  <details><summary>Hand trims (cut by tools/sql_exercises.json; 10 sentences in 5 lessons, plus the 3 placeholder spots above)</summary>
 
   | Lesson | Cut |
   |---|---|
@@ -304,7 +304,8 @@
 
   </details>
 
-  Left in on purpose, flagged for the owner's review: `data_types_beginner` "A `quantity` of 3 at a price of 19.99 returns 59.97..."; `aggregating_beginner` "`SUM(profit)` and `AVG(profit)` in the same row..."; `complex_data_advanced` h3 "Capstone: long tracks by id" with "The final query combines the lesson..."; `query_structure_beginner` "List those names after `SELECT` in the order the..."; `query_structure_advanced` "The signup table counts attempts..." (a headingless sentence after the dropped h3).
+  Left in on purpose, flagged for the owner's review: `data_types_beginner` "A `quantity` of 3 at a price of 19.99 returns 59.97..."; `query_structure_beginner` "List those names after `SELECT` in the order the...".
+
 
 - **Learn Python exercises** (811 in 42 lessons, 14 cards x 3 tiers; all `python`; 720 fill-in-the-blank, 152 of those with a `tile_bank`, 91 `debug`). Per lesson, with the animations each lesson keeps and the run cells (`executable_python`, 548 in all) that stay:
 

@@ -238,6 +238,8 @@ Any question shaped as what is in A and missing from B is an `EXCEPT`. A cleanin
 
 Sometimes the answer needs columns of the left row beyond the ones being compared, or a filter on the right side that the left does not share. In that case the `NOT EXISTS` form from the previous section does the same subtraction on a key and keeps every column of the outer row. Pick by what the output needs: `EXCEPT` for a row-level diff with no join to write, `NOT EXISTS` for a subtraction on a key that returns the full left row.
 
+The signup table counts attempts, so the query that lists unconfirmed attempts, including repeats, needs `EXCEPT ALL` and the sides in the right order.
+
 Exercise: [Assemble the subtraction](_exercises/query_structure_advanced_exercise_1.md)
 
 

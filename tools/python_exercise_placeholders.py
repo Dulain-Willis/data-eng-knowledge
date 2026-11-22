@@ -5,8 +5,8 @@ yet). Each spot where an exercise sat gets a link to a PLACEHOLDER file in the l
 _exercises/ folder, and the text that only referred to the exercise ("The drill below ...",
 "Capstone: ...") lives in that placeholder instead of the lesson body.
 
-The spots and the moved text are kept by hand in tools/python_exercises.json
-({slug: [exercise, ...]}). lesson_to_md.py calls apply_lesson() after it writes a Learn Python
+The spots and the moved text are kept by hand in tools/python_exercises.json and, for Learn SQL
+and the one Interview SQL lesson, tools/sql_exercises.json ({slug: [exercise, ...]}; same format). lesson_to_md.py calls apply_lesson() after it writes a Learn Python
 lesson, so a re-run of the converter reproduces the committed result; it can also be run on its
 own (idempotent):  python3 tools/python_exercise_placeholders.py [lessons/learn/python]
 
@@ -17,7 +17,9 @@ Exercise fields (all optional except name and moved):
   before/after  prefix of the block the link goes before / after (default: where the heading was)
   trim          [[find, replace]] edits to the lesson text, for sentences cut out of longer paragraphs
   trim_only     true: the entry only carries trims (no placement, no placeholder; keep it last)
-  moved         text moved into the placeholder (dropped blocks and trimmed sentences)
+  moved         text moved into the placeholder (dropped blocks and trimmed sentences; [] when the
+                trimmed words are partial edits of text that stays in the lesson)
+  empty_note    placeholder sentence used when moved is empty (default: the spot was a heading only)
 Headings that are left over ("### Practice", "### Practice: x", "### Capstone: x") get the same
 rule: the word goes, a bare heading is removed.
 """
@@ -27,7 +29,7 @@ import re
 import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SPEC_FILE = os.path.join(HERE, "python_exercises.json")
+SPEC_FILES = [os.path.join(HERE, "python_exercises.json"), os.path.join(HERE, "sql_exercises.json")]
 LEFTOVER = re.compile(r"^(#{2,6}) (?:Practice|Capstones?)(?:: (.+))?$")
 
 
@@ -81,23 +83,36 @@ def placeholder_text(slug, title, ex):
         for m in moved:
             out += [m, ""]
     else:
-        out += ["No lesson text was moved here: the spot was a heading only.", ""]
+        out += [ex.get("empty_note") or "No lesson text was moved here: the spot was a heading only.", ""]
     return "\n".join(out)
+
+
+def load_spec():
+    """All exercise specs by lesson slug (Python, Learn SQL and the one Interview SQL lesson)."""
+    spec = {}
+    for p in SPEC_FILES:
+        with open(p, encoding="utf-8") as f:
+            spec.update(json.load(f))
+    return spec
 
 
 def apply_lesson(path, exercises=None):
     """Rewrite one lesson file and write its placeholders. Returns the number of exercises placed."""
     slug = os.path.basename(path)[:-3]
     if exercises is None:
-        with open(SPEC_FILE, encoding="utf-8") as f:
-            exercises = json.load(f).get(slug, [])
+        exercises = load_spec().get(slug, [])
+    if not exercises:
+        return 0  # no entry for this lesson: leave the file alone
     text = open(path, encoding="utf-8").read()
     title = lesson_title(text)
     folder = os.path.join(os.path.dirname(path), "_exercises")
     placed = 0
-    for ex in exercises:
+    for n, ex in enumerate(exercises, 1):
+        # once the exercise is placed its trims have run (a heading may have been renamed since)
+        placed_already = (not ex.get("trim_only")
+                          and f"Exercise: [{ex['name']}](_exercises/{slug}_exercise_{n}.md)" in text)
         for find, repl in ex.get("trim", []):
-            if find not in text and repl and repl not in text:
+            if find not in text and repl and repl not in text and not placed_already:
                 raise ValueError(f"{slug}: trim text not found (neither old nor new): {find!r}")
             text = text.replace(find, repl)
     blocks = parse_blocks(text)
@@ -163,14 +178,18 @@ def apply_lesson(path, exercises=None):
 
 
 def main():
-    root = sys.argv[1] if len(sys.argv) > 1 else os.path.join(HERE, "..", "lessons", "learn", "python")
-    with open(SPEC_FILE, encoding="utf-8") as f:
-        spec = json.load(f)
+    root = sys.argv[1] if len(sys.argv) > 1 else None
+    spec = load_spec()
     total = 0
-    for d, _, files in sorted(os.walk(root)):
-        for name in sorted(files):
-            if name.endswith(".md") and os.path.basename(d) != "_exercises":
-                total += apply_lesson(os.path.join(d, name), spec.get(name[:-3], []))
+    roots = [root] if len(sys.argv) > 1 else [
+        os.path.join(HERE, "..", "lessons", "learn", "python"),
+        os.path.join(HERE, "..", "lessons", "learn", "sql"),
+        os.path.join(HERE, "..", "lessons", "interview", "sql")]
+    for root in roots:
+        for d, _, files in sorted(os.walk(root)):
+            for name in sorted(files):
+                if name.endswith(".md") and os.path.basename(d) != "_exercises" and name[:-3] in spec:
+                    total += apply_lesson(os.path.join(d, name), spec[name[:-3]])
     print(f"{total} placeholder(s) written")
 
 
