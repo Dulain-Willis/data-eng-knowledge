@@ -2353,8 +2353,11 @@ def main():
         f.write(convert(html, images, sections, animations, drop_refs,
                        load_drops(slug), cells, regex_images, switchers))
     os.replace(tmp_path, path)
-    if os.sep + os.path.join("learn", "python") + os.sep in os.path.abspath(path):
-        # Learn Python: exercise spots become links to placeholder files (tools/python_exercises.json)
+    if any(os.sep + os.path.join(*d) + os.sep in os.path.abspath(path)
+           for d in (("learn", "python"), ("learn", "sql"), ("interview", "sql"))):
+        # Learn Python, Learn SQL, Interview SQL: exercise spots become links to placeholder files and
+        # hand trims are re-applied (tools/python_exercises.json, tools/sql_exercises.json); lessons
+        # without an entry are left alone
         sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
         from python_exercise_placeholders import apply_lesson
         n = apply_lesson(path)

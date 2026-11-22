@@ -6,6 +6,4 @@ Lesson: [query_structure_advanced.md](../query_structure_advanced.md)
 
 ## Text moved from the lesson
 
-The signup table counts attempts, so the query that lists unconfirmed attempts, including repeats, needs `EXCEPT ALL` and the sides in the right order. Arrange the tiles. Two of them do not belong.
-
 List every signup attempt that was never confirmed, so that a user who tried twice and confirmed once still shows one remaining attempt, sorted by user.
