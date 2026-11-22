@@ -456,7 +456,7 @@ The lock serializes `next()`, so the shared source runs at single-thread speed. 
 
 A generator expression evaluates its outermost iterable at creation and everything else at consumption. A generator function binds its arguments at the call and runs its body at the first `next()`. Both rules move work, and errors, away from the line that looks responsible for them.
 
-https://github.com/user-attachments/assets/902b4687-cfb7-4615-b5b3-deb12e5d306c
+https://github.com/user-attachments/assets/6d037833-264e-4751-9ec4-b8a548e32ca7
 
 *Late-bound and parameter-bound filters over the same rows.*
 

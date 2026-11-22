@@ -36,7 +36,7 @@ Inference is a separate distributed job that runs before the read you asked for.
 - **4 TB** — parsed per day with inference
 - **2** — full passes over each file
 
-https://github.com/user-attachments/assets/f9af854a-b7b2-47e3-a946-8cf01ac028f3
+https://github.com/user-attachments/assets/ab072535-244b-4247-92ec-9a22ad8d00b3
 
 *The inferred schema depends on which records inference sees*
 
@@ -160,7 +160,7 @@ The schema here is a DDL string, which reads well for a handful of fields; a `St
 
 The 2 functions differ only on rows whose array is empty or null. `explode` drops those rows, which removes orders C and D from the output. `explode_outer` keeps each of them as a row with null element fields. The animation runs both over the 4 orders above.
 
-https://github.com/user-attachments/assets/02ca7a76-47ee-40d9-ad79-23e541ac7494
+https://github.com/user-attachments/assets/262ec586-6fa4-4aaa-aaf1-78be3c3cd315
 
 *Empty and null arrays decide which orders survive*
 
@@ -267,7 +267,7 @@ events = landed.select(
 
 Both branches of the `when` return the same struct type, `street STRING, city STRING`, which the expression requires: a branch returning a bare string beside a struct fails analysis with a type mismatch. The `address_unparsed` column keeps the text of any value that looked like an object and yielded neither field, so a broken payload stays visible and countable.
 
-https://github.com/user-attachments/assets/5d2ababd-ee56-462e-a754-e8ea8a90ad87
+https://github.com/user-attachments/assets/5052ac40-cdc4-4a65-a227-32e031acf103
 
 *Every shape lands as text, then parses into the same 3 fields*
 
@@ -393,7 +393,7 @@ query = (
 
 `startingOffsets` applies only to a query's first run: once a checkpoint exists, the query resumes from its stored offsets. `maxOffsetsPerTrigger` caps a batch at 600,000 messages across all partitions, which bounds recovery after an outage. Without it, the first batch after a 2-hour stop would try to pull 144 million messages at once.
 
-https://github.com/user-attachments/assets/5c933ebc-12a2-4504-b871-cc1f87289497
+https://github.com/user-attachments/assets/4a7d301f-dd43-48e6-904a-c5e36db19a2c
 
 *Routing on the required key catches both failure kinds*
 

@@ -372,7 +372,7 @@ for i in range(n):
 
 The animation fills the same 4 files by length, and each printed line is a finished range: all 3 ranges of length 2 come out before any range of length 3.
 
-https://github.com/user-attachments/assets/600c8092-31dd-4de0-8272-95c181d447e2
+https://github.com/user-attachments/assets/be916dd4-ab2c-4bc0-8e14-bf45db4c00b6
 
 *Ranges finish shortest first, so every read is ready.*
 

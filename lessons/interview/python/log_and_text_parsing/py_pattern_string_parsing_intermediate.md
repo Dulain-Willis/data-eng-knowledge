@@ -75,7 +75,7 @@ It raises `ValueError: invalid literal for int() with base 10: '"-"'`, because i
 
 The pattern describes each fence instead of counting tokens. `\[(?P<time>[^\]]+)\]` takes everything up to the closing bracket. A quoted field is `"(?:[^"\\]|\\.)*"`: any character that is neither a quote nor a backslash, or a backslash followed by any character. The second branch matters because the server writes a quote inside a user agent as `\"`, and a plain `[^"]*` would stop there. The size group is `\d+|-`, which accepts the dash explicitly. The pattern is compiled once at module level, and `match` anchors it at index 0, so a line that doesn't start like a record fails at the first position instead of being retried from every offset the way `search` would.
 
-https://github.com/user-attachments/assets/5c1209dd-8ac8-44d4-ae6b-e34441f4486b
+https://github.com/user-attachments/assets/7fcabb0f-9d5b-40f3-8b9f-cd2f3ce4e47e
 
 *4 lines through 1 compiled pattern. The first 2 are a full record and a 408 made of dashes, the last 2 an escaped quote and a fragment.*
 
@@ -235,7 +235,7 @@ The first call prints `['level=error', 'user=Ana Silva', 'retry=3']`. The second
 
 When only double quotes delimit values, a pattern states that rule directly. Each pair is a word key, `=`, then either a double-quoted string with the same escape branch the log pattern used for its quoted fields, or a run of non-space characters. `findall` returns every pair in a single pass.
 
-https://github.com/user-attachments/assets/a8e27689-9880-41ef-976e-2947e65d8989
+https://github.com/user-attachments/assets/4a240e07-e288-42f5-ad49-d9e160806e97
 
 *Partition after a whitespace split, then a pattern that knows the quoting rule.*
 
@@ -267,7 +267,7 @@ A single generator keeps a file's lines out of memory. A production parse needs 
 
 ### Watch the stages interleave
 
-https://github.com/user-attachments/assets/7538059c-a06b-47c2-ac32-29b1396ffb50
+https://github.com/user-attachments/assets/db5e3524-826d-4a3d-80ab-6d0198851809
 
 *3 stages over 5 lines: each read happens only when the consumer asks for a record.*
 

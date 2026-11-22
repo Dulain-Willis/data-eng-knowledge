@@ -45,7 +45,7 @@ Sort by start and 1 comparison per interval is enough. Walk the sorted list whil
 
 The animation runs that walk on the same 5 intervals. `sorted(intervals, key=lambda iv: iv[0])` returns a new list ordered by start and leaves the caller's list untouched. `merged[-1][1]` is the end of the last block, the only output value each step reads. Opening a block appends a fresh `[start, end]` list built from the 2 numbers; the last section of this lesson shows the bug that reusing the input pair causes.
 
-https://github.com/user-attachments/assets/72969fb2-b056-4811-bb21-19168b5ebac4
+https://github.com/user-attachments/assets/9d0d6d42-2cf4-4ca9-afc1-0be467f915a2
 
 *Each interval is compared with the last merged block only.*
 
@@ -201,7 +201,7 @@ The argument for earliest end fits in 3 sentences. Take any best schedule and lo
 
 The code sorts once by end and keeps a single number, `last_end`, the finish time of the most recent meeting kept. Starting it at `float("-inf")` means the first candidate always fits. Each candidate is compared with `last_end` alone, so the scan is O(n) after an O(n log n) sort.
 
-https://github.com/user-attachments/assets/4a8fe47a-805e-4ff6-b353-e9455f290163
+https://github.com/user-attachments/assets/245d3d55-d20f-43b2-aa2d-ff36727d3b79
 
 *Only last_end decides whether the next meeting fits.*
 

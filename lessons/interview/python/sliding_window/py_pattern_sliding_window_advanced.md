@@ -422,7 +422,7 @@ class SlidingLogLimiter:
 
 A session ends after more than 30 minutes of inactivity, so per user the state is the session's start and its last event. A session closes only when the stream proves the gap: an event from any user more than 30 minutes past that session's last event. Using the newest timestamp as the clock and flushing every session it has outrun keeps memory proportional to users active within the gap.
 
-https://github.com/user-attachments/assets/03ddd8ca-8ecf-421e-9204-faee33e36621
+https://github.com/user-attachments/assets/2a0a40ee-a952-4817-9dac-f5469127ae3b
 
 *Times are minutes. Ana's events at 20 and 50 are exactly 30 apart and stay in 1 session.*
 

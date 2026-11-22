@@ -116,7 +116,7 @@ Predict the 2 tracebacks the guards produce for bad grids. `Prefix2D([[1, 2], [3
 
 The last follow-up asks for the rectangle with the largest sum. Scoring every rectangle with the O(1) query is O(R^2 \* C^2). The faster plan fixes a top row and a bottom row, collapses the band between them into a strip of column totals, and runs Kadane's algorithm along that strip. Kadane keeps `run`, the best sum of a run ending at the current column, as the larger of the value alone or `run` plus the value, and `best` keeps the largest `run` seen. A column prefix table makes each strip O(C), since column `j` of the band totals `col[bot + 1][j] - col[top][j]`, and R(R + 1)/2 row pairs make the search O(R^2 \* C).
 
-https://github.com/user-attachments/assets/cb33ae19-c372-4b5e-9987-4445373478f8
+https://github.com/user-attachments/assets/e02caf79-510d-43a0-8d27-fd97936fef08
 
 *Each row pair collapses into a strip of column totals, and Kadane scans the strip once.*
 
@@ -155,7 +155,7 @@ Refunds push running totals below 0, and the remainder of a negative number depe
 
 The print shows `3 -2 (-2, 3)`, since Python defines floor division and remainder together. Under truncation, a positive total with remainder r lands in bucket r and a negative total of the same class lands in r - 5, so -3 and 2 sit in separate buckets. Every same-class pair on opposite sides of 0 with a nonzero remainder goes uncounted. Pairs such as -5 and 5 both truncate to 0 and still match. Adding K and reducing again maps both -3 and 2 to 2. The animation runs the same count with 3 remainder functions.
 
-https://github.com/user-attachments/assets/7f83a892-19b5-462a-9174-be07e6a76f54
+https://github.com/user-attachments/assets/d74693d7-b6f9-4fe8-a87a-7aca89770489
 
 *The same 5 numbers counted with 3 remainder functions.*
 

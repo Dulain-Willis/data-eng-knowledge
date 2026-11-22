@@ -33,7 +33,7 @@ The heap solution to top-K costs O(m log k) after counting, where m is the numbe
 
 Count with a `Counter`, then build a list of buckets where `buckets[c]` holds every element seen exactly `c` times. Reading the buckets from the highest index down yields elements in descending frequency, and the read stops once `k` are collected. Sizing the list by `max(counts.values()) + 1` instead of `n + 1` keeps it as short as the data allows.
 
-https://github.com/user-attachments/assets/9d4a7b39-6147-4d59-a389-7bf70b65e9f7
+https://github.com/user-attachments/assets/bf6694c6-e9ad-49e8-8a78-e1b47ce5e352
 
 *Counts index the buckets; the walk runs from bucket 4 down and stops at k = 2.*
 
@@ -425,7 +425,7 @@ A frequent first proposal reads the data in chunks, counts each chunk, and adds 
 
 The fix splits the key space instead of the rows. A stable hash sends every occurrence of a key to the same 1 of P partitions, so each partition's Counter holds around 1/P of the distinct keys and its counts are already final. Top-K then needs only each partition's local top-K: a key in the global top K is in the top K of its own partition, because no other partition holds any of its occurrences.
 
-https://github.com/user-attachments/assets/51d3bd4d-f6cf-4794-9316-01325a0b0604
+https://github.com/user-attachments/assets/dbd54122-a6f5-4689-a40f-51a41c7d75ae
 
 *Each user ID lands in 1 partition, so local top-2 lists contain the global top 2.*
 

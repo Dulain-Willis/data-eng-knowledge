@@ -292,7 +292,7 @@ The prompt hands you `orders` and `customers` as Python lists and asks for their
 
 ### Build, probe, and 3 join types
 
-https://github.com/user-attachments/assets/86947f6d-b6d1-40d8-a6db-eb3b48e7208d
+https://github.com/user-attachments/assets/41658574-356f-474f-bd16-11f2ca1d48cf
 
 *Build on customers and probe with orders; the left and full branches are where unmatched rows get added.*
 

@@ -73,7 +73,7 @@ def preorder(node, out):
 
 Move out.append(node.val) below the first recursive call and the function becomes inorder. Move it below the second and it becomes postorder. The animation runs all 3 at once: 1 walk, 3 lists, each appended at its own moment. Watch the call frames stack up on the way down the left edge, and notice that the inorder list receives 1 before anything else, because 1 is the first node whose left subtree is empty.
 
-https://github.com/user-attachments/assets/7c48c441-fdb9-4a7c-86d4-5b329d15da83
+https://github.com/user-attachments/assets/f6fcb593-7e4f-4bf2-9686-5e813c0619e1
 
 *1 walk fills 3 lists: before the left call, between the calls, after the right call.*
 
@@ -117,7 +117,7 @@ Use collections.deque. Its popleft() removes the front item in constant time. A 
 
 A flat visit order rarely satisfies the prompt. Most versions want a list of lists, 1 inner list per level, and the technique that delivers it is a snapshot. At the top of each pass through the outer loop, the queue contains exactly 1 complete level and nothing else. Read `len(queue)` into `size` once, pop exactly `size` nodes, and any children appended during those pops wait behind them for the next pass.
 
-https://github.com/user-attachments/assets/800391d1-1a9c-479e-9277-bd8e4535c8b8
+https://github.com/user-attachments/assets/ee46ce76-cb52-483b-848d-d9e6d969e5db
 
 *size is read once per pass, so each pass drains exactly 1 level.*
 
@@ -217,7 +217,7 @@ Wrong answers usually start in the None column. For the minimum, returning 0 fro
 
 The animation runs max depth with a print just before each return, so the order in which answers are produced is visible line by line.
 
-https://github.com/user-attachments/assets/d1b7500a-d335-4f54-8fef-c0fe4589be75
+https://github.com/user-attachments/assets/76d91876-bada-4b34-b869-033c6ce8d95f
 
 *Each node prints only after both children have returned their depths.*
 
@@ -307,7 +307,7 @@ Hierarchies in a warehouse do not arrive as linked objects. They arrive as rows,
 
 The children map is built in 1 pass over the rows. children.setdefault(parent, []).append(cid) creates the list the first time a parent appears and appends to it afterwards, giving {1: [2, 3], 2: [4, 5], 3: [6]}. Leaf ids such as 4 never appear as keys, which is why the traversal reads children.get(cid, []): a missing key means no children, the n-ary counterpart of None.
 
-https://github.com/user-attachments/assets/cde9e8bf-b591-4c2a-ad8c-41fbc7baeaac
+https://github.com/user-attachments/assets/0d8349be-406e-4bb1-ab40-e62b7cf4d99d
 
 *The children map is built in 1 pass, then a postorder walk adds each child's total into its parent.*
 
@@ -441,7 +441,7 @@ has_path_sum(root, 18) should be False, since the root-to-leaf sums are 12 and 1
 
 ### Bug 3: a default list shared between calls
 
-https://github.com/user-attachments/assets/bfd0a7dd-2002-44ed-987b-14189a1e014b
+https://github.com/user-attachments/assets/26f4e3d7-b812-43f5-8546-c76dfbc43b3d
 
 *Both calls append to the single list created when def ran.*
 

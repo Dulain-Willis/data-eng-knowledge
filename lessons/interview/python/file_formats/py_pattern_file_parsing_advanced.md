@@ -145,7 +145,7 @@ A Parquet bloom filter is a bitset built for a single column chunk and stored ou
 
 The program uses 16-bit filters and takes one position from `key % 16` and the other from `(key  16) % 16`, both computed from the key itself, so every bit can be checked by hand. The row groups hold unsorted IDs, so their min/max ranges overlap. Predict which of the 6 printed lines say `bloom: True`.
 
-https://github.com/user-attachments/assets/933ac66d-d343-49be-8337-11d0f5132611
+https://github.com/user-attachments/assets/4a8cdc9a-29c7-407a-a71c-f980cc5398c0
 
 *Min/max ranges overlap for unsorted IDs; the bloom filters rule out row groups the ranges cannot.*
 
