@@ -424,7 +424,7 @@ A `return` inside `finally` discards the exception in flight. Throw `ValueError`
 
 Every generator object carries a flag that is set while its frame runs. Calling `next()` while the flag is set raises `ValueError: generator already executing`. With threads, that happens when 2 workers pull from 1 shared generator and the interpreter switches threads while the first is inside the body, so the error depends on timing: rare in tests and frequent under production load. A generator that advances itself trips the same guard in a single thread, every time, which makes the failure reproducible.
 
-https://github.com/user-attachments/assets/d0a13bc4-f885-47fb-ad32-df0e5974a02c
+https://github.com/user-attachments/assets/1479fd82-bf7e-4b5d-b603-2d5c7ea75acd
 
 *A generator that advances itself trips the running-frame guard.*
 

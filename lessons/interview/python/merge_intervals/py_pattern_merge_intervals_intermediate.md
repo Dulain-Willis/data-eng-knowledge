@@ -219,7 +219,7 @@ Everything so far assumed the full input was known before the first answer. A bo
 
 If accepted bookings never overlap, sorting them by start sorts them by end as well. A new request `[s, e)` can then collide only with the stored interval immediately before its insertion point or the one sitting at it. `bisect` finds that point in O(log n), 2 comparisons settle the conflict, and inserting at the found index keeps the list sorted.
 
-https://github.com/user-attachments/assets/c4b33503-f256-4a8d-83f8-c34aef2f90c1
+https://github.com/user-attachments/assets/5467f306-bef8-4425-a372-958d25b670f3
 
 *Each request is checked against its 2 neighbors in the sorted list and nothing else.*
 

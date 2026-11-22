@@ -514,7 +514,7 @@ It prints 1 2. The good rows go on to the curated table and the bad rows to a qu
 
 The animation models each mode with the same `try/except` around `json.loads()` from the dead-letter loop, run over the same 3 lines, so you can follow where line 2 ends up in each run.
 
-https://github.com/user-attachments/assets/90776719-5c6c-4c3f-9913-ad2c17c6f801
+https://github.com/user-attachments/assets/ba8e6b27-0dae-42d7-baf1-b75b8d4a6a47
 
 *One loop, 3 policies for the line that fails to parse.*
 

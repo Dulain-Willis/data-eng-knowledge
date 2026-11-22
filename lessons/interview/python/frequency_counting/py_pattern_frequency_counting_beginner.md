@@ -213,7 +213,7 @@ groups[Counter("eat")] = ["eat"]
 
 The sorted string is the clearest key to say aloud, and its log factor stays small on real words: log2 of 10 is about 3, so sorting a 10-letter word costs a few dozen comparisons. The 26-count tuple only pays off on strings hundreds of characters long over a fixed alphabet. Here is the sorted-key version grouping 6 words:
 
-https://github.com/user-attachments/assets/9988a15c-beb8-4b7e-9cab-be851733a50c
+https://github.com/user-attachments/assets/b33f6c18-b709-4785-83fc-8a5a6d7ecbc4
 
 *Every word in a class sorts to the same string, so it lands in the same list.*
 
@@ -275,7 +275,7 @@ Both lines print `[('E500', 3), ('E404', 2)]`. Row order no longer reaches the r
 
 Sorting all d distinct keys costs O(d log d). A min-heap capped at K entries costs O(d log K): push each key, and whenever the heap holds K + 1 entries, pop the smallest, so the heap always holds the K largest seen so far. `most_common(k)` already works this way through `heapq.nlargest`; `most_common()` with no argument sorts everything. Watch the heap run on the 4 error codes and predict which of the tied codes survives.
 
-https://github.com/user-attachments/assets/047dd4df-1eae-4e91-b1f9-5a09957da208
+https://github.com/user-attachments/assets/1cb03ca9-ccef-42be-978e-10d707999267
 
 *The heap root is the weakest survivor; anything pushed past K entries evicts it.*
 
@@ -382,7 +382,7 @@ It prints {102: 2}. Comparing len(set(ids)) with len(ids) would only say that so
 
 Reconciliation is the anagram comparison applied to rows: source and target should hold the same multiset of rows, in any order. Subtracting 2 Counters answers it in both directions, because `a - b` keeps only the keys where a holds more copies than b. Each row goes in as a tuple of its fields so it can be used as a key.
 
-https://github.com/user-attachments/assets/a8ae671c-1737-4744-8ac4-4bbf2d90213b
+https://github.com/user-attachments/assets/43b5eb65-4e2a-4813-ba0d-799f79e5509a
 
 *Each subtraction keeps only the rows one side holds more copies of.*
 

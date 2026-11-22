@@ -431,7 +431,7 @@ The sequence number does 2 jobs. It is unique, so comparison never reaches the p
 
 Negating the key turns `heapq` into a max-heap for numbers, as `low` did in the median section. A string has no negative: `-"etl"` raises `TypeError: bad operand type for unary -: 'str'`. The problem bites hardest with mixed directions. The top-K frequent words prompt wants the highest counts with ties broken alphabetically, so a size-k min-heap must evict the lowest count and, among equal counts, the alphabetically last word. That eviction order cannot be built cleanly from a plain tuple, so the entry gets its own `__lt__`.
 
-https://github.com/user-attachments/assets/c39a08b7-cdf6-4099-a97a-ee4fdbb57ebd
+https://github.com/user-attachments/assets/1bdb3044-95ca-46c8-9daa-38a7d0703b22
 
 *The heap keeps 2 entries; sla is evicted before dag because it sorts later alphabetically.*
 

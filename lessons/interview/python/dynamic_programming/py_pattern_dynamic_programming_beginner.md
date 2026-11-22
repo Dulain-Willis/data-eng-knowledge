@@ -130,7 +130,7 @@ def min_batches(target, sizes):
 
 Placing @lru_cache(maxsize=None) above the `def` leaves the body untouched. The program below writes out by hand what that wrapper does: build a key from the arguments, look it up, and count hits and misses. It calls the function with the sizes as a list, then as a tuple. Predict its first printed line before you play it.
 
-https://github.com/user-attachments/assets/f441a325-c729-4943-a394-37ff4abd5e04
+https://github.com/user-attachments/assets/b4a7473d-f18a-489c-9983-1e275bf15794
 
 *Hits return from the cache without running the body, so only misses enter the loop.*
 

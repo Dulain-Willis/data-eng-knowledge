@@ -398,7 +398,7 @@ The full table also records which edit produced each cell, and the traceback wal
 
 Matrix powers attack the other end: a recurrence with a tiny state that runs for an enormous number of steps. Fibonacci needs 2 numbers of memory but n steps of time. When the update from 1 state vector to the next is the same linear map at every step, write it as a matrix M. The state after k steps is M^k applied to the start, and repeated squaring builds M^k from about log2(k) squarings plus at most that many extra products. For an s-by-s matrix that is O(s^3 log k), against O(s^2 k) for stepping.
 
-https://github.com/user-attachments/assets/40960a8c-5f9e-4222-ab39-f7bf7a040135
+https://github.com/user-attachments/assets/76d4318a-6e9e-4cd1-8e17-7b5516e55faa
 
 The power of `[[1, 1], [1, 0]]` holds F(n) in its top-right entry, so the run prints `10 55` and then `90 2880067194370816120`. For k = 90, binary `1011010`, the loop squares 7 times and multiplies into the result 4 times, once per set bit. At 90, a loop of additions would still win; the matrix method only pulls ahead once k reaches the billions.
 

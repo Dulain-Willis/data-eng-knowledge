@@ -121,7 +121,7 @@ Every shrinking window rests on 1 property: if a window satisfies the constraint
 
 Each at_most pass is the at-most-K counter you already know, adding right - left + 1 windows per right end. Nesting is what makes exactly(K) = at_most(K) - at_most(K - 1) exact: every window with at most K-1 distinct values also has at most K, so the subtraction removes only the windows with fewer than K. The same nesting gives at_least(K) = n \* (n + 1) // 2 - at_most(K - 1), where n \* (n + 1) // 2 counts every subarray. A constraint can look monotone and still fail to nest: a sum of at most 2 holds for [4, -3] (sum 1) and fails for its inner [4], so a shrinking window drops 4 at right 0 and never counts [4, -3].
 
-https://github.com/user-attachments/assets/253c9894-c085-4b7a-af80-5214ce567b20
+https://github.com/user-attachments/assets/5f3e9a9d-0bff-4774-bc68-9ee46add5328
 
 *2 monotone passes, and their difference is the exact count.*
 
@@ -332,7 +332,7 @@ bisect_left finds the outgoing value in O(log k), but pop there and insort each 
 
 Find the k-th smallest absolute difference among all pairs. With 100,000 values there are 4,999,950,000 pairs, too many to list. Invert it: for a guessed distance d, how many pairs differ by at most d? On the sorted array that is 1 window pass, because for each right end the valid left ends form a contiguous run. The count only rises with d, so binary search finds the smallest d whose count reaches k: O(n log n) to sort plus O(n log R), where R is the largest value minus the smallest.
 
-https://github.com/user-attachments/assets/aaff088c-9bb0-4d41-a459-12d68f7e5db1
+https://github.com/user-attachments/assets/fe744a9e-21e8-42a4-b1f6-9b951504c926
 
 *Each guess is a window pass, and the range of guesses halves every step.*
 
@@ -422,7 +422,7 @@ class SlidingLogLimiter:
 
 A session ends after more than 30 minutes of inactivity, so per user the state is the session's start and its last event. A session closes only when the stream proves the gap: an event from any user more than 30 minutes past that session's last event. Using the newest timestamp as the clock and flushing every session it has outrun keeps memory proportional to users active within the gap.
 
-https://github.com/user-attachments/assets/d159846e-1bfe-4197-a3fb-0cbfd76c12d3
+https://github.com/user-attachments/assets/03ddd8ca-8ecf-421e-9204-faee33e36621
 
 *Times are minutes. Ana's events at 20 and 50 are exactly 30 apart and stay in 1 session.*
 
