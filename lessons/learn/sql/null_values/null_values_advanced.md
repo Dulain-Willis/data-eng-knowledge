@@ -123,7 +123,7 @@ ORDER BY day_num
 
 Merging one kind of record from 2 systems usually means stacking 2 queries with UNION or UNION ALL. UNION ALL keeps every row. UNION also removes duplicate rows, and to find them it compares rows column by column under a rule that departs from `=` in one place: a NULL beside a NULL counts as a match. In a WHERE clause, `NULL = NULL` is NULL and the row is dropped. In a UNION, 2 rows that are both NULL in a column are duplicates there, and only 1 of them survives.
 
-A shop takes orders on the web and in an app. Both systems record `coupon_code`, NULL when the customer used none. Each version lists the coupon codes across both channels. Predict the row count before you open each one.
+A shop takes orders on the web and in an app. Both systems record `coupon_code`, NULL when the customer used none. Each version lists the coupon codes across both channels. Predict the row count before you read each result.
 
 **UNION ALL**
 

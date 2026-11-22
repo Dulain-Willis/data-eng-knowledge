@@ -30,3 +30,9 @@ Everything the agents left for you to decide or look at. Nothing here blocked th
 
 ## Applied by default
 - **Learn SQL tabbed examples: Option A (ticket #22, branch `ticket-22`).** The owner was away, so the recommended Option A of PR #24 was applied: all 58 blocks / 152 tabs stay as text, each tab as a bold name label, caption, ```sql fence and result as text, no per-tab screenshots. Done by splicing into the existing lessons (no re-conversion, hand trims kept) and by the converter rule `sql_switcher` (`BLOCK-TYPES.md`). Lesson prose that said "tab"/"switcher" now says "version"/"examples". *To switch:* options B (add a 2x screenshot per tab, about 17 MB), C (first tab only) and D (one merged commented code block) are described with their trade-offs in PR #24 (`review/sql_learn_tabs/README.md`). Tell me the option and the sections are regenerated from the live pages the same way (`sql_switcher_tabs`, `switcher_markdown`).
+
+## Review notes (independent reviewers, minor)
+- Folder names `lessons/learn/python/foundations` and `.../expressions` omit the "Python" that the page titles have (cosmetic; MCP layout expects card folders as is).
+- The upload code in `tools/lesson_to_md.py` writes the GitHub token to a mode-600 temp curl config deleted afterwards (the method you chose; never in the repo).
+- Learn SQL `filtering_intermediate` keeps the site's own caption saying "the first tab"; the other stale tab wording (4 places) was fixed by hand after the #22 review.
+- Anonymous `curl` of user-attachments video URLs returns 404; they play in a logged-out browser on rendered GitHub pages.

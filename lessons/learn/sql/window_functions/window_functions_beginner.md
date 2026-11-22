@@ -22,7 +22,7 @@ The lesson follows 1 table through all 5 sections: `employees`, 6 people in 3 de
 | Frank | Marketing | 95000 | 2020-04-20 |
 | Grace | Marketing | 90000 | 2023-03-13 |
 
-The table can answer 3 different questions with `SUM`, and the clause around it decides which one. Plain `SUM(salary)` answers how much the company pays in total and returns 1 row. `SUM(salary)` with `GROUP BY department` answers what each department costs and returns 3 rows. `SUM(salary) OVER ()` answers how each person's pay sits against the company total and returns 6 rows, one per employee, with 605,000 on every one of them. The 3 versions below run each version; the row count is the thing to watch.
+The table can answer 3 different questions with `SUM`, and the clause around it decides which one. Plain `SUM(salary)` answers how much the company pays in total and returns 1 row. `SUM(salary)` with `GROUP BY department` answers what each department costs and returns 3 rows. `SUM(salary) OVER ()` answers how each person's pay sits against the company total and returns 6 rows, one per employee, with 605,000 on every one of them. The 3 versions below show each one; the row count is the thing to watch.
 
 **Plain SUM**
 

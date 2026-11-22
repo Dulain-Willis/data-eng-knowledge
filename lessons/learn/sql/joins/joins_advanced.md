@@ -107,7 +107,7 @@ The cost_allocs table holds the tax bands: each row is a min_income, a max_incom
 
 ### BETWEEN closes both ends
 
-x BETWEEN a AND b means x >= a AND x <= b, inclusive on both sides. That matters at the seams. If 2 bands touch at 40,000, so that one ends at 40,000 and the next starts at 40,000, an income of exactly 40,000 satisfies both, and that employee comes back twice. Switch between the 3 queries below to see the duplicate appear and then disappear.
+x BETWEEN a AND b means x >= a AND x <= b, inclusive on both sides. That matters at the seams. If 2 bands touch at 40,000, so that one ends at 40,000 and the next starts at 40,000, an income of exactly 40,000 satisfies both, and that employee comes back twice. Compare the 3 queries below to see the duplicate appear and then disappear.
 
 **BETWEEN**
 
