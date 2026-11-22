@@ -23,3 +23,7 @@ Everything the agents left for you to decide or look at. Nothing here blocked th
 - **MP4s are not committed.** Local copies are in `~/animation-mp4s/` only; a lost hosted asset means re-recording.
 - **Temporary PRs, never merge:** #7, #9 (old), #24 (SQL tabs), #25 (Python drops). Close them when done.
 - **HANDOFF.md** still exists in the repo root; the spec says to delete it at the end.
+
+## Added after #21
+- **Learn SQL hand trims** (9 cuts across 5 lessons, commit "Learn SQL hand trims" on ticket-21, listed in `docs/skipped-blocks.md`). `joins_beginner` trim of ", and the blank below is that condition" is a judgement call.
+- **Learn SQL pending-decision sentences** are kept as-is (see Decisions pending #5); `complex_data_advanced` not checked for a runnable cell after the Capstone heading.
