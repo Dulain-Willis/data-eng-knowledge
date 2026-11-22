@@ -596,7 +596,7 @@ The text holds 5 characters, ï takes 2 bytes in UTF-8, and index 2 is its first
 
 Inside one spec the parts keep their order even when most are missing: `>8,` puts alignment before width and grouping last, and `.1%` puts precision ahead of type. Swapping them changes the meaning without an error: in `f"{1532:,>8}"` the comma sits in the fill position, so it prints `,,,,1532`.
 
-Centering splits the padding in 2, and when the padding is odd the extra character goes on the right: `f"|{'GET':^6}|"` prints `| GET |`. In that same width of 6, `/a` starts 2 characters in, with 2 spaces after it.
+Centering splits the padding in 2, and when the padding is odd the extra character goes on the right: `f"|{'GET':^6}|"` prints `| GET |`.
 
 
 <br>

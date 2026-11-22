@@ -93,7 +93,13 @@
    ],
    "heading": "### Capstone",
    "heading_new": null,
-   "moved": []
+   "moved": [],
+   "trim": [
+    [
+     "The capstone pulls the 5 sections",
+     "The script below pulls the 5 sections"
+    ]
+   ]
   }
  ],
  "python_control_flow_intermediate": [
@@ -352,7 +358,13 @@
    ],
    "heading": "### Capstone: a plan with undo",
    "heading_new": "### A plan with undo",
-   "moved": []
+   "moved": [],
+   "trim": [
+    [
+     "The last problems use everything from the earlier sections. You'll see shallow and deep copies",
+     "This last problem uses everything from the earlier sections. It has shallow and deep copies"
+    ]
+   ]
   }
  ],
  "python_dictionaries_beginner": [
@@ -384,7 +396,13 @@
    "heading": "### Practice",
    "heading_nth": 2,
    "heading_new": null,
-   "moved": []
+   "moved": [],
+   "trim": [
+    [
+     "Trace this session cleanup line by line before you run it:",
+     "Trace this session cleanup line by line:"
+    ]
+   ]
   },
   {
    "name": "Checking for Keys and Key Types",
@@ -408,6 +426,22 @@
    "heading_new": "### The fullest gap",
    "moved": [
     "This one combines 3 patterns: sort the input, walk 2 pointers inward, and keep the best total so far. A total that fits the gap is a candidate, and moving `left` up tries a larger one; a total that overflows moves `right` down to a shorter track."
+   ]
+  }
+ ],
+ "python_strings_advanced": [
+  {
+   "name": "Centering example",
+   "places": [
+    47
+   ],
+   "trim_only": true,
+   "moved": [],
+   "trim": [
+    [
+     "`| GET |`. In that same width of 6, `/a` starts 2 characters in, with 2 spaces after it.",
+     "`| GET |`."
+    ]
    ]
   }
  ]
