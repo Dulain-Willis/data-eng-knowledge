@@ -210,26 +210,50 @@ The CASE tests `d.dept_id`, the join key, in place of `d.dept_name`. A departmen
 
 A LEFT JOIN protects its rows only until WHERE runs. WHERE keeps rows whose condition is TRUE, and every comparison against a NULL the join filled in is NULL. Ask for every employee outside Sales, then add the branch that keeps the gaps.
 
+**Filter only**
+
 The comparison alone: every row whose dept_name is NULL evaluates to NULL and is discarded.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | e.emp_id, |
-|  | d.dept_name |
-|  | FROM employees AS e |
-|  | LEFT JOIN departments AS d |
-|  | ON e.dept_id = d.dept_id |
-|  | WHERE d.dept_name != 'Sales' |
+```sql
+SELECT
+  e.emp_id,
+  d.dept_name
+FROM employees AS e
+LEFT JOIN departments AS d
+  ON e.dept_id = d.dept_id
+WHERE d.dept_name != 'Sales'
+```
 
-Result
+Result:
 
-| emp_id | dept_name |
-| --- | --- |
+```
+emp_id | dept_name
+```
 
-0 rows
+**With IS NULL**
 
-The first tab returns no rows. E-101 is in Sales and fails the test as it should. E-103 and E-105 have a NULL dept_name, so `NULL != 'Sales'` is NULL and WHERE discards them: the LEFT JOIN kept them and the next clause threw them out. The second tab's `OR d.dept_name IS NULL` brings both back.
+An IS NULL branch keeps the employees the LEFT JOIN preserved, so the answer to 'outside Sales' is complete.
+
+```sql
+SELECT
+  e.emp_id,
+  d.dept_name
+FROM employees AS e
+LEFT JOIN departments AS d
+  ON e.dept_id = d.dept_id
+WHERE d.dept_name != 'Sales'
+  OR d.dept_name IS NULL
+```
+
+Result:
+
+```
+emp_id | dept_name
+E-103 | NULL
+E-105 | NULL
+```
+
+The first version returns no rows. E-101 is in Sales and fails the test as it should. E-103 and E-105 have a NULL dept_name, so `NULL != 'Sales'` is NULL and WHERE discards them: the LEFT JOIN kept them and the next clause threw them out. The second version's `OR d.dept_name IS NULL` brings both back.
 
 
 <br>

@@ -123,37 +123,96 @@ ORDER BY day_num
 
 Merging one kind of record from 2 systems usually means stacking 2 queries with UNION or UNION ALL. UNION ALL keeps every row. UNION also removes duplicate rows, and to find them it compares rows column by column under a rule that departs from `=` in one place: a NULL beside a NULL counts as a match. In a WHERE clause, `NULL = NULL` is NULL and the row is dropped. In a UNION, 2 rows that are both NULL in a column are duplicates there, and only 1 of them survives.
 
-A shop takes orders on the web and in an app. Both systems record `coupon_code`, NULL when the customer used none. Each tab lists the coupon codes across both channels. Predict the row count before you open each one.
+A shop takes orders on the web and in an app. Both systems record `coupon_code`, NULL when the customer used none. Each version lists the coupon codes across both channels. Predict the row count before you open each one.
+
+**UNION ALL**
 
 Keeps all 6 rows, including the 3 NULLs from orders placed without a coupon.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | coupon_code |
-|  | FROM web_orders |
-|  |  |
-|  | UNION ALL |
-|  |  |
-|  | SELECT |
-|  | coupon_code |
-|  | FROM app_orders |
-|  | ORDER BY coupon_code |
+```sql
+SELECT
+  coupon_code
+FROM web_orders
 
-Result
+UNION ALL
 
-| coupon_code |
-| --- |
-| NULL |
-| NULL |
-| NULL |
-| SPRING |
-| SPRING |
-| WELCOME |
+SELECT
+  coupon_code
+FROM app_orders
+ORDER BY coupon_code
+```
 
-6 rows
+Result:
 
-The UNION result has 1 NULL row standing in for 3 orders across 2 channels, and nothing in it says which. That's fine for a list of codes in use and wrong for anything that counts: counting coupon-free orders from that result gives 1. The third tab shows the usual repair, a column recording where each row came from. Rows from different channels now differ in that column, so UNION can merge NULLs only when they share a source.
+```
+coupon_code
+NULL
+NULL
+NULL
+SPRING
+SPRING
+WELCOME
+```
+
+**UNION**
+
+Keeps all 6 rows, including the 3 NULLs from orders placed without a coupon.
+
+```sql
+SELECT
+  coupon_code
+FROM web_orders
+
+UNION ALL
+
+SELECT
+  coupon_code
+FROM app_orders
+ORDER BY coupon_code
+```
+
+Result:
+
+```
+coupon_code
+NULL
+NULL
+NULL
+SPRING
+SPRING
+WELCOME
+```
+
+**With source**
+
+Labels each row with its channel, so NULLs merge only inside a channel and 1 NULL row per channel survives.
+
+```sql
+SELECT
+  coupon_code,
+  'web' AS channel
+FROM web_orders
+
+UNION
+
+SELECT
+  coupon_code,
+  'app' AS channel
+FROM app_orders
+ORDER BY channel, coupon_code
+```
+
+Result:
+
+```
+coupon_code | channel
+NULL | app
+WELCOME | app
+NULL | web
+SPRING | web
+```
+
+The UNION result has 1 NULL row standing in for 3 orders across 2 channels, and nothing in it says which. That's fine for a list of codes in use and wrong for anything that counts: counting coupon-free orders from that result gives 1. The third version shows the usual repair, a column recording where each row came from. Rows from different channels now differ in that column, so UNION can merge NULLs only when they share a source.
 
 
 <br>
@@ -312,25 +371,49 @@ SQL exposes the deduplication rule as an operator you can put in your own condit
 
 The difference matters most in change detection. `tier_changes` holds each customer's loyalty tier from yesterday's snapshot and from today's. Compare the 2 filters.
 
+**Using <>**
+
 Keeps only rows where both tiers are known and different.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | customer_id, |
-|  | old_tier, |
-|  | new_tier |
-|  | FROM tier_changes |
-|  | WHERE old_tier <> new_tier |
-|  | ORDER BY customer_id |
+```sql
+SELECT
+  customer_id,
+  old_tier,
+  new_tier
+FROM tier_changes
+WHERE old_tier <> new_tier
+ORDER BY customer_id
+```
 
-Result
+Result:
 
-| customer_id | old_tier | new_tier |
-| --- | --- | --- |
-| 2 | Silver | Gold |
+```
+customer_id | old_tier | new_tier
+2 | Silver | Gold
+```
 
-1 row
+**IS DISTINCT**
+
+Also keeps customers who gained a tier from NULL or lost theirs to NULL.
+
+```sql
+SELECT
+  customer_id,
+  old_tier,
+  new_tier
+FROM tier_changes
+WHERE old_tier IS DISTINCT FROM new_tier
+ORDER BY customer_id
+```
+
+Result:
+
+```
+customer_id | old_tier | new_tier
+2 | Silver | Gold
+3 | NULL | Gold
+4 | Gold | NULL
+```
 
 With `<>`, customer 3's first tier and customer 4's lost tier both evaluate to NULL and drop out, so a change feed built on it never reports a customer joining or leaving the program. `IS DISTINCT FROM` returns customers 2, 3 and 4 and still skips customer 5, whose tier was unknown on both days.
 
@@ -358,23 +441,58 @@ FROM order_lines
 ORDER BY line_id
 ```
 
-`unit_price * quantity` for line 2 is a known 30. Subtracting NULL turns it into NULL, and the 30 is gone from the row. One stage later, `SUM` skips that NULL like any other, so the order's revenue loses line 2 completely and the query raises no error. Each tab below sums the 4 lines a different way.
+`unit_price * quantity` for line 2 is a known 30. Subtracting NULL turns it into NULL, and the 30 is gone from the row. One stage later, `SUM` skips that NULL like any other, so the order's revenue loses line 2 completely and the query raises no error. Each version below sums the 4 lines a different way.
+
+**No fix**
 
 Sums the raw expression, and SUM skips line 2's NULL total.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | SUM(unit_price \* quantity - discount) AS revenue |
-|  | FROM order_lines |
+```sql
+SELECT
+  SUM(unit_price * quantity - discount) AS revenue
+FROM order_lines
+```
 
-Result
+Result:
 
-| revenue |
-| --- |
-| 145 |
+```
+revenue
+145
+```
 
-1 row
+**Fix output**
+
+Wraps the computed total in COALESCE, so line 2 contributes 0.
+
+```sql
+SELECT
+  SUM(COALESCE(unit_price * quantity - discount, 0)) AS revenue
+FROM order_lines
+```
+
+Result:
+
+```
+revenue
+145
+```
+
+**Fix input**
+
+Wraps the discount in COALESCE, so line 2's total is computed from known parts.
+
+```sql
+SELECT
+  SUM(unit_price * quantity - COALESCE(discount, 0)) AS revenue
+FROM order_lines
+```
+
+Result:
+
+```
+revenue
+175
+```
 
 - **145** — revenue with COALESCE on the total
 - **175** — revenue with COALESCE on the discount
@@ -463,31 +581,109 @@ The filtering lessons showed the symptom: a `NOT IN` subquery that returns a sin
 
 ### Four ways to find artists on no playlist
 
-`artists` lists 4 artists, and `playlist_tracks` records which artist appears on which playlist. One track row on playlist 11 lost its artist id. Each tab asks which artists appear on no playlist.
+`artists` lists 4 artists, and `playlist_tracks` records which artist appears on which playlist. One track row on playlist 11 lost its artist id. Each version asks which artists appear on no playlist.
+
+**NOT IN**
 
 Compares each artist with a list that contains a NULL, so no row can be TRUE.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | artist_id, |
-|  | artist_name |
-|  | FROM artists |
-|  | WHERE artist_id NOT IN ( |
-|  | SELECT |
-|  | artist_id |
-|  | FROM playlist_tracks |
-|  | ) |
-|  | ORDER BY artist_id |
+```sql
+SELECT
+  artist_id,
+  artist_name
+FROM artists
+WHERE artist_id NOT IN (
+  SELECT
+    artist_id
+  FROM playlist_tracks
+)
+ORDER BY artist_id
+```
 
-Result
+Result:
 
-| artist_id | artist_name |
-| --- | --- |
+```
+artist_id | artist_name
+```
 
-0 rows
+**Filtered**
 
-The last 3 tabs agree here on Kite and Ravel, ids 2 and 4. They stop agreeing when the NULL sits on the left of the filter instead of inside the list.
+Removes NULLs inside the subquery first, so the comparison chain can be TRUE again.
+
+```sql
+SELECT
+  artist_id,
+  artist_name
+FROM artists
+WHERE artist_id NOT IN (
+  SELECT
+    artist_id
+  FROM playlist_tracks
+  WHERE artist_id IS NOT NULL
+)
+ORDER BY artist_id
+```
+
+Result:
+
+```
+artist_id | artist_name
+2 | Kite
+4 | Ravel
+```
+
+**NOT EXISTS**
+
+Looks for a matching track row per artist, and a NULL id matches nothing, so it blocks no artist.
+
+```sql
+SELECT
+  a.artist_id,
+  a.artist_name
+FROM artists AS a
+WHERE NOT EXISTS (
+  SELECT
+    1
+  FROM playlist_tracks AS p
+  WHERE p.artist_id = a.artist_id
+)
+ORDER BY a.artist_id
+```
+
+Result:
+
+```
+artist_id | artist_name
+2 | Kite
+4 | Ravel
+```
+
+**EXCEPT**
+
+Subtracts one set of ids from another, and the NULL on the right finds no NULL on the left to remove.
+
+```sql
+SELECT
+  artist_id
+FROM artists
+
+EXCEPT
+
+SELECT
+  artist_id
+FROM playlist_tracks
+ORDER BY artist_id
+```
+
+Result:
+
+```
+artist_id
+2
+4
+```
+
+The last 3 versions agree here on Kite and Ravel, ids 2 and 4. They stop agreeing when the NULL sits on the left of the filter instead of inside the list.
 
 
 <br>
