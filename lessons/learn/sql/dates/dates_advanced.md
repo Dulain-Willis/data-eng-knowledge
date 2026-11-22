@@ -41,23 +41,41 @@ Trips 101 and 103 both end at 23:50 on a Sunday in Chicago, yet their UTC times 
 
 ### Named zones follow daylight saving rules
 
-A fixed offset such as `-06:00` applies the same shift all year. A named zone such as `America/Chicago` carries the region's rule history, so it moves from 6 to 5 hours behind UTC at the instant the clocks jumped. Both tabs below read 07:30 and 08:30 UTC on March 10, 2024, half an hour before and after Chicago's jump.
+A fixed offset such as `-06:00` applies the same shift all year. A named zone such as `America/Chicago` carries the region's rule history, so it moves from 6 to 5 hours behind UTC at the instant the clocks jumped. Both versions below read 07:30 and 08:30 UTC on March 10, 2024, half an hour before and after Chicago's jump.
+
+**Named zone**
 
 The named zone reads 01:30 before the jump and 03:30 after it: 1 hour of UTC time covers 2 hours of Chicago clock, because 02:00 to 03:00 never happened that night.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | TIMESTAMP '2024-03-10 07:30:00 UTC' AT TIME ZONE 'America/Chicago' AS before_jump, |
-|  | TIMESTAMP '2024-03-10 08:30:00 UTC' AT TIME ZONE 'America/Chicago' AS after_jump |
+```sql
+SELECT
+  TIMESTAMP '2024-03-10 07:30:00 UTC' AT TIME ZONE 'America/Chicago' AS before_jump,
+  TIMESTAMP '2024-03-10 08:30:00 UTC' AT TIME ZONE 'America/Chicago' AS after_jump
+```
 
-Result
+Result:
 
-| before_jump | after_jump |
-| --- | --- |
-| 2024-03-10 01:30:00 America/Chicago | 2024-03-10 03:30:00 America/Chicago |
+```
+before_jump | after_jump
+2024-03-10 01:30:00 America/Chicago | 2024-03-10 03:30:00 America/Chicago
+```
 
-1 row
+**Fixed offset**
+
+The offset reads 01:30 and 02:30, and 02:30 is a time no Chicago clock showed on March 10, 2024.
+
+```sql
+SELECT
+  TIMESTAMP '2024-03-10 07:30:00 UTC' AT TIME ZONE '-06:00' AS before_jump,
+  TIMESTAMP '2024-03-10 08:30:00 UTC' AT TIME ZONE '-06:00' AS after_jump
+```
+
+Result:
+
+```
+before_jump | after_jump
+2024-03-10 01:30:00 -06:00 | 2024-03-10 02:30:00 -06:00
+```
 
 The jump in March has a mirror in November. On November 3, 2024, Chicago clocks reached 2:00 a.m. and fell back to 1:00 a.m., so every minute between 1:00 and 2:00 happened twice. Converting from UTC still gives a single answer per instant, as these 2 readings taken an hour apart show.
 
@@ -163,24 +181,46 @@ March 14, 2024 is a Thursday, and `'week'` snaps it back to Monday, March 11: `d
 
 Grouping by `month(ordered_at)`, from the intermediate lesson, returns 3 for every March. That puts March 2023 and March 2024 in 1 group. `date_trunc('month', ordered_at)` returns a full timestamp such as `2024-03-01 00:00:00`, which still names its year and sorts across years in calendar order.
 
+**month()**
+
 Returns 1 row: month 3 with 4 orders, placed a year apart and counted together.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | MONTH(ordered_at) AS order_month, |
-|  | COUNT(\*) AS orders |
-|  | FROM orders |
-|  | GROUP BY MONTH(ordered_at) |
-|  | ORDER BY order_month |
+```sql
+SELECT
+  MONTH(ordered_at) AS order_month,
+  COUNT(*) AS orders
+FROM orders
+GROUP BY MONTH(ordered_at)
+ORDER BY order_month
+```
 
-Result
+Result:
 
-| order_month | orders |
-| --- | --- |
-| 3 | 4 |
+```
+order_month | orders
+3 | 4
+```
 
-1 row
+**date_trunc**
+
+Returns 2 rows, 2023-03-01 and 2024-03-01, each with 2 orders.
+
+```sql
+SELECT
+  DATE_TRUNC('month', ordered_at) AS order_month,
+  COUNT(*) AS orders
+FROM orders
+GROUP BY DATE_TRUNC('month', ordered_at)
+ORDER BY order_month
+```
+
+Result:
+
+```
+order_month | orders
+2023-03-01 00:00:00 | 2
+2024-03-01 00:00:00 | 2
+```
 
 The GROUP BY repeats the whole `date_trunc` expression because GROUP BY runs before the SELECT list names `order_month`. Change the unit string and the same query counts at another grain, such as week or quarter. Every key stays a timestamp, so later steps can filter on it or format it.
 
@@ -305,20 +345,37 @@ With that row added to `raw_events`, the 3 rows above parse as before and the ne
 
 The text `03/04/2024` means March 4 to a US system and April 3 to most of Europe. Nothing in its 10 characters says which, so the format string records the decision, and only the source system's documentation can settle it.
 
+**Month first**
+
 Reads month then day and returns 2024-03-04.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | DATE_PARSE('03/04/2024', '%m/%d/%Y') AS parsed |
+```sql
+SELECT
+  DATE_PARSE('03/04/2024', '%m/%d/%Y') AS parsed
+```
 
-Result
+Result:
 
-| parsed |
-| --- |
-| 2024-03-04 00:00:00 |
+```
+parsed
+2024-03-04 00:00:00
+```
 
-1 row
+**Day first**
+
+Reads day then month and returns 2024-04-03, a month later, with no error raised.
+
+```sql
+SELECT
+  DATE_PARSE('03/04/2024', '%d/%m/%Y') AS parsed
+```
+
+Result:
+
+```
+parsed
+2024-04-03 00:00:00
+```
 
 > **TIP**
 >
@@ -580,29 +637,53 @@ SELECT
 
 ### Sort by the value, show the text
 
-A formatted date is a `VARCHAR`, and text sorts character by character. `Apr` comes before `Jan` because A precedes J, so ordering by the label scrambles the calendar. Both tabs below show the same labels and differ only in the ORDER BY column.
+A formatted date is a `VARCHAR`, and text sorts character by character. `Apr` comes before `Jan` because A precedes J, so ordering by the label scrambles the calendar. Both versions below show the same labels and differ only in the ORDER BY column.
+
+**By label**
 
 Alphabetical order: Apr, Feb, Jan, Mar, Nov.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | DATE_FORMAT(month_start, '%b %Y') AS month_label, |
-|  | revenue |
-|  | FROM monthly |
-|  | ORDER BY month_label |
+```sql
+SELECT
+  DATE_FORMAT(month_start, '%b %Y') AS month_label,
+  revenue
+FROM monthly
+ORDER BY month_label
+```
 
-Result
+Result:
 
-| month_label | revenue |
-| --- | --- |
-| Apr 2024 | 101 |
-| Feb 2024 | 95 |
-| Jan 2024 | 120 |
-| Mar 2024 | 143 |
-| Nov 2024 | 160 |
+```
+month_label | revenue
+Apr 2024 | 101
+Feb 2024 | 95
+Jan 2024 | 120
+Mar 2024 | 143
+Nov 2024 | 160
+```
 
-5 rows
+**By date**
+
+Calendar order: Jan, Feb, Mar, Apr, Nov, because the sort reads the date.
+
+```sql
+SELECT
+  DATE_FORMAT(month_start, '%b %Y') AS month_label,
+  revenue
+FROM monthly
+ORDER BY month_start
+```
+
+Result:
+
+```
+month_label | revenue
+Jan 2024 | 120
+Feb 2024 | 95
+Mar 2024 | 143
+Apr 2024 | 101
+Nov 2024 | 160
+```
 
 > **TIP**
 >

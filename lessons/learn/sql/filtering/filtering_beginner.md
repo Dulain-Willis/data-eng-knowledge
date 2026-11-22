@@ -105,27 +105,69 @@ https://github.com/user-attachments/assets/a1bf8786-7f62-4e1c-8307-c557cc5e4f64
 
 This time 5 rows pass, and they are the exact 5 that failed the first query: Osei, Tanaka, Ruiz, Adams and Novak. `= 'Engineering'` and `!= 'Engineering'` split the table in 2 with nothing left over, 3 rows on one side and 5 on the other. That clean split holds as long as every row has a department. A row with NULL in `department` fails both tests and lands in neither result; the advanced tier of this track, in its section on `NOT IN` and NULL, explains why a missing value refuses to be compared.
 
+**Match**
+
 Exact match keeps the 3 Engineering rows.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | emp_name, |
-|  | department |
-|  | FROM employees |
-|  | WHERE department = 'Engineering' |
+```sql
+SELECT
+  emp_name,
+  department
+FROM employees
+WHERE department = 'Engineering'
+```
 
-Result
+Result:
 
-| emp_name | department |
-| --- | --- |
-| Chen | Engineering |
-| Patel | Engineering |
-| Kim | Engineering |
+```
+emp_name | department
+Chen | Engineering
+Patel | Engineering
+Kim | Engineering
+```
 
-3 rows
+**Exclude**
 
-The third tab is the mistake that costs the most time in practice, because the query runs without complaint and returns an empty result. The syntax is valid. The literal `'engineering'` matches none of the 8 stored values, so the result is correct and useless at the same time. When a text filter returns 0 rows unexpectedly, the first thing to check is the spelling and casing of the literal against the values the column really holds, which a quick `SELECT department FROM employees` with no filter will show.
+The same literal with != keeps the other 5.
+
+```sql
+SELECT
+  emp_name,
+  department
+FROM employees
+WHERE department != 'Engineering'
+```
+
+Result:
+
+```
+emp_name | department
+Osei | Marketing
+Tanaka | Marketing
+Ruiz | Sales
+Adams | Sales
+Novak | HR
+```
+
+**Lowercase**
+
+One lowercase letter and the match finds 0 rows.
+
+```sql
+SELECT
+  emp_name,
+  department
+FROM employees
+WHERE department = 'engineering'
+```
+
+Result:
+
+```
+emp_name | department
+```
+
+The third version is the mistake that costs the most time in practice, because the query runs without complaint and returns an empty result. The syntax is valid. The literal `'engineering'` matches none of the 8 stored values, so the result is correct and useless at the same time. When a text filter returns 0 rows unexpectedly, the first thing to check is the spelling and casing of the literal against the values the column really holds, which a quick `SELECT department FROM employees` with no filter will show.
 
 The same strictness applies to numbers, in a quieter way. `salary = 80000` keeps Ruiz and nobody else, because an exact salary is a rare thing to share. `salary != 80000` keeps the other 7. Equality on a numeric column is useful for keys and codes, where values are meant to repeat, and rarely useful for amounts, where the next section's operators do the work.
 

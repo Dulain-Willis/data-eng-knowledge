@@ -120,41 +120,107 @@ The engine runs a window function in 3 physical steps: it hashes every row by th
 
 The planner groups window functions by their specification. Any 2 functions with the same PARTITION BY and ORDER BY share a single shuffle and sort, whatever their frames, because the frame is applied as rows stream past; a function with a different partition key or a different order needs a pass of its own. Count the distinct PARTITION BY and ORDER BY combinations in a query and you have counted its sorts.
 
+**Two keys**
+
 Partitioning by user_id and by country are different keys, so the table is shuffled and sorted twice.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | session_id, |
-|  | user_id, |
-|  | country, |
-|  | duration_s, |
-|  | ROW_NUMBER() OVER ( |
-|  | PARTITION BY user_id |
-|  | ORDER BY started_at |
-|  | ) AS session_seq, |
-|  | SUM(duration_s) OVER ( |
-|  | PARTITION BY country |
-|  | ) AS country_total |
-|  | FROM sessions |
-|  | ORDER BY session_id |
+```sql
+SELECT
+  session_id,
+  user_id,
+  country,
+  duration_s,
+  ROW_NUMBER() OVER (
+    PARTITION BY user_id
+    ORDER BY started_at
+  ) AS session_seq,
+  SUM(duration_s) OVER (
+    PARTITION BY country
+  ) AS country_total
+FROM sessions
+ORDER BY session_id
+```
 
-Result
+Result:
 
-| session_id | user_id | country | duration_s | session_seq | country_total |
-| --- | --- | --- | --- | --- | --- |
-| 1 | u1 | US | 120 | 1 | 1065 |
-| 2 | u1 | US | 300 | 2 | 1065 |
-| 3 | u2 | US | 45 | 1 | 1065 |
-| 4 | u2 | US | 600 | 2 | 1065 |
-| 5 | u3 | DE | 90 | 1 | 470 |
-| 6 | u3 | DE | 30 | 2 | 470 |
-| 7 | u4 | DE | 200 | 1 | 470 |
-| 8 | u4 | DE | 150 | 2 | 470 |
+```
+session_id | user_id | country | duration_s | session_seq | country_total
+1 | u1 | US | 120 | 1 | 1065
+2 | u1 | US | 300 | 2 | 1065
+3 | u2 | US | 45 | 1 | 1065
+4 | u2 | US | 600 | 2 | 1065
+5 | u3 | DE | 90 | 1 | 470
+6 | u3 | DE | 30 | 2 | 470
+7 | u4 | DE | 200 | 1 | 470
+8 | u4 | DE | 150 | 2 | 470
+```
 
-8 rows
+**One key**
 
-The first tab pays twice: one hash of the table on `user_id`, a second on `country`. If the per-country figure can come from a GROUP BY, its few rows broadcast-join back to the sessions at a fraction of the cost of a second shuffle of the full table, and the window pass on `user_id` stays the only big one.
+Both windows share PARTITION BY user_id ORDER BY started_at, so one shuffle and one sort feed both functions.
+
+```sql
+SELECT
+  session_id,
+  user_id,
+  country,
+  duration_s,
+  ROW_NUMBER() OVER (
+    PARTITION BY user_id
+    ORDER BY started_at
+  ) AS session_seq,
+  SUM(duration_s) OVER (
+    PARTITION BY user_id
+    ORDER BY started_at
+  ) AS user_running_s
+FROM sessions
+ORDER BY session_id
+```
+
+Result:
+
+```
+session_id | user_id | country | duration_s | session_seq | user_running_s
+1 | u1 | US | 120 | 1 | 120
+2 | u1 | US | 300 | 2 | 420
+3 | u2 | US | 45 | 1 | 45
+4 | u2 | US | 600 | 2 | 645
+5 | u3 | DE | 90 | 1 | 90
+6 | u3 | DE | 30 | 2 | 120
+7 | u4 | DE | 200 | 1 | 200
+8 | u4 | DE | 150 | 2 | 350
+```
+
+**Filter first**
+
+WHERE runs before the window, so only the 4 US rows are shuffled and sorted, and the sequence counts US sessions only.
+
+```sql
+SELECT
+  session_id,
+  user_id,
+  country,
+  duration_s,
+  ROW_NUMBER() OVER (
+    PARTITION BY user_id
+    ORDER BY started_at
+  ) AS session_seq
+FROM sessions
+WHERE country = 'US'
+ORDER BY session_id
+```
+
+Result:
+
+```
+session_id | user_id | country | duration_s | session_seq
+1 | u1 | US | 120 | 1
+2 | u1 | US | 300 | 2
+3 | u2 | US | 45 | 1
+4 | u2 | US | 600 | 2
+```
+
+The first version pays twice: one hash of the table on `user_id`, a second on `country`. If the per-country figure can come from a GROUP BY, its few rows broadcast-join back to the sessions at a fraction of the cost of a second shuffle of the full table, and the window pass on `user_id` stays the only big one.
 
 
 <br>

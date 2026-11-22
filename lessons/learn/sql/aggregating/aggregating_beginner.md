@@ -113,23 +113,58 @@ https://github.com/user-attachments/assets/8db28675-6335-4d84-8ea2-5950d64db140
 
 ### DISTINCT counts each value once
 
-Add a `country` column to the same 5 customers: 3 live in the US and 2 in the UK. `COUNT(country)` returns 5, since every row has a country. `COUNT(DISTINCT country)` returns 2, because the function collects the set of values it has seen and counts the set. The 3 tabs below run the 3 forms over the identical table; switch between them and read the single number each one produces.
+Add a `country` column to the same 5 customers: 3 live in the US and 2 in the UK. `COUNT(country)` returns 5, since every row has a country. `COUNT(DISTINCT country)` returns 2, because the function collects the set of values it has seen and counts the set. The 3 versions below run the 3 forms over the identical table; read the single number each one produces.
+
+**COUNT(*)**
 
 Every row counts, including the 2 customers with no email.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | COUNT(\*) AS total_customers |
-|  | FROM customers |
+```sql
+SELECT
+  COUNT(*) AS total_customers
+FROM customers
+```
 
-Result
+Result:
 
-| total_customers |
-| --- |
-| 5 |
+```
+total_customers
+5
+```
 
-1 row
+**COUNT(col)**
+
+Only rows with a non-null email count.
+
+```sql
+SELECT
+  COUNT(email) AS customers_with_email
+FROM customers
+```
+
+Result:
+
+```
+customers_with_email
+3
+```
+
+**DISTINCT**
+
+Each distinct country counts once, however many customers live there.
+
+```sql
+SELECT
+  COUNT(DISTINCT country) AS countries
+FROM customers
+```
+
+Result:
+
+```
+countries
+2
+```
 
 `COUNT(DISTINCT email)` on this table returns 3, the same as `COUNT(email)`, because the 3 present emails are all different. If 2 customers shared an address the distinct count would drop to 2 while the plain count stayed at 3, and the distinct form is the one that answers how many inboxes a campaign actually reaches. Distinct counting is also the most expensive of the 3 forms, since the engine has to hold every value it has seen to know whether the next one is new; on a column with millions of values that memory cost is real, and the intermediate tier covers the approximate version that trades a little accuracy for a lot of memory.
 

@@ -43,7 +43,7 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
-    "executable_spark", "executable_python", "executable_sql", "regex_cards",
+    "executable_spark", "executable_python", "executable_sql", "regex_cards", "sql_switcher",
 }
 # Runnable cells: block type -> how the run control is found. Spark has a "Run" button and draws its
 # output with JavaScript; Python cells have a ">>>" button that reveals the output the page already holds.
@@ -352,6 +352,83 @@ def spark_cell(soup, block, tokens, image_name, number, lang="python"):
     block.replace_with(marker)
 
 
+def switcher_panel(html):
+    """Parse the HTML of one sql_switcher block in one tab state into
+    {"caption", "sql", "result"}. The block holds the tab bar, one caption div, one code table
+    (a row per line, code in the last cell) and a Result table (rendered in the DOM even while it
+    is collapsed on the page). `result` is a list of rows (header first), or [] if there is none."""
+    soup = parse(html)  # keeps the indentation spans of the code cells
+    content = soup.find(attrs={"data-note-content": True}) or soup
+    caption = ""
+    tables = soup.find_all("table")
+    code_table = next(t for t in tables if t.find("td", attrs={"data-ln": True}))
+    sql = "\n".join(tr.find_all("td")[-1].get_text() for tr in code_table.find_all("tr")
+                    if tr.find_all("td")).strip("\n")
+    # the caption is the first plain text div (no tab buttons, tables or nested divs): it sits between the
+    # tab bar and the code; the saved HTML has no buttons (clean() drops them), the live one does
+    for el in content.find_all("div"):
+        if el.find(["div", "table", "button"]) or el.find_parent("table"):
+            continue
+        text = " ".join(el.get_text(" ").split())
+        if text:
+            caption = text
+            break
+    result = []
+    result_table = next((t for t in tables if t is not code_table and t.find("th")), None)
+    if result_table:
+        result = [[" ".join(c.get_text(" ").split()) for c in tr.find_all(["th", "td"])]
+                  for tr in result_table.find_all("tr")]
+    return {"caption": caption, "sql": sql, "result": result}
+
+
+def switcher_markdown(tabs):
+    """Option A (owner-reviewed in draft PR #24): every tab stays as text. A bold label with the tab's name,
+    its caption, its SQL as a ```sql fence, then its result as text. `tabs` is [{"name", "caption", "sql",
+    "result"}] in tab order (switcher_panel plus the name from the tab button)."""
+    parts = []
+    for t in tabs:
+        part = [f"**{t['name']}**"]
+        if t["caption"]:
+            part.append(t["caption"])
+        part.append(f"```sql\n{t['sql']}\n```")
+        if t["result"]:
+            rows = "\n".join(" | ".join(r) for r in t["result"])
+            part.append(f"Result:\n\n```\n{rows}\n```")
+        parts.append("\n\n".join(part))
+    return "\n\n".join(parts)
+
+
+def sql_switcher_tabs(url):
+    """Click every tab of every sql_switcher block on the live page and return, per block, the list of
+    {"name", "caption", "sql", "result"}. The saved page HTML holds only the first tab's panel, so the
+    other tabs exist only after a click. Returns [] without playwright."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("playwright not installed; tab panels not captured", file=sys.stderr)
+        return []
+    out = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1100, "height": 900})
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="sql_switcher"]')
+        for i in range(blocks.count()):
+            block = blocks.nth(i)
+            block.scroll_into_view_if_needed()
+            names = block.locator("button").evaluate_all(  # the 3 icon buttons have a title; tabs do not
+                "els => els.filter(e => !e.title && !e.getAttribute('aria-label')).map(e => e.innerText.trim())")
+            tabs = []
+            for n in names:
+                block.locator("button", has_text=n).first.click()
+                page.wait_for_timeout(350)
+                tabs.append({"name": n, **switcher_panel(block.evaluate("e => e.outerHTML"))})
+            out.append(tabs)
+        browser.close()
+    return out
+
+
 def regex_cards(soup, block, tokens, image_name, number):
     """Regex example cards (python_strings_advanced): a screenshot of the stacked cards as the UI draws
     them, then the text of each card (pattern, description, example -> match) so it stays searchable."""
@@ -418,11 +495,12 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=(), regex_images=()):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=(), regex_images=(), switchers=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
     drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
+    switchers: per sql_switcher block in page order, its tabs (sql_switcher_tabs); empty means first tab only.
     cells: file names of the run-output screenshots, one per executable_spark / executable_python block in page order
     (record_cells); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
@@ -442,7 +520,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         p.string = EXERCISE_TOKEN.format(i)
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
-    diagrams_seen = animations_seen = cells_seen = regex_seen = 0
+    diagrams_seen = animations_seen = cells_seen = regex_seen = switchers_seen = 0
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
@@ -477,6 +555,17 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             name = cells[cells_seen] if cells_seen < len(cells) else None
             cells_seen += 1
             spark_cell(soup, block, tokens, name, cells_seen, CELL_FENCE[kind])
+        elif kind == "sql_switcher":
+            tabs = switchers[switchers_seen] if switchers_seen < len(switchers) else None
+            switchers_seen += 1
+            if not tabs:  # no live capture: the saved HTML holds the first tab only
+                print("warning: sql_switcher tabs not captured; first tab only", file=sys.stderr)
+                tabs = [{"name": "Tab 1", **switcher_panel(str(block))}]
+            token = f"@@SWITCHER-{len(tokens)}@@"
+            tokens[token] = switcher_markdown(tabs)
+            marker = soup.new_tag("p")
+            marker.string = token
+            block.replace_with(marker)
         elif kind == "static_code":
             code_block(soup, block)
         elif kind == "big_number":
@@ -2111,6 +2200,8 @@ def main():
     cells = record_cells(url, out_dir, slug, n_cells, cell_kind) if "--screenshots" in sys.argv else []
     n_regex = len(soup0.find_all(attrs={"data-note-block-type": "regex_cards"}))
     regex_images = record_regex_cards(url, out_dir, slug, n_regex) if "--screenshots" in sys.argv else []
+    switchers = (sql_switcher_tabs(url) if soup0.find(attrs={"data-note-block-type": "sql_switcher"})
+                 else [])
     path = os.path.join(out_dir, slug + ".md")
     tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
     with open(tmp_path, "w", encoding="utf-8") as f:
@@ -2142,7 +2233,7 @@ def main():
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
-                       load_drops(slug), cells, regex_images))
+                       load_drops(slug), cells, regex_images, switchers))
     os.replace(tmp_path, path)
     print(path)
 

@@ -139,34 +139,89 @@ Comparisons evaluate first: =, !=, <, >, IN, LIKE and BETWEEN each turn into TRU
 | 3rd | AND | a AND b OR c reads as (a AND b) OR c |
 | 4th | OR | a OR b AND c reads as a OR (b AND c) |
 
-Parentheses override the rule: whatever sits inside them resolves before anything outside. The 3 tabs below run the same conditions with no parentheses, with parentheses around the OR, and with parentheses that spell out the default reading.
+Parentheses override the rule: whatever sits inside them resolves before anything outside. The 3 versions below run the same conditions with no parentheses, with parentheses around the OR, and with parentheses that spell out the default reading.
+
+**Implicit**
 
 No parentheses, so AND groups first and OR joins the group to the spending test.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | user_id, |
-|  | country, |
-|  | status, |
-|  | total_spent |
-|  | FROM users |
-|  | WHERE country = 'US' |
-|  | AND status = 'active' |
-|  | OR total_spent > 1000 |
+```sql
+SELECT
+  user_id,
+  country,
+  status,
+  total_spent
+FROM users
+WHERE country = 'US'
+  AND status = 'active'
+  OR total_spent > 1000
+```
 
-Result
+Result:
 
-| user_id | country | status | total_spent |
-| --- | --- | --- | --- |
-| user_42 | US | active | 500 |
-| user_89 | US | active | 750 |
-| user_156 | CA | inactive | 1200 |
-| user_203 | UK | inactive | 1500 |
+```
+user_id | country | status | total_spent
+user_42 | US | active | 500
+user_89 | US | active | 750
+user_156 | CA | inactive | 1200
+user_203 | UK | inactive | 1500
+```
 
-4 rows
+**Grouped**
 
-The grouped version returns 2 rows, users 42 and 89, since now every kept row must be from the US. The third tab returns the same 4 rows as the first, and that is its value: parentheses that match the default reading change nothing in the result and spare the next reader from recalling the rule. A reviewer scanning the first tab has to know the rule to know what it returns; a reviewer scanning the third does not.
+Parentheses around the OR, so every kept row must be from the US.
+
+```sql
+SELECT
+  user_id,
+  country,
+  status,
+  total_spent
+FROM users
+WHERE country = 'US'
+  AND (
+    status = 'active'
+    OR total_spent > 1000
+  )
+```
+
+Result:
+
+```
+user_id | country | status | total_spent
+user_42 | US | active | 500
+user_89 | US | active | 750
+```
+
+**Explicit**
+
+Parentheses that match the default reading and return the same rows as the first tab.
+
+```sql
+SELECT
+  user_id,
+  country,
+  status,
+  total_spent
+FROM users
+WHERE (
+    country = 'US'
+    AND status = 'active'
+  )
+  OR total_spent > 1000
+```
+
+Result:
+
+```
+user_id | country | status | total_spent
+user_42 | US | active | 500
+user_89 | US | active | 750
+user_156 | CA | inactive | 1200
+user_203 | UK | inactive | 1500
+```
+
+The grouped version returns 2 rows, users 42 and 89, since now every kept row must be from the US. The third version returns the same 4 rows as the first, and that is its value: parentheses that match the default reading change nothing in the result and spare the next reader from recalling the rule. A reviewer scanning the first version has to know the rule to know what it returns; a reviewer scanning the third does not.
 
 
 <br>
@@ -229,28 +284,75 @@ Equality asks whether a string is exactly one value. LIKE asks whether a string 
 - `'_ake%'`: Any single character, then ake, then anything Example: `'lake house retreat'` -> `matches: the lower case l fills the underscore`
 - `'Cabin'`: No wildcard, so it behaves like = Example: `'Mountain Cabin'` -> `no match: the pattern must cover the whole title`
 
-The listings table below holds 6 titles. The 3 tabs search it with a prefix pattern, a contains pattern, and a pattern whose first character is a wildcard.
+The listings table below holds 6 titles. The 3 versions search it with a prefix pattern, a contains pattern, and a pattern whose first character is a wildcard.
+
+**Prefix**
 
 Titles that begin with Lake, with anything or nothing after it.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | listing_id, |
-|  | title, |
-|  | city |
-|  | FROM listings |
-|  | WHERE title LIKE 'Lake%' |
+```sql
+SELECT
+  listing_id,
+  title,
+  city
+FROM listings
+WHERE title LIKE 'Lake%'
+```
 
-Result
+Result:
 
-| listing_id | title | city |
-| --- | --- | --- |
-| 1 | Lakeview Cabin | Tahoe |
-| 2 | Lakeside Loft | Austin |
-| 6 | Lake | Geneva |
+```
+listing_id | title | city
+1 | Lakeview Cabin | Tahoe
+2 | Lakeside Loft | Austin
+6 | Lake | Geneva
+```
 
-3 rows
+**Contains**
+
+Titles with Lake anywhere, still case sensitive.
+
+```sql
+SELECT
+  listing_id,
+  title,
+  city
+FROM listings
+WHERE title LIKE '%Lake%'
+```
+
+Result:
+
+```
+listing_id | title | city
+1 | Lakeview Cabin | Tahoe
+2 | Lakeside Loft | Austin
+3 | Downtown Lake Studio | Chicago
+6 | Lake | Geneva
+```
+
+**Any first**
+
+Titles whose second to fourth characters are ake, whatever the first character is.
+
+```sql
+SELECT
+  listing_id,
+  title,
+  city
+FROM listings
+WHERE title LIKE '_ake%'
+```
+
+Result:
+
+```
+listing_id | title | city
+1 | Lakeview Cabin | Tahoe
+2 | Lakeside Loft | Austin
+4 | lake house retreat | Tahoe
+6 | Lake | Geneva
+```
 
 The prefix pattern returns 3 rows, and listing 6 is one of them: the title 'Lake' leaves nothing after the prefix, and % matches nothing without complaint. The contains pattern adds listing 3, where Lake sits mid-title, for 4 rows. The third pattern also returns 4 rows but swaps listing 3 for listing 4, because the underscore accepts the lower case l that the capital L in the other 2 patterns rejected. The underscore accepts the D in 'Downtown Lake Studio' too, but the next 3 characters are own where the pattern requires ake, and the Lake later in the title does not help, because the pattern has no leading %.
 
@@ -305,28 +407,76 @@ NOT LIKE keeps the rows that fail the pattern. A NULL title fits neither LIKE no
 
 LIMIT cuts the result to its first n rows. OFFSET skips the first m rows before the cut begins. Together they carve a sorted result into pages: page 1 is OFFSET 0 LIMIT 20, page 2 is OFFSET 20 LIMIT 20, and page k is OFFSET (k - 1) \* 20 LIMIT 20. In the query text OFFSET follows ORDER BY and comes before LIMIT. The products table below has 8 rows, paged 3 at a time.
 
+**Page 1**
+
 Skip nothing and keep the first 3 rows of the sorted result.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | product_id, |
-|  | name, |
-|  | price |
-|  | FROM products |
-|  | ORDER BY price DESC, product_id |
-|  | LIMIT 3 |
-|  | OFFSET 0 |
+```sql
+SELECT
+  product_id,
+  name,
+  price
+FROM products
+ORDER BY price DESC, product_id
+LIMIT 3
+OFFSET 0
+```
 
-Result
+Result:
 
-| product_id | name | price |
-| --- | --- | --- |
-| 2 | Monitor | 310 |
-| 7 | Chair | 310 |
-| 5 | Headset | 120 |
+```
+product_id | name | price
+2 | Monitor | 310
+7 | Chair | 310
+5 | Headset | 120
+```
 
-3 rows
+**Page 2**
+
+Skip 3 rows and keep the next 3.
+
+```sql
+SELECT
+  product_id,
+  name,
+  price
+FROM products
+ORDER BY price DESC, product_id
+LIMIT 3
+OFFSET 3
+```
+
+Result:
+
+```
+product_id | name | price
+3 | Keyboard | 90
+6 | Webcam | 90
+1 | Desk Lamp | 45
+```
+
+**Page 3**
+
+Skip 6 rows and keep whatever is left, up to 3.
+
+```sql
+SELECT
+  product_id,
+  name,
+  price
+FROM products
+ORDER BY price DESC, product_id
+LIMIT 3
+OFFSET 6
+```
+
+Result:
+
+```
+product_id | name | price
+4 | Mouse | 45
+8 | Cable | 12
+```
 
 | page | OFFSET | LIMIT | product_id returned |
 | --- | --- | --- | --- |
@@ -448,26 +598,50 @@ Both endpoints are included: 45 >= 45 and 90 <= 90 are TRUE, so Desk Lamp, Mouse
 
 A timestamp column carries a time of day, and the bound TIMESTAMP '2024-03-31 00:00:00' is the first instant of March 31, not the last. A BETWEEN that ends there keeps events at exactly midnight and drops everything else that day. The events table below stores occurred_at as text from an event log, so each query casts it to TIMESTAMP before comparing.
 
+**BETWEEN**
+
 Both bounds included, with the upper bound at midnight on the last day of the quarter.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | event_id, |
-|  | occurred_at |
-|  | FROM events |
-|  | WHERE CAST(occurred_at AS TIMESTAMP) BETWEEN TIMESTAMP '2024-01-01 00:00:00' |
-|  | AND TIMESTAMP '2024-03-31 00:00:00' |
+```sql
+SELECT
+  event_id,
+  occurred_at
+FROM events
+WHERE CAST(occurred_at AS TIMESTAMP) BETWEEN TIMESTAMP '2024-01-01 00:00:00'
+AND TIMESTAMP '2024-03-31 00:00:00'
+```
 
-Result
+Result:
 
-| event_id | occurred_at |
-| --- | --- |
-| 1 | 2024-01-01 00:00:00 |
-| 2 | 2024-02-14 09:15:00 |
-| 3 | 2024-03-31 00:00:00 |
+```
+event_id | occurred_at
+1 | 2024-01-01 00:00:00
+2 | 2024-02-14 09:15:00
+3 | 2024-03-31 00:00:00
+```
 
-3 rows
+**Half-open**
+
+Lower bound included, upper bound excluded and set to the first instant of the next quarter.
+
+```sql
+SELECT
+  event_id,
+  occurred_at
+FROM events
+WHERE CAST(occurred_at AS TIMESTAMP) >= TIMESTAMP '2024-01-01 00:00:00'
+  AND CAST(occurred_at AS TIMESTAMP) < TIMESTAMP '2024-04-01 00:00:00'
+```
+
+Result:
+
+```
+event_id | occurred_at
+1 | 2024-01-01 00:00:00
+2 | 2024-02-14 09:15:00
+3 | 2024-03-31 00:00:00
+4 | 2024-03-31 18:20:00
+```
 
 The BETWEEN version returns 3 events and loses event 4, which happened at 18:20 on March 31, inside the quarter by any sensible definition. The half-open version returns 4. Its lower bound is included and its upper bound is excluded, set to the first instant of the next period, so every moment of March 31 passes. Event 5 at midnight on April 1 falls out of both, which is right, since it opens the next quarter. Writing the upper bound as 23:59:59 instead rescues whole seconds but still drops an event stamped 23:59:59.500.
 

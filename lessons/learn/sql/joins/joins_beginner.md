@@ -112,32 +112,77 @@ The 2 sides of an equality have to be comparable, and the case with no surprises
 
 Implicit conversion also costs the plan. When the engine converts `orders.customer_code` from text to integer on every row, an index on that column is useless for the join, because the index stores the text and the comparison needs the number, so the converted side becomes a full scan. An explicit `CAST` on the side that is stored wrong makes the mismatch visible in the query and puts the conversion on the side the author chose rather than the one the engine picked.
 
-The switcher below runs 3 formulations over the same tables. The orders table stores `customer_id` as an integer and also has a `customer_code` column inherited from an older system, which stores the same identifier as text. The first tab joins on the right integer key, the second on a plausible wrong key, and the third on the text key with an explicit cast.
+The examples below run 3 formulations over the same tables. The orders table stores `customer_id` as an integer and also has a `customer_code` column inherited from an older system, which stores the same identifier as text. The first version joins on the right integer key, the second on a plausible wrong key, and the third on the text key with an explicit cast.
+
+**Right key**
 
 Customer identifier to customer identifier, integer to integer. Four matched pairs.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | c.name, |
-|  | o.order_id, |
-|  | o.total |
-|  | FROM customers AS c |
-|  | INNER JOIN orders AS o |
-|  | ON c.customer_id = o.customer_id |
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.total
+FROM customers AS c
+INNER JOIN orders AS o
+  ON c.customer_id = o.customer_id
+```
 
-Result
+Result:
 
-| name | order_id | total |
-| --- | --- | --- |
-| Alice | 101 | 50 |
-| Alice | 102 | 30 |
-| Bob | 103 | 75 |
-| Carol | 104 | 20 |
+```
+name | order_id | total
+Alice | 101 | 50
+Alice | 102 | 30
+Bob | 103 | 75
+Carol | 104 | 20
+```
 
-4 rows
+**Wrong key**
 
-The first and third tabs return the same 4 rows, because `CAST(o.customer_code AS INTEGER)` turns `'1'` into 1 and the comparison proceeds on integers. The second returns 0 rows: no order number between 101 and 104 equals a customer number between 1 and 4, and nothing in the engine knew the condition was meaningless. On production tables the same mistake returns a result set that looks reasonable and is random.
+Order identifier to customer identifier. The query runs, and no pair passes.
+
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.total
+FROM customers AS c
+INNER JOIN orders AS o
+  ON c.customer_id = o.order_id
+```
+
+Result:
+
+```
+name | order_id | total
+```
+
+**Cast text**
+
+The text copy of the customer identifier, cast to an integer before the comparison.
+
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.total
+FROM customers AS c
+INNER JOIN orders AS o
+  ON c.customer_id = CAST(o.customer_code AS INTEGER)
+```
+
+Result:
+
+```
+name | order_id | total
+Alice | 101 | 50
+Alice | 102 | 30
+Bob | 103 | 75
+Carol | 104 | 20
+```
+
+The first and third versions return the same 4 rows, because `CAST(o.customer_code AS INTEGER)` turns `'1'` into 1 and the comparison proceeds on integers. The second returns 0 rows: no order number between 101 and 104 equals a customer number between 1 and 4, and nothing in the engine knew the condition was meaningless. On production tables the same mistake returns a result set that looks reasonable and is random.
 
 > Before writing the ON clause
 >
