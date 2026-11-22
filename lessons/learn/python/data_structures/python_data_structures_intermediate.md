@@ -664,9 +664,11 @@ The dict looks up order X by key, and replacing a value keeps the key at its fir
 
 <br>
 
-### Capstone: from raw events to clean rows
+### From raw events to clean rows
 
 ![Pipeline diagram 1](_images/python_data_structures_intermediate_diagram_1.png)
+
+Exercise: [From raw events to clean rows](_exercises/python_data_structures_intermediate_exercise_1.md)
 
 
 <br>

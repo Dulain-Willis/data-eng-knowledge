@@ -87,8 +87,6 @@ Step 3 became 2 lines under 1 if, because both totals change under the same cond
 
 <br>
 
-### Practice
-
 **A teammate asks: given a list of daily temperatures, how many days were at least 30 degrees? Which step list translates the question?**
 
 - **A.** Start a counter at 0; look at each temperature; if it is 30 or more, add 1 to the counter; report the counter.
@@ -197,8 +195,6 @@ Each item is a tuple, so item[1] is the price being compared and best[0] is the 
 
 <br>
 
-### Practice
-
 **Problem: given a list of exam scores, return how many students scored under 40. A teammate writes these input and output pairs. Which pair is wrong?**
 
 - **A.** Input [] gives output 0
@@ -303,8 +299,6 @@ The first pass compares 42 to itself and does nothing, which is correct and harm
 
 
 <br>
-
-### Practice
 
 **Trace this program by hand. What does it print?**
 
@@ -457,8 +451,6 @@ The loop runs 3 passes for the first call and stops at 80 without looking at 95.
 
 <br>
 
-### Practice
-
 **A product manager asks: of all the support tickets opened this week, how many came in from each region? Which pattern fits?**
 
 - **A.** Count: start at 0 and add 1 for each ticket from the region.
@@ -583,8 +575,6 @@ The order matters. Writing the expected answer before running the code means the
 
 <br>
 
-### Practice
-
 **Which small input finds the problem in this function?**
 
 ```python
@@ -618,7 +608,9 @@ The total is 0 and len(values) is 0, so the division fails. The function needs a
 
 <br>
 
-### Capstone: one problem, all 5 habits
+### One problem, all 5 habits
+
+Exercise: [One problem, all 5 habits](_exercises/python_problem_solving_beginner_exercise_1.md)
 
 A logistics team asks: given a list of parcel weights in kilograms, how many parcels are over the 20 kilogram limit? Walk it through every section of this lesson:
 

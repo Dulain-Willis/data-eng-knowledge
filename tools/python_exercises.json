@@ -1,0 +1,414 @@
+{
+ "python_foundations_beginner": [
+  {
+   "name": "A name that was never bound",
+   "places": [
+    1,
+    2
+   ],
+   "after": "The most common error in a new programmer",
+   "moved": [
+    "The program below computes a subtotal and stops on its last line.",
+    "The error names `Subtotal_cents`, with a capital S, and that spelling appears nowhere on the left of an `=`."
+   ],
+   "trim": [
+    [
+     " The program below computes a subtotal and stops on its last line.",
+     ""
+    ],
+    [
+     "The error names `Subtotal_cents`, with a capital S, and that spelling appears nowhere on the left of an `=`. ",
+     ""
+    ]
+   ]
+  },
+  {
+   "name": "Converting between types",
+   "places": [
+    3
+   ],
+   "after": "Conversion toward a narrower type",
+   "moved": [
+    "`int` for the quantity, because a count of items is whole and later code will use it to loop or to index. `float` for the price, because the fractional cents matter. `float` on the quantity would still give the same line total but prints the count as `4.0`, and a label built from it would read as 4.0 units; `str` on either leaves text in place, and text multiplied by text is the `TypeError` from the top of the section."
+   ]
+  },
+  {
+   "name": "f-strings",
+   "places": [
+    4
+   ],
+   "after": "The spec sits after the colon",
+   "moved": [
+    "`sep` is applied between arguments and `end` after the last one. An empty `sep` glues the values together, so `user8814checkout` cannot be split apart again; the newline `end` is the default and leaves the subtotal on a line of its own. The pipe rarely appears in ids or event names, which is why exports use it as a delimiter, though a field that contains one still breaks the split."
+   ]
+  },
+  {
+   "name": "Precedence and augmented assignment",
+   "places": [
+    5
+   ],
+   "after": "| Level | Operators | Example |",
+   "moved": [
+    "The broken line divides only `discount_cents` by 100, because `/` binds tighter than `-`, so the output is 14992.0, a cent total with 5 dollars subtracted from it. Wrapping the subtraction in parentheses makes the whole cent amount divide, and the result is 144.97 dollars. A bug like this prints a plausible number every time it runs, which is why a total that is 100 times too large is worth a parenthesis check before anything else."
+   ]
+  }
+ ],
+ "python_foundations_intermediate": [
+  {
+   "name": "Indentation and Code Blocks",
+   "places": [
+    6
+   ],
+   "after": "| ✓ Do | ✗ Don't |\n| --- | --- |\n| • Indent with 4 spaces",
+   "moved": []
+  },
+  {
+   "name": "Importing Modules",
+   "places": [
+    7
+   ],
+   "after": "Importing `pricing` runs every line",
+   "moved": []
+  },
+  {
+   "name": "Reading Input From the User",
+   "places": [
+    8
+   ],
+   "after": "> What input() guarantees",
+   "moved": []
+  },
+  {
+   "name": "Reading a Traceback",
+   "places": [
+    9
+   ],
+   "after": "A SyntaxError or IndentationError appears before",
+   "moved": []
+  },
+  {
+   "name": "Trying Code in the Interactive Shell",
+   "places": [
+    10
+   ],
+   "heading": "### Capstone",
+   "heading_new": null,
+   "moved": []
+  }
+ ],
+ "python_control_flow_intermediate": [
+  {
+   "name": "A reading through every tool",
+   "places": [
+    11,
+    12,
+    13
+   ],
+   "heading": "### Capstone: a reading through every tool",
+   "heading_new": "### A reading through every tool",
+   "moved": [
+    "These last 2 drills put the whole lesson into a single function. Guards leave early and a type check sits at the boundary. After that come a chained range and an inline label.",
+    "The second capstone hinges on a habit worth keeping for any type ladder:"
+   ],
+   "trim": [
+    [
+     "The second capstone hinges on a habit",
+     "A habit"
+    ]
+   ]
+  }
+ ],
+ "python_expressions_beginner": [
+  {
+   "name": "Operators and Readability",
+   "places": [
+    14,
+    15
+   ],
+   "before": "A fixed fee plus a per-item cost",
+   "moved": [
+    "Each program below pulls on more than one section at once, so expect naming and the assignment-versus-comparison question to turn up in the same lines as type mixing and operator order."
+   ]
+  }
+ ],
+ "python_expressions_advanced": [
+  {
+   "name": "One event, every operator",
+   "places": [
+    19,
+    20,
+    21
+   ],
+   "before": "A pipeline step like this one usually breaks",
+   "heading_new": "### One event, every operator",
+   "moved": [
+    "The last 2 problems put the whole lesson into a single pipeline step. It decodes a message event's ID and tests a permission bit before guarding a division; after that it reads present values and compares float results.",
+    "The next program contains one of each."
+   ],
+   "trim": [
+    [
+     " The next program contains one of each.",
+     ""
+    ]
+   ]
+  }
+ ],
+ "python_dictionaries_intermediate": [
+  {
+   "name": "Iterating and Dictionary Views",
+   "places": [
+    22
+   ],
+   "after": "Keeping the first value per key is one use",
+   "moved": [
+    "Put the views to work. The report below prints the largest payment, then every order id whose payment is above 10."
+   ]
+  },
+  {
+   "name": "Merging Dictionaries",
+   "places": [
+    23
+   ],
+   "after": "`{**a, **b}` also accepts literal keys",
+   "moved": [
+    "The runner below should let each job's settings beat the defaults. Run it: the job asked for 0 retries and a 120-second timeout, and the printed config disagrees."
+   ]
+  },
+  {
+   "name": "Copying Dictionaries",
+   "places": [
+    24
+   ],
+   "after": "Functions are where shared state bites",
+   "moved": [
+    "The function below tags replayed events and was meant to leave its input alone."
+   ],
+   "trim": [
+    [
+     " The function below tags replayed events and was meant to leave its input alone.",
+     ""
+    ]
+   ]
+  }
+ ],
+ "python_collections_intermediate": [
+  {
+   "name": "A ranking step end to end",
+   "places": [
+    25,
+    26
+   ],
+   "before": "Ties deserve their own check",
+   "heading_new": "### A ranking step end to end",
+   "moved": [
+    "The code quiz below puts all 5 ideas into one pipeline step, in the order a real job runs them: label the columns, convert the values, select the rows, rank the survivors. The debug drill after it returns to the tie rule from ranking on its own."
+   ]
+  }
+ ],
+ "python_functional_beginner": [
+  {
+   "name": "One Pricing Pipeline",
+   "places": [
+    27,
+    28
+   ],
+   "before": "#### Lists of Dicts Have 2 Layers",
+   "heading_new": "### One Pricing Pipeline",
+   "moved": [
+    "The 2 drills below combine the sections: a pure higher-order function with hints that builds a new list, then a bug hunt in a function that rewrites what it was given."
+   ]
+  }
+ ],
+ "python_problem_solving_beginner": [
+  {
+   "name": "One problem, all 5 habits",
+   "places": [
+    29
+   ],
+   "heading": "### Capstone: one problem, all 5 habits",
+   "heading_new": "### One problem, all 5 habits",
+   "moved": [
+    "before the drill below hands you a version with a mistake in it"
+   ],
+   "trim": [
+    [
+     " before the drill below hands you a version with a mistake in it:",
+     ":"
+    ]
+   ]
+  }
+ ],
+ "python_data_structures_beginner": [
+  {
+   "name": "Which Collections Keep Their Order",
+   "places": [
+    30
+   ],
+   "heading": "### Practice",
+   "heading_nth": 0,
+   "heading_new": null,
+   "before": "An empty list is `[]` and grows with",
+   "moved": [
+    "The drill below depends on how each collection starts and grows."
+   ],
+   "trim": [
+    [
+     "The drill below depends on how each collection starts and grows. ",
+     ""
+    ]
+   ]
+  },
+  {
+   "name": "Which Collections Can Change",
+   "places": [
+    33
+   ],
+   "heading": "### Practice",
+   "heading_nth": 1,
+   "heading_new": null,
+   "moved": [
+    "The first exercise is about what a function can do to a list it was handed. The second hands you a tuple that someone treated like a list."
+   ]
+  },
+  {
+   "name": "Converting Between Collections",
+   "places": [
+    34
+   ],
+   "heading": "### Practice",
+   "heading_nth": 2,
+   "heading_new": null,
+   "moved": [
+    "Both exercises hinge on what `set()` throws away and what `list()` can and can't restore."
+   ]
+  },
+  {
+   "name": "Which Collections Allow Duplicates",
+   "places": [
+    35
+   ],
+   "heading": "### Practice",
+   "heading_nth": 3,
+   "heading_new": null,
+   "moved": [
+    "The first exercise mixes a set literal and a dict literal with repeats. The second has you write the counting pattern."
+   ]
+  },
+  {
+   "name": "Choosing the Right Type",
+   "places": [
+    31,
+    32,
+    36
+   ],
+   "heading": "### Capstones",
+   "heading_new": null,
+   "before": "Run the 4 questions in order",
+   "moved": [
+    "The third capstone builds 2 collections from the same list of readings, and each answers a different count. `len` of a set counts distinct values, while `len` of a tuple counts every reading, repeats included. `max` returns the same highest value from either one, because dropping repeats never removes the largest value, only extra copies of it.",
+    "The last capstone depends on what square brackets mean on a dict built from pairs. `dict()` makes the first item of each pair a key, so a dict built from (name, quantity) pairs is read with a name. A position number between the brackets asks for a key that is that number, and when no such key exists the lookup stops with a `KeyError` naming the missing key.",
+    "That capstone kept a set beside a list so each answered its own question. The next one hands you a need and no code."
+   ],
+   "trim": [
+    [
+     "That capstone kept a set beside a list so each answered its own question. The next one hands you a need and no code. ",
+     ""
+    ]
+   ]
+  }
+ ],
+ "python_data_structures_intermediate": [
+  {
+   "name": "From raw events to clean rows",
+   "places": [
+    37
+   ],
+   "heading": "### Capstone: from raw events to clean rows",
+   "heading_new": "### From raw events to clean rows",
+   "after": "![Pipeline diagram 1]",
+   "moved": [
+    "The last practice runs the lesson's steps on a handful of events: drop the repeats, attach titles through an index, and group by listener."
+   ]
+  }
+ ],
+ "python_sets_intermediate": [
+  {
+   "name": "Changing a set in place",
+   "places": [
+    38
+   ],
+   "after": "```python\nmon = {1, 2}\ntue = {2, 3}\nflagged = [3, 1]",
+   "moved": [
+    "The last exercise uses each operator from this lesson. Returning users are an intersection, new users a difference that also subtracts the banned list, users seen in only 1 week a symmetric difference, and the banned check a subset test against the union."
+   ]
+  }
+ ],
+ "python_lists_advanced": [
+  {
+   "name": "A plan with undo",
+   "places": [
+    49,
+    50
+   ],
+   "heading": "### Capstone: a plan with undo",
+   "heading_new": "### A plan with undo",
+   "moved": []
+  }
+ ],
+ "python_dictionaries_beginner": [
+  {
+   "name": "Creating Your First Dictionary",
+   "places": [
+    51
+   ],
+   "heading": "### Practice",
+   "heading_nth": 0,
+   "heading_new": null,
+   "moved": []
+  },
+  {
+   "name": "Reading and Updating Values",
+   "places": [
+    52
+   ],
+   "heading": "### Practice",
+   "heading_nth": 1,
+   "heading_new": null,
+   "moved": []
+  },
+  {
+   "name": "Removing Items",
+   "places": [
+    53
+   ],
+   "heading": "### Practice",
+   "heading_nth": 2,
+   "heading_new": null,
+   "moved": []
+  },
+  {
+   "name": "Checking for Keys and Key Types",
+   "places": [
+    54
+   ],
+   "heading": "### Practice",
+   "heading_nth": 3,
+   "heading_new": null,
+   "moved": []
+  }
+ ],
+ "python_problem_solving_advanced": [
+  {
+   "name": "The fullest gap",
+   "places": [
+    55,
+    56
+   ],
+   "after": "A missing sort sometimes leaves a visible trace",
+   "heading_new": "### The fullest gap",
+   "moved": [
+    "This one combines 3 patterns: sort the input, walk 2 pointers inward, and keep the best total so far. A total that fits the gap is a candidate, and moving `left` up tries a larger one; a total that overflows moves `right` down to a shorter track."
+   ]
+  }
+ ]
+}

@@ -519,7 +519,9 @@ isinstance(False, int) is True since bool is built on int. 2.0 is a float, which
 
 <br>
 
-### Capstone: a reading through every tool
+### A reading through every tool
+
+Exercise: [A reading through every tool](_exercises/python_control_flow_intermediate_exercise_1.md)
 
 A habit worth keeping for any type ladder: feed it one value of every shape it could receive and note which test fires first. Give bools their own rows, since they are the values that slip into an int branch, and include 0, a real quantity that must come back as 0 and never as a missing value. Here is that check run on `parse_qty` from the animation.
 

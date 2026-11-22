@@ -97,8 +97,6 @@ Both membership checks answered at once, because answering them is what a set is
 
 <br>
 
-### Practice
-
 Predict each result before you pick, then read the explanations for the options you ruled out.
 
 **What does this program print?**
@@ -133,6 +131,8 @@ The set blocks the second b1 and the list records each first arrival in order.
 - **D.** append places each item at the end, so the list follows first arrival order.
 
 </details>
+
+Exercise: [Which Collections Keep Their Order](_exercises/python_data_structures_beginner_exercise_1.md)
 
 An empty list is `[]` and grows with `append`, which puts the item in the next free slot. An empty set is `set()`, since `{}` builds an empty dict, and it grows with `add`, which files the item by its value. A set has no `append` and a list has no `add`, so pairing a collection with the other one's method stops the program with an `AttributeError`.
 
@@ -235,7 +235,7 @@ Python accepted the tuple as a key, and reading it back with the same tuple retu
 
 <br>
 
-### Practice
+Exercise: [Which Collections Can Change](_exercises/python_data_structures_beginner_exercise_2.md)
 
 **What does this program print?**
 
@@ -360,7 +360,7 @@ Conversion never edits the source, so to drop duplicates and keep working with a
 
 <br>
 
-### Practice
+Exercise: [Converting Between Collections](_exercises/python_data_structures_beginner_exercise_3.md)
 
 **What does this program print?**
 
@@ -488,7 +488,7 @@ The list reports 5 because it kept every click. The dict reports 2 because `home
 
 <br>
 
-### Practice
+Exercise: [Which Collections Allow Duplicates](_exercises/python_data_structures_beginner_exercise_4.md)
 
 **What does this program print?**
 
@@ -580,8 +580,6 @@ Swap the set for a list and the program still works but scans every earlier user
 
 <br>
 
-### Capstones
-
 These mix every idea so far: order and change, plus conversion and duplicates. Trace the code by hand first; the explanations assume you did.
 
 **What does this program print?**
@@ -616,6 +614,8 @@ The set blocks the second b1 and the list records each first arrival in order.
 - **D.** append places each item at the end, so the list follows first arrival order.
 
 </details>
+
+Exercise: [Choosing the Right Type](_exercises/python_data_structures_beginner_exercise_5.md)
 
 Run the 4 questions in order, and when 2 types both satisfy every answer, prefer the one that refuses what the program never does: a type that blocks an unwanted edit turns a silent mistake into an error on the line that made it.
 

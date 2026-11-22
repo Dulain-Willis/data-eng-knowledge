@@ -112,6 +112,8 @@ Python does not guess at a block's borders, so 3 mistakes stop the program befor
 | --- | --- |
 | • Indent with 4 spaces per level, every time<br><br>• End every header line with a colon<br><br>• Set your editor to insert spaces when you press Tab<br><br>• Return to the margin to close a block | • Mix tabs and spaces in one file<br><br>• Indent a line that no header asked for<br><br>• Use 2 spaces in one block and 4 in another<br><br>• Expect a blank line to end a block; only dedenting does |
 
+Exercise: [Indentation and Code Blocks](_exercises/python_foundations_intermediate_exercise_1.md)
+
 
 <br>
 
@@ -234,6 +236,8 @@ print(pricing.with_tax(100))
 
 Importing `pricing` runs every line of `pricing.py` once, top to bottom, which is how `TAX_RATE` gets its value and `with_tax` gets defined. A print at the top level of `pricing.py` would run at import time too, which surprises people the first time a bare import produces output. Keep a module's top level to constants and definitions, and the importing script decides what gets printed.
 
+Exercise: [Importing Modules](_exercises/python_foundations_intermediate_exercise_2.md)
+
 
 <br>
 
@@ -351,6 +355,8 @@ The fourth row shows the program dying at line 1, so the Quantity prompt never a
 > - It keeps every other character typed, spaces included
 > - It blocks: nothing after it runs until the user presses Enter
 
+Exercise: [Reading Input From the User](_exercises/python_foundations_intermediate_exercise_3.md)
+
 
 <br>
 
@@ -459,6 +465,8 @@ print(with_tax(price))
 
 A SyntaxError or IndentationError appears before the program runs a single line, because Python reads the whole file first and couldn't parse it. The report skips the Traceback header, shows the file and line, the offending source, a caret under the point where parsing gave up, and the error name. There's no frame to list, since nothing was executing. A traceback with the header always means the file parsed and some line actually ran.
 
+Exercise: [Reading a Traceback](_exercises/python_foundations_intermediate_exercise_4.md)
+
 
 <br>
 
@@ -550,7 +558,7 @@ The 2 work together. Try an expression in the shell until it gives the value you
 
 <br>
 
-### Capstone
+Exercise: [Trying Code in the Interactive Shell](_exercises/python_foundations_intermediate_exercise_5.md)
 
 The capstone pulls the 5 sections into one short script: an import, an indented block, a value standing in for user input, and a bug that produces a traceback. Predict the traceback first, then decide the fix.
 

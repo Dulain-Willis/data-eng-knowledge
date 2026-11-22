@@ -61,7 +61,7 @@ total = 0 before the loop matters. If that line sat inside the body, total would
 
 <br>
 
-### Practice: counting letters
+### Counting letters
 
 Run the program below in your head before you reveal its output. The if inside the loop fires only on passes where the character is "a". "banana" has 6 characters, so the body runs 6 times, and count moves on 3 of those passes.
 

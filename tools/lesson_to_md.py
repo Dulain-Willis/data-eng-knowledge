@@ -2297,6 +2297,12 @@ def main():
         f.write(convert(html, images, sections, animations, drop_refs,
                        load_drops(slug), cells, regex_images, switchers))
     os.replace(tmp_path, path)
+    if os.sep + os.path.join("learn", "python") + os.sep in os.path.abspath(path):
+        # Learn Python: exercise spots become links to placeholder files (tools/python_exercises.json)
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from python_exercise_placeholders import apply_lesson
+        n = apply_lesson(path)
+        print(f"note: {n} exercise placeholder(s) written (python_exercise_placeholders.py)", file=sys.stderr)
     print(path)
 
 

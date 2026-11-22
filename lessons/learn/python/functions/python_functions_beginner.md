@@ -600,7 +600,7 @@ The string comes second in the body, after rate = 15, so Python does not record 
 
 <br>
 
-### Capstone: a documented pricing module
+### A documented pricing module
 
 The program below brings the 5 sections together: 3 documented functions, one calling another, used inside a loop that totals a driver's first 3 trips of the week, then a direct call. Predict both printed lines before running it; the trips are 2, 4 and 6 miles, lasting 10, 20 and 30 minutes.
 

@@ -540,7 +540,7 @@ hold_days:
 
 <br>
 
-### Capstone: transitions as a decision table
+### Transitions as a decision table
 
 The pipeline run's if-elif chain is a decision table too: the current state and the event go in, and the next state comes out. Keyed by `(state, event)`, it shrinks `handle` to a lookup and a None check. That rewrite combines dispatch on tuple keys with the guard reasoning from earlier sections.
 

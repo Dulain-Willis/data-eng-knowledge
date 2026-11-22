@@ -15,7 +15,7 @@
   "spark_narrow_wide_shuffle_advanced": [
     "The drill hands you a program that already repartitions"
   ],
-  "_comment_python_learn": "Learn Python drops: PROPOSED DEFAULTS from review PR #25 (27 places, 24 prefixes), pending owner decision. Delete or move an entry below to change a decision. Prefixes come from the converted Markdown. Practice (python_foundations_intermediate) matches 4 headings, all dropped. The 8 trims are NOT here: they are hand edits in a separate commit.",
+  "_comment_python_learn": "Learn Python drops (27 places, 24 prefixes), decided: the blocks leave the lesson body and their text goes into placeholder files in _exercises/, see tools/python_exercises.json (and docs/skipped-blocks.md). Practice (python_foundations_intermediate) matches 4 headings, all dropped. The 8 sentence trims are in python_exercises.json (trim), not here.",
   "python_foundations_beginner": [
     "int for the quantity, because a count of items is whole and",
     "sep is applied between arguments and end after the last",
