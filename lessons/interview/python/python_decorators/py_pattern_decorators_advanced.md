@@ -80,7 +80,7 @@ print(parse_row.__wrapped__("4,1.0"), parse_row.calls)
 | (1, 9.5) | parsed, calls is 1 |
 | bad row: 2,oops | float raised ValueError, failures is 1, the error re-raised to the loop |
 | (3, 4.0) | parsed, calls is 3 |
-| parse_row | Split an id,amount row into a typed tuple. | update_wrapper copied the name and docstring onto the instance |
+| parse_row \| Split an id,amount row into a typed tuple. | update_wrapper copied the name and docstring onto the instance |
 | 3 1 | 3 calls, 1 failure |
 | (4, 1.0) 3 | __wrapped__ ran the original, so calls stayed at 3 |
 

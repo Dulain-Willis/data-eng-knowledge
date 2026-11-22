@@ -280,7 +280,7 @@ Alternatives in a single branch are joined with `or`: `status == 200 or status =
 | Pattern kind | match-case (3.10+) | Python 3.9 equivalent | Matches when |
 | --- | --- | --- | --- |
 | Literal | `case 404:` | `if status == 404:` | the subject equals 404 |
-| Alternatives | `case 200 | 204:` | `if status == 200 or status == 204:` | any listed literal equals the subject |
+| Alternatives | `case 200 \| 204:` | `if status == 200 or status == 204:` | any listed literal equals the subject |
 | Capture plus guard | `case s if 500 <= s < 600:` | `if 500 <= status < 600:` | the guard is True; `s` is bound to the subject |
 | None literal | `case None:` | `if status is None:` | the subject is None, compared by identity |
 | Wildcard | `case _:` | the final `return` or `else:` | always; it catches whatever is left |

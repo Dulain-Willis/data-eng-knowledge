@@ -448,8 +448,8 @@ A field in an f-string can carry a format spec after a colon, as in `f"{value:sp
 | Part | Example | Result |
 | --- | --- | --- |
 | Fill and center | `f"{'GET':\*^9}"` | `\*\*\*GET\*\*\*` |
-| Width, left | `f"|{'GET':<6}|"` | `|GET |` |
-| Width, right | `f"|{'GET':>6}|"` | `| GET|` |
+| Width, left | `f"\|{'GET':<6}\|"` | `\|GET \|` |
+| Width, right | `f"\|{'GET':>6}\|"` | `\| GET\|` |
 | Sign | `f"{42:+d}"` | `+42` |
 | Thousands | `f"{20481:,}"` | `20,481` |
 | Precision | `f"{3.14159:.2f}"` | `3.14` |

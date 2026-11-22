@@ -117,8 +117,8 @@ A pipeline job's settings usually arrive in layers: package defaults, then overr
 | Spelling | Gives back | Changes the left dict | Python |
 | --- | --- | --- | --- |
 | `a.update(b)` | None; `a` holds the result | Yes | Any |
-| `a |= b` | `a`, holding the result | Yes | 3.9+ |
-| `a | b` | A new dict | No | 3.9+ |
+| `a \|= b` | `a`, holding the result | Yes | 3.9+ |
+| `a \| b` | A new dict | No | 3.9+ |
 | `{\*\*a, \*\*b}` | A new dict | No | 3.5+ |
 
 ```sql

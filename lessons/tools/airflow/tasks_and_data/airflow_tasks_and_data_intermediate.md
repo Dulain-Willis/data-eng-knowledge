@@ -314,9 +314,9 @@ Every task instance keeps the rendered value of each templated field from its la
 
 | Field | Written in the file | Rendered for 2026-11-03 |
 | --- | --- | --- |
-| sql[0] | DELETE ... WHERE order_date = DATE '{{ data_interval_start | ds }}' | DELETE ... WHERE order_date = DATE '2026-11-03' |
-| sql[1], lower bound | from_iso8601_timestamp('{{ data_interval_start | ts }}') | from_iso8601_timestamp('2026-11-03T00:00:00+00:00') |
-| sql[1], upper bound | from_iso8601_timestamp('{{ data_interval_end | ts }}') | from_iso8601_timestamp('2026-11-04T00:00:00+00:00') |
+| sql[0] | DELETE ... WHERE order_date = DATE '{{ data_interval_start \| ds }}' | DELETE ... WHERE order_date = DATE '2026-11-03' |
+| sql[1], lower bound | from_iso8601_timestamp('{{ data_interval_start \| ts }}') | from_iso8601_timestamp('2026-11-03T00:00:00+00:00') |
+| sql[1], upper bound | from_iso8601_timestamp('{{ data_interval_end \| ts }}') | from_iso8601_timestamp('2026-11-04T00:00:00+00:00') |
 | conn_id | warehouse | warehouse |
 
 The 2 views differ in when they look. The tab holds the render of the task instance's latest try and nothing older: clear the task and let it run again, and the new try writes its render over the old one, so the string the failed try used is gone from the tab once the next try starts. Read it before clearing, or recover it afterwards from the try's log or from the database's error, which usually quotes what it rejected. The CLI renders now, on the machine you run it from, with today's file, variables and environment, so it shows what the next try would see, and it is the view that checks a fix before anything is cleared.
@@ -329,9 +329,9 @@ The 2 views differ in when they look. The tab holds the render of the task insta
 | What you see rendered | Why | Fix |
 | --- | --- | --- |
 | DATE '{{ ds }}' with the braces still in it | The value sits in a field that is not templated, or in a string a TaskFlow function built in its body | Move it into a templated field, or take data_interval_start as a function parameter |
-| DATE '2026-11-03T00:00:00+00:00' and the database rejects it | data_interval_start rendered as a full datetime | Filter it: | ds for a date, | ts for an ISO timestamp, or strftime for a custom shape |
+| DATE '2026-11-03T00:00:00+00:00' and the database rejects it | data_interval_start rendered as a full datetime | Filter it: \| ds for a date, \| ts for an ISO timestamp, or strftime for a custom shape |
 | The try failed before its first log line, with a KeyError | The template asked for var.value.region and no home defines region | Define it, or give the lookup a default with var.value.get('region', 'us') |
-| A date 1 day earlier than the night it ran | ds names the window's start, and the run that covers Nov 3 runs on Nov 4 | Decide whether the field wants the window's start or its end, and render the end as data_interval_end | ds |
+| A date 1 day earlier than the night it ran | ds names the window's start, and the run that covers Nov 3 runs on Nov 4 | Decide whether the field wants the window's start or its end, and render the end as data_interval_end \| ds |
 | The same field renders 2 ways on 2 workers | A variable in the template lives in 1 worker's environment | Section 2: airflow variables get on each worker |
 
 The variable case fails earliest. Rendering happens before the task's own code starts, so a missing variable ends the try at render, the log opens with the traceback, and there is no completed render for that try to show. The date case fails latest and loudest: the render looks plausible, the statement reaches the database, and the database rejects a DATE literal that carries a T, a time and an offset, so the clue sits in the database's error, which quotes the string it received.

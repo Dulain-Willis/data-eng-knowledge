@@ -330,9 +330,9 @@ print({**defaults, **job} == defaults | job)
 
 | Line | Prints |
 | --- | --- |
-| `print(defaults | job)` | `{'retries': 3, 'timeout_s': 120, 'region': 'us', 'owner': 'ads'}` |
-| `print(job | defaults)` | `{'timeout_s': 30, 'owner': 'ads', 'retries': 3, 'region': 'us'}` |
-| `print({\*\*defaults, \*\*job} == defaults | job)` | `True` |
+| `print(defaults \| job)` | `{'retries': 3, 'timeout_s': 120, 'region': 'us', 'owner': 'ads'}` |
+| `print(job \| defaults)` | `{'timeout_s': 30, 'owner': 'ads', 'retries': 3, 'region': 'us'}` |
+| `print({\*\*defaults, \*\*job} == defaults \| job)` | `True` |
 
 Both {\*\*a, \*\*b} and a | b build a new dict: keys from a first, then new keys from b. For a key in both, the value from b replaces the value from a, and the key keeps the position it had in a. The | operator arrived in Python 3.9. a |= b and a.update(b) change a in place, and update returns None, so config = defaults.update(job) leaves config as None. Both forms merge only the top level: a nested dict under a shared key is replaced whole.
 

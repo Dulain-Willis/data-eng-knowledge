@@ -199,10 +199,10 @@ Because the entry is data, the parser for a delimited format can be generic code
 | Upstream change | Example | Registry response |
 | --- | --- | --- |
 | Optional field added | JSON gains `channel` | Compatible: minor version, extra key ignored until mapped |
-| Delimiter changed | `|` becomes `;` | New format entry; the old one stays for replaying history |
+| Delimiter changed | `\|` becomes `;` | New format entry; the old one stays for replaying history |
 | Type widened | `amount` gains decimals | Compatible only if the target column was already decimal |
 | Required field removed | `amount` disappears | Breaking: rows fail validation and the contract owner is paged |
-| Fields reordered, same count | `user|ts|amount|currency` | Undetectable by shape: require a version marker or header |
+| Fields reordered, same count | `user\|ts\|amount\|currency` | Undetectable by shape: require a version marker or header |
 
 The last row is where detection by shape runs out. A pipe-delimited line with 4 fields looks the same whether `ts` comes first or second, and a parser that trusts position will write user ids into the time column until something downstream fails to cast. No detector rule can recover information the format does not carry, so the fix is a contract: a header line, a version field, or a file-naming convention the source agrees to.
 
@@ -307,7 +307,7 @@ Real engines carry optimizations that skip some of these attempts in some cases,
 | --- | --- | --- |
 | `.\*.\*=.\*` | 2 wildcards compete for the same characters | `^[^=]\*=.\*` |
 | `(\w+\s?)+$` | Inner and outer `+` can split a word many ways | `^\w+(?:\s\w+)\*$` |
-| `"(.|\\")\*"` | `.` also matches the backslash of an escape | `"(?:[^"\\]|\\.)\*"` |
+| `"(.\|\\")\*"` | `.` also matches the backslash of an escape | `"(?:[^"\\]\|\\.)\*"` |
 
 The test behind every row: can 2 parts of the pattern match the same character at the same position, and can the overall match still fail? If both are true, failure costs every split. On Python 3.11 and later, an atomic group `(?>...)` or a possessive quantifier such as `*+` gives back no characters once it has matched, which removes the splits for that part of the pattern; earlier versions have neither. The `re` module has no timeout argument in any version, so on every version the controls are rewriting the pattern, bounding the input, and running untrusted patterns in a worker that can be stopped from outside.
 

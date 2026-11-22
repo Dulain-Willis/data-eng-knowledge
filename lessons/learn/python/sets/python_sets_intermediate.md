@@ -11,7 +11,7 @@ Spotify's Blend builds a shared playlist out of friends' listening. Suppose you 
 
 Pipelines rarely get their keys from a single place. Say Monday's purchases arrive on 2 event feeds, the website and the mobile app, and each feed is loaded into a set of buyer IDs. A customer who bought on both shows up in both sets. Finance wants the number of distinct people who bought on Monday, and that number comes from the union: every ID present in at least 1 of the sets, each counted once.
 
-| user_id | in web | in app | in web | app |
+| user_id | in web | in app | in web \| app |
 | --- | --- | --- | --- |
 | 101 | yes | no | yes |
 | 102 | yes | no | yes |
@@ -67,7 +67,7 @@ print(sorted(wide))
 
 The list carried 103 twice. The result kept a single 103, which `web` already held, and added 106 and 107. The second call merged a list, a range and another set at once, and 101, already in `web`, appeared a single time.
 
-| ✓ The | operator | ✗ The union() method |
+| ✓ The \| operator | ✗ The union() method |
 | --- | --- |
 | • Both sides must be sets, or Python raises TypeError<br><br>• Chains to more inputs: a \| b \| c<br><br>• Short enough to sit inside a larger expression | • Takes lists, strings, ranges and dicts as well as sets<br><br>• Merges any number of inputs in a single call<br><br>• Converts its inputs, so no set(...) wrapper is needed |
 
@@ -198,7 +198,7 @@ The loop starts from `days[0]` and each `&` can only remove IDs, so the set shri
 
 | Folding a list with | Start from | Why |
 | --- | --- | --- |
-| | (union) | set() | an empty set adds no IDs, so the result is untouched |
+| \| (union) | set() | an empty set adds no IDs, so the result is untouched |
 | & (intersection) | the first set | an empty set removes every ID, so the result stays empty |
 
 
@@ -597,7 +597,7 @@ Each operation in this lesson has an in-place form that rewrites the left set an
 
 | Builds a new set | Changes the left set | Method form |
 | --- | --- | --- |
-| a | b | a |= b | a.update(b) |
+| a \| b | a \|= b | a.update(b) |
 | a & b | a &= b | a.intersection_update(b) |
 | a - b | a -= b | a.difference_update(b) |
 | a ^ b | a ^= b | a.symmetric_difference_update(b) |

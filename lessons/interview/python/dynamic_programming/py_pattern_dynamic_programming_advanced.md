@@ -44,7 +44,7 @@ Bitmask DP fits problems where the answer depends on which members of a small se
 | --- | --- | --- |
 | Is item 2 in the set? | `mask >> 2 & 1` | 1 |
 | Is item 1 in the set? | `mask >> 1 & 1` | 0 |
-| Add item 1 | `mask | 1 << 1` | 15 |
+| Add item 1 | `mask \| 1 << 1` | 15 |
 | Remove item 3 | `mask & ~(1 << 3)` | 5 |
 | How many items? | `bin(mask).count("1")` | 3 |
 | Lowest item's bit | `mask & -mask` | 1 |

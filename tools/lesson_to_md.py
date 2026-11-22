@@ -322,7 +322,7 @@ def tick_cross(soup, block, tokens):
     if len(sides) != 2:
         return
     token = f"@@TICK-CROSS-{len(tokens)}@@"
-    tokens[token] = ("| " + " | ".join(h for h, _ in sides) + " |\n| --- | --- |\n| "
+    tokens[token] = ("| " + " | ".join(h.replace("|", "\\|") for h, _ in sides) + " |\n| --- | --- |\n| "
                      + " | ".join("<br><br>".join(items) for _, items in sides) + " |")
     marker = soup.new_tag("p")
     marker.string = token
@@ -647,6 +647,11 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             continue
         text.replace_with(re.sub(r"^(\s*)((?:>\s*)+)",
                                  lambda m: m.group(1) + "".join("\\>" for _ in m.group(2).replace(" ", "")), str(text)))
+    # A literal "|" in a table cell (e.g. the set operator in "a | b", also inside code) would
+    # split the cell and break the row; GFM needs "\|" there, and reads it as "|" in code too.
+    for cell_tag in soup.find_all(["td", "th"]):
+        for text in cell_tag.find_all(string=lambda s: "|" in s):
+            text.replace_with(re.sub(r"(?<!\\)\|", r"\\|", str(text)))
     # escape_underscores=False keeps names like fare_amount readable
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not

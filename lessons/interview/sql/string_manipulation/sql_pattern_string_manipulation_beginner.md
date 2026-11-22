@@ -53,7 +53,7 @@ Interviewers rarely say "string manipulation". The prompt names a business dimen
 | --- | --- | --- | --- |
 | Fixed-width code | APP2400417, with each part at fixed offsets | SUBSTRING, LEFT, RIGHT | Cutting Fixed-Width Codes Apart |
 | Delimited field | ana@gmail.com, https://shop.example.com/cart | SPLIT_PART, STRPOS | Extracting a Field by Position |
-| Messy value | ' Ana@Gmail.com', '(555) 123-4567' | TRIM, LOWER, ||, REPLACE | The last 2 sections |
+| Messy value | ' Ana@Gmail.com', '(555) 123-4567' | TRIM, LOWER, \|\|, REPLACE | The last 2 sections |
 
 Name the shape out loud before you write a function. "Characters 1 to 3 of `sku` look like a department code, so this is a fixed-width cut" tells the interviewer you read the data. It also commits you to a claim the sample can confirm or break. Candidates who skip that sentence often reach for the wrong tool, such as searching for a delimiter in a code that has none.
 

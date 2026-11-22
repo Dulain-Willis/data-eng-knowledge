@@ -145,12 +145,12 @@ The 1-pass follow-up tracks far and near as its left pointers: far is the first 
 
 The second form hides in take-from-both-ends problems. Take i items from the left and k - i from the right, and what remains is always a contiguous middle block of n - k items. Maximizing what you take equals minimizing what you leave, and the leftover is a fixed-width window. For cards [1, 2, 3, 4, 5, 6, 1] with k = 3, the middle has width 4 and there are exactly 4 placements of it.
 
-| middle left behind | middle sum | taken: left | right | taken sum |
+| middle left behind | middle sum | taken: left \| right | taken sum |
 | --- | --- | --- | --- |
-| [1, 2, 3, 4] | 10 | none | 5, 6, 1 | 12 |
-| [2, 3, 4, 5] | 14 | 1 | 6, 1 | 8 |
-| [3, 4, 5, 6] | 18 | 1, 2 | 1 | 4 |
-| [4, 5, 6, 1] | 16 | 1, 2, 3 | none | 6 |
+| [1, 2, 3, 4] | 10 | none \| 5, 6, 1 | 12 |
+| [2, 3, 4, 5] | 14 | 1 \| 6, 1 | 8 |
+| [3, 4, 5, 6] | 18 | 1, 2 \| 1 | 4 |
+| [4, 5, 6, 1] | 16 | 1, 2, 3 \| none | 6 |
 
 The total is 22, the smallest middle is 10, and the best take is 22 - 10 = 12. The variable-width version makes the same move: the fewest end removals summing to x equals n minus the longest middle summing to sum(nums) - x. On [3, 2, 20, 1, 1, 3] with x = 10, the total is 30, the longest middle summing to 20 is [20], and the answer is 6 - 1 = 5 removals. Every value is positive, so the middle's sum rises as it widens and a shrinking window finds it.
 

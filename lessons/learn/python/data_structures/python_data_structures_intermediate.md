@@ -341,7 +341,7 @@ print(changed)
 | yesterday.keys() - today.keys() | keys only in yesterday: removed | {56} |
 | today.keys() & yesterday.keys() | keys in both: kept | {55, 57} |
 | today.keys() ^ yesterday.keys() | keys on exactly 1 side | {56, 58} |
-| today.keys() | yesterday.keys() | every key either snapshot has | {55, 56, 57, 58} |
+| today.keys() \| yesterday.keys() | every key either snapshot has | {55, 56, 57, 58} |
 
 Key math says which ids exist, never what they hold. Track 57 sits in both snapshots, yet its title changed from Heroes to Heroes (Remaster). Finding that takes the last loop in the program: walk the shared keys and compare values. A change feed emits those 3 results. A downstream table inserts the added ids and deletes the removed ones, then updates the rows whose values changed.
 

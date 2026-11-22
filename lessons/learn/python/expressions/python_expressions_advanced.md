@@ -381,13 +381,13 @@ An int is stored as bits too, one per power of 2. bin(13) returns '0b1101': 8 + 
 | `12` | 1 | 1 | 0 | 0 | 12 |
 | `10` | 1 | 0 | 1 | 0 | 10 |
 | `12 & 10` | 1 | 0 | 0 | 0 | 8 |
-| `12 | 10` | 1 | 1 | 1 | 0 | 14 |
+| `12 \| 10` | 1 | 1 | 1 | 0 | 14 |
 | `12 ^ 10` | 0 | 1 | 1 | 0 | 6 |
 
 | Operator | Rule | Example | Result |
 | --- | --- | --- | --- |
 | `&` | 1 where both bits are 1 | `12 & 10` | `8` |
-| `|` | 1 where either bit is 1 | `12 | 10` | `14` |
+| `\|` | 1 where either bit is 1 | `12 \| 10` | `14` |
 | `^` | 1 where the 2 bits differ | `12 ^ 10` | `6` |
 | `~` | flips every bit, giving `-x - 1` | `~12` | `-13` |
 | `<<` | shifts left, filling with 0s | `3 << 2` | `12` |

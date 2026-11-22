@@ -157,9 +157,9 @@ Candidates who know the rule still trip on expressions where the answer looks fo
 | NULL \* 0 | NULL |
 | NULL - NULL | NULL |
 | 40.00 \* (1 - NULL) | NULL |
-| 'Order ' || NULL | NULL |
+| 'Order ' \|\| NULL | NULL |
 | UPPER(NULL) | NULL |
-| '' || 'Ben' | 'Ben' |
+| '' \|\| 'Ben' | 'Ben' |
 
 In the last row, the empty string is a real value, so concatenating it leaves the other side unchanged. Only NULL propagates.
 

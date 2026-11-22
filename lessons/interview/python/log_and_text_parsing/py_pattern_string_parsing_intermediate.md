@@ -369,8 +369,8 @@ The danger is a quantified group whose body can match the same characters in mor
 | --- | --- | --- |
 | ^(\d+,?)+$ | an optional comma lets digit runs split anywhere | ^\d+(?:,\d+)\*$ |
 | ^(\w+\s?)+$ | an optional space does the same to words | ^\w+(?:\s\w+)\*$ |
-| ^(\w|\d)+$ | a digit matches both branches | ^\w+$ |
-| "(?:[^"]|\\.)\*" | a backslash matches both branches | "(?:[^"\\]|\\.)\*" |
+| ^(\w\|\d)+$ | a digit matches both branches | ^\w+$ |
+| "(?:[^"]\|\\.)\*" | a backslash matches both branches | "(?:[^"\\]\|\\.)\*" |
 
 
 <br>

@@ -209,12 +209,12 @@ Python groups `a | b | c` from the left, as `(a | b) | c`. That makes `rows | Pi
 
 | Dunder | Triggered by | Pipeline use | Trap |
 | --- | --- | --- | --- |
-| `__or__` | `a | b` | Join 2 pipelines into a new one | Mutating `self` shares stages between pipelines |
-| `__ror__` | `a | b` after `a` declines | Feed records in from the left | In 3.9 a `dict` on the left declines too, so its keys run through the stages |
-| `__ior__` | `a |= b` | Usually left undefined | Without it Python rebinds `a` to `a | b`; a mutating version brings shared-state bugs back |
-| `__rshift__` | `a >> b` | Arrow-style alternative | `>>` binds tighter than `|`, so mixing them regroups the chain |
+| `__or__` | `a \| b` | Join 2 pipelines into a new one | Mutating `self` shares stages between pipelines |
+| `__ror__` | `a \| b` after `a` declines | Feed records in from the left | In 3.9 a `dict` on the left declines too, so its keys run through the stages |
+| `__ior__` | `a \|= b` | Usually left undefined | Without it Python rebinds `a` to `a \| b`; a mutating version brings shared-state bugs back |
+| `__rshift__` | `a >> b` | Arrow-style alternative | `>>` binds tighter than `\|`, so mixing them regroups the chain |
 | `__call__` | `p(rows)` | Run without the operator | Gives tests a plain function call to assert on |
-| `__repr__` | `repr(p)`, debuggers, logs | Show `Pipe(parse | drop_negative)` | Without it, logs show a memory address |
+| `__repr__` | `repr(p)`, debuggers, logs | Show `Pipe(parse \| drop_negative)` | Without it, logs show a memory address |
 | `__eq__` | `a == b` | Compare stage tuples in tests | Defining it sets `__hash__` to `None`, so a pipeline stops working as a dict key |
 
 *set behaves the same way: in 3.9, set.__or__ returns NotImplemented for a Pipe, so a set of record ids on the left becomes the data, iterated in hash order.*

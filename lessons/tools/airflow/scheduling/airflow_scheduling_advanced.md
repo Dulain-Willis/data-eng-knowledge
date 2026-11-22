@@ -112,7 +112,7 @@ nightly_audit()
 
 `daily_revenue` needs 1 event from each of its 2 assets since its last run. Counts beyond 1 change nothing: 2 orders events and 0 refunds events leave it waiting. When the refunds event arrives, the run is created with all 3 events in `triggering_asset_events`, and both flags reset to waiting. `fraud_scores` fires on every single event of either asset, so 2 orders events 15 minutes apart give it 2 runs.
 
-| Time | Event on | daily_revenue (orders & refunds) | fraud_scores (orders | rules) |
+| Time | Event on | daily_revenue (orders & refunds) | fraud_scores (orders \| rules) |
 | --- | --- | --- | --- |
 | 02:10 | orders_raw | waiting: orders yes, refunds no | run 1, carrying 1 event |
 | 02:25 | orders_raw | waiting: orders yes, refunds no | run 2, carrying 1 event |
