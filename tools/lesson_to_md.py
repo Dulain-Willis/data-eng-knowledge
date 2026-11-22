@@ -1121,6 +1121,31 @@ def _max_gap(path):
     return max((b - a for a, b in zip(ts, ts[1:])), default=0.0)
 
 
+def _start_corr(path):
+    """Python player START CHECK by content: the code panel (top left of the crop) does not change while the
+    player plays, so frame 0 must look like the frames 1.2 s and 2.4 s later (Pearson correlation of the top of
+    the panel, about 0.95 for the same panel, about 0 when frame 0 shows page text or a shifted layout)."""
+    W = 1600
+
+    def region(t):
+        raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(t), "-i", path, "-frames:v", "1",
+                              "-vf", f"scale={W}:-2", "-f", "rawvideo", "-pix_fmt", "gray", "-"],
+                             capture_output=True, stdin=subprocess.DEVNULL).stdout
+        return [raw[y * W + x] for y in range(14, min(175, len(raw) // W), 2) for x in range(30, 620, 2)]
+
+    def corr(a, b):
+        n = len(a)
+        if not n or n != len(b):
+            return 0.0
+        ma, mb = sum(a) / n, sum(b) / n
+        sab = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+        saa, sbb = sum((x - ma) ** 2 for x in a), sum((y - mb) ** 2 for y in b)
+        return sab / ((saa * sbb) ** 0.5 or 1)
+
+    first = region(0)
+    return min(corr(first, region(t)) for t in (1.2, 2.4))
+
+
 def _wait_idle(block, page, began, cap=150):
     """Finish detector for a player with no step counter: its markup has not changed for 4 seconds
     (the cap is generous). Returns the time of the last change, plus nothing else to trim."""
@@ -1813,6 +1838,9 @@ def record_animations(url, out_dir, slug, info, only=None):
                         # The Python player's long slow stretches change little per frame (a progress bar, one cell per
                         # step), so 10 distinct frames/s is too strict: demand motion at least 3 times a second on
                         # average and no frozen stretch longer than 2 s (a stalled recording).
+                        sc = _start_corr(dest)
+                        if sc < 0.8:
+                            problems.append(f"frame 0 is not the player's code panel (match {sc:.2f}): page text or a shifted layout")
                         gap = _max_gap(dest)
                         if fps < 3 or gap > 2.0:
                             problems.append(f"{fps:.1f} distinct frames/s, longest frozen stretch {gap:.1f} s")
