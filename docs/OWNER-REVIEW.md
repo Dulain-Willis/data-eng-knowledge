@@ -43,7 +43,6 @@ Everything the agents left for you to decide or look at. Nothing here blocked th
 
 ## Added after #21
 - **Learn SQL hand trims** (9 cuts across 5 lessons, commit "Learn SQL hand trims" on ticket-21, listed in `docs/skipped-blocks.md`). `joins_beginner` trim of ", and the blank below is that condition" is a judgement call.
-- **Learn SQL pending-decision sentences** are kept as-is (see Decisions pending #5); `complex_data_advanced` not checked for a runnable cell after the Capstone heading.
 
 ## Applied by default
 - **Learn SQL tabbed examples: Option A (ticket #22, branch `ticket-22`).** The owner was away, so the recommended Option A of PR #24 was applied: all 58 blocks / 152 tabs stay as text, each tab as a bold name label, caption, ```sql fence and result as text, no per-tab screenshots. Done by splicing into the existing lessons (no re-conversion, hand trims kept) and by the converter rule `sql_switcher` (`BLOCK-TYPES.md`). Lesson prose that said "tab"/"switcher" now says "version"/"examples". *To switch:* options B (add a 2x screenshot per tab, about 17 MB), C (first tab only) and D (one merged commented code block) are described with their trade-offs in PR #24 (`review/sql_learn_tabs/README.md`). Tell me the option and the sections are regenerated from the live pages the same way (`sql_switcher_tabs`, `switcher_markdown`).

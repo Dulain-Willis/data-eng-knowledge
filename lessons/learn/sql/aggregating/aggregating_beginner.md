@@ -252,7 +252,7 @@ The `bonuses` table below has 3 employees. Two received a bonus and 1 has `NULL`
 
 The argument to `SUM` can be arithmetic over several columns, computed per row before the adding starts. An `order_items` table storing `quantity` and `unit_price` has no revenue column, and `SUM(quantity * unit_price)` builds it: each row's quantity times its price, then the products added within the group. `SUM(quantity) * SUM(unit_price)` is a different and wrong number, since it multiplies 2 totals that were never meant to meet.
 
-`SUM(profit)` and `AVG(profit)` in the same row let a reader spot the region whose high total comes from many small orders rather than a few large ones, the same volume-versus-size reading the 2 counts gave in the previous section.
+Exercise: [Total and average profit per region](_exercises/aggregating_beginner_exercise_1.md)
 
 
 <br>

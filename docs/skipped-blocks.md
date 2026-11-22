@@ -265,7 +265,7 @@
 
   </details>
 
-- **Learn SQL drops and trims.** Drops are in `tools/drops.json` under the comment key `_comment_sql_learn` (14 places): the drag-the-tiles puzzles and the prose that only introduces or explains them. The trims are hand edits of the Markdown in their own commit ("Learn SQL hand trims"); re-running the converter on those lessons brings the sentences back.
+- **Learn SQL drops and trims.** Drops are in `tools/drops.json` under the comment key `_comment_sql_learn` (14 places): the drag-the-tiles puzzles and the prose that only introduces or explains them. The trims are hand edits of the Markdown in their own commit ("Learn SQL hand trims"); re-running the converter on those lessons brings the sentences back. Three Learn SQL spots that only referred to a dropped exercise were moved to placeholder files by hand, the same convention as Learn Python (`lessons/learn/sql/<card>/_exercises/<slug>_exercise_1.md`, not produced by the converter; re-running it on these lessons brings the sentences back): `aggregating_beginner` (the `profit` per region exercise and its explanation), `complex_data_advanced` (heading "Capstone: long tracks by id" is now "Long tracks by id"), `query_structure_advanced` (the "Assemble the subtraction" intro).
 
   <details><summary>Drops (14 places)</summary>
 
