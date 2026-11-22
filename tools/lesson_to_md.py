@@ -1950,10 +1950,14 @@ def _click_run(page, block, kind):
         print(f"warning: cell has {buttons.count()} '>>>' buttons, expected 1", file=sys.stderr)
     buttons.first.click()
     began = time.monotonic()
+    grew = False
     while time.monotonic() - began < 8:  # the output panel animates open
         page.wait_for_timeout(200)
         if block.bounding_box()["height"] > h0 + 5:
+            grew = True
             break
+    if not grew:
+        print("warning: cell did not grow after '>>>' (output not revealed?)", file=sys.stderr)
     page.wait_for_timeout(1200)  # let the open animation finish
     return before, block.inner_text()
 
