@@ -1741,7 +1741,17 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
         start_geom = geom
         mount_t = mark = time.monotonic()
         play = block.locator('button[aria-label="Play"]')
-        if m > 0 and play.count():  # a switched mode starts paused: the playback starts at this click
+        if btype == "python_animation" and m == 0:
+            # The Python player plays by itself from its mount, and the video can show its first painted frame several
+            # steps in (5/60, 3/107). Restart it and pause it at step 1, like a switched mode, so the recorded
+            # playback starts at a click of ours and the first frame reads 1/N.
+            block.locator('button[aria-label="Restart"]').first.click()
+            page.wait_for_timeout(300)
+            pause = block.locator('button[aria-label="Pause"]')
+            if pause.count():
+                pause.first.click()
+            page.wait_for_timeout(2000)
+        if (m > 0 or (btype == "python_animation" and m == 0)) and play.count():  # a switched mode starts paused: the playback starts at this click
             play.first.click()
             mark = time.monotonic()
         last_geom, h_max, last_seen = geom, geom["h"], None
@@ -1779,7 +1789,11 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
         webm = os.path.join(tmp, vids[0])
         pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
-        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))  # a stubborn player: start a frame or two later
+        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))
+        if btype == "python_animation" and m == 0:
+            # the video clock lags the script clock by up to about a second: start well inside the 2 s paused stretch
+            # at step 1 (before our Play click), not at the click, or the first frame can already be at step 2
+            start = max(pres, start - 1.0)  # a stubborn player: start a frame or two later
         live = last_seen - mark
         end = start + live + 2
         os.makedirs(os.path.dirname(dest), exist_ok=True)
