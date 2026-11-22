@@ -159,42 +159,98 @@ FROM artist_tracks
 
 ### LAST_VALUE sees less than you expect
 
-LAST_VALUE ought to hand every row the bottom of the partition. Run it with ORDER BY streams DESC and each row gets its own track back instead. The cause is how an ordered window is sized: once an OVER clause has an ORDER BY, the rows it covers run from the start of the partition up to the current row (and any rows tied with it, as the next section shows) and no further. That rule is why SUM over an ordered window produced a running total in the beginner lesson, and it means the last row LAST_VALUE can see is the current one. The 3 tabs below show the surprise and 2 ways out of it.
+LAST_VALUE ought to hand every row the bottom of the partition. Run it with ORDER BY streams DESC and each row gets its own track back instead. The cause is how an ordered window is sized: once an OVER clause has an ORDER BY, the rows it covers run from the start of the partition up to the current row (and any rows tied with it, as the next section shows) and no further. That rule is why SUM over an ordered window produced a running total in the beginner lesson, and it means the last row LAST_VALUE can see is the current one. The 3 versions below show the surprise and 2 ways out of it.
+
+**Default**
 
 The ordered window ends at the current row, so LAST_VALUE hands every row its own track.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | artist, |
-|  | track, |
-|  | streams, |
-|  | LAST_VALUE(track) OVER ( |
-|  | PARTITION BY artist |
-|  | ORDER BY streams DESC |
-|  | ) AS bottom_track |
-|  | FROM artist_tracks |
+```sql
+SELECT
+  artist,
+  track,
+  streams,
+  LAST_VALUE(track) OVER (
+    PARTITION BY artist
+    ORDER BY streams DESC
+  ) AS bottom_track
+FROM artist_tracks
+```
 
-Result
+Result:
 
-| artist | track | streams | bottom_track |
-| --- | --- | --- | --- |
-| Kite | Wind | 2500 | Wind |
-| Kite | Line | 500 | Line |
-| Nova | Orbit | 4000 | Orbit |
-| Nova | Dust | 3000 | Dust |
-| Nova | Halo | 1000 | Halo |
+```
+artist | track | streams | bottom_track
+Kite | Wind | 2500 | Wind
+Kite | Line | 500 | Line
+Nova | Orbit | 4000 | Orbit
+Nova | Dust | 3000 | Dust
+Nova | Halo | 1000 | Halo
+```
 
-5 rows
+**Full window**
 
-The first tab returns Wind, Line, Orbit, Dust, Halo, one row's own track per row. The other 2 tabs both return Line for every Kite row and Halo for every Nova row. The second tab fixes the window's size, which is the subject of the next section; the third sidesteps the question by making the row you want the first one. Both are correct, and the third is shorter, so reach for it when a single reversed sort gets you there.
+ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING stretches the window over the whole partition, so every row sees the true last track.
+
+```sql
+SELECT
+  artist,
+  track,
+  streams,
+  LAST_VALUE(track) OVER (
+    PARTITION BY artist
+    ORDER BY streams DESC
+    ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
+  ) AS bottom_track
+FROM artist_tracks
+```
+
+Result:
+
+```
+artist | track | streams | bottom_track
+Kite | Wind | 2500 | Line
+Kite | Line | 500 | Line
+Nova | Orbit | 4000 | Halo
+Nova | Dust | 3000 | Halo
+Nova | Halo | 1000 | Halo
+```
+
+**Flip order**
+
+Sorting ascending makes the smallest track the first row, so FIRST_VALUE returns it with no extra clause at all.
+
+```sql
+SELECT
+  artist,
+  track,
+  streams,
+  FIRST_VALUE(track) OVER (
+    PARTITION BY artist
+    ORDER BY streams
+  ) AS bottom_track
+FROM artist_tracks
+```
+
+Result:
+
+```
+artist | track | streams | bottom_track
+Kite | Line | 500 | Line
+Kite | Wind | 2500 | Line
+Nova | Halo | 1000 | Halo
+Nova | Dust | 3000 | Halo
+Nova | Orbit | 4000 | Halo
+```
+
+The first version returns Wind, Line, Orbit, Dust, Halo, one row's own track per row. The other 2 versions both return Line for every Kite row and Halo for every Nova row. The second version fixes the window's size, which is the subject of the next section; the third sidesteps the question by making the row you want the first one. Both are correct, and the third is shorter, so reach for it when a single reversed sort gets you there.
 
 
 <br>
 
 ### NTH_VALUE picks a position
 
-NTH_VALUE(track, 2) returns the value from the second row of the window. The same sizing rule applies: under an ordered window with no extra clause, the first row of a partition has not reached row 2 yet, so it gets NULL while every later row gets the runner-up. Stretching the window to the whole partition, as the **Full window** tab did, gives every row the same runner-up.
+NTH_VALUE(track, 2) returns the value from the second row of the window. The same sizing rule applies: under an ordered window with no extra clause, the first row of a partition has not reached row 2 yet, so it gets NULL while every later row gets the runner-up. Stretching the window to the whole partition, as the **Full window** version did, gives every row the same runner-up.
 
 ![Run output 4](_images/window_functions_intermediate_cell_4.png)
 
@@ -294,29 +350,55 @@ This frame trails: it ends at the current row and reaches 2 rows back, so the su
 
 ROWS measures the frame in physical rows. RANGE measures it in values of the ORDER BY column: rows that share the same sort value are peers, and a RANGE frame ending at CURRENT ROW includes every peer of the current row, even the ones placed after it. The difference only shows when the sort column has duplicates, which real data has constantly: 2 orders on the same day, 2 tracks with the same stream count.
 
+**ROWS**
+
 Each row gets its own running total, and the 2 day-2 orders receive different totals in an order the engine chooses.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | order_day, |
-|  | amount, |
-|  | SUM(amount) OVER ( |
-|  | ORDER BY order_day |
-|  | ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW |
-|  | ) AS running_total |
-|  | FROM orders |
+```sql
+SELECT
+  order_day,
+  amount,
+  SUM(amount) OVER (
+    ORDER BY order_day
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total
+FROM orders
+```
 
-Result
+Result:
 
-| order_day | amount | running_total |
-| --- | --- | --- |
-| 1 | 100 | 100 |
-| 2 | 200 | 300 |
-| 2 | 50 | 350 |
-| 3 | 300 | 650 |
+```
+order_day | amount | running_total
+1 | 100 | 100
+2 | 200 | 300
+2 | 50 | 350
+3 | 300 | 650
+```
 
-4 rows
+**RANGE**
+
+The 2 day-2 orders are peers, so both frames include both rows and both report 350.
+
+```sql
+SELECT
+  order_day,
+  amount,
+  SUM(amount) OVER (
+    ORDER BY order_day
+    RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  ) AS running_total
+FROM orders
+```
+
+Result:
+
+```
+order_day | amount | running_total
+1 | 100 | 100
+2 | 200 | 350
+2 | 50 | 350
+3 | 300 | 650
+```
 
 Under ROWS, the 2 day-2 orders get different running totals. The one the engine sorts first reads 300 or 150, depending on which order that is, and the other reads 350, so a second run can swap them. Under RANGE both read 350, because both share the value 2 in order_day and each frame includes its peer. A running total by day should be identical for every order on that day, and RANGE delivers that. RANGE is also the default unit when OVER has an ORDER BY and no frame.
 
