@@ -132,7 +132,7 @@ The trouble is the price of 1 call: answering 'connected after event t' builds a
 
 Every pair's search sits at its own midpoint, but all midpoints are positions on the same log, and 1 forward sweep passes all of them. A round of parallel binary search buckets unfinished pairs by midpoint, resets the union-find and replays the log once. After event t it answers every pair waiting at t and moves that pair's `lo` or `hi`. Each round halves every bracket, so about log2 of the log length rounds close them all.
 
-https://github.com/user-attachments/assets/6bcdbf42-7f85-43a4-8755-102b3939e807
+https://github.com/user-attachments/assets/5d912321-5c13-4d57-b987-8a41ec95170c
 
 *Each round rebuilds the union-find once and answers every pair at its own midpoint.*
 
@@ -211,7 +211,7 @@ Build from the last list backwards. The last augmented list, M2, is L2 itself; e
 
 The down pointer is approximate on purpose: it names the first M1 key at or above the M0 key the query landed on. The true M1 answer is that target or the key right before it, because promotion took every other key, so no run of M1 keys missing from M0 is longer than 1. One comparison decides.
 
-https://github.com/user-attachments/assets/a3402a5c-1f52-4990-8b13-9c7842da6b14
+https://github.com/user-attachments/assets/dfa45338-b6cd-4217-baee-6a249783019f
 
 *One bisect on M0; after that, each level costs a pointer and at most 1 step back.*
 
@@ -346,7 +346,7 @@ At table level, each commit appends an entry to a version log. The entry holds a
 
 Storing each commit as a delta keeps writes small, but rebuilding version v from nothing replays v deltas. A checkpoint every K commits holds the full state at that version, so resolving v becomes a floor search over checkpoint versions plus at most K - 1 deltas. This is the previous section's restart-point trade at a coarser grain: a full record at a fixed interval, compressed records between.
 
-https://github.com/user-attachments/assets/39a3e591-748f-4677-aa1f-b365d0bfef77
+https://github.com/user-attachments/assets/a08f31b4-e89d-43a3-83ad-a3b0f4d5b7a7
 
 *A floor search on commit_ts, a floor search on checkpoints, then a short replay.*
 
