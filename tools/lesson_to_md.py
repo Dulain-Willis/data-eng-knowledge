@@ -43,8 +43,11 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
-    "executable_spark",
+    "executable_spark", "executable_python", "regex_cards",
 }
+# Runnable cells: block type -> how the run control is found. Spark has a "Run" button and draws its
+# output with JavaScript; Python cells have a ">>>" button that reveals the output the page already holds.
+CELL_KINDS = ("executable_spark", "executable_python")
 # Interactive exercise with no answers in the page, so what's left is a dangling question.
 # Dropped. (multiple_choice used to be here; its answers ARE in the page's embedded JSON.)
 SKIPPED_BLOCKS = {"schema_story", "placed_challenge"}  # placed_challenge: empty stub for Airflow exercises
@@ -325,11 +328,39 @@ def spark_cell(soup, block, tokens, image_name, number):
     lines scroll sideways in the screenshot. Built as Markdown and swapped in after markdownify.
     """
     pre = block.find("pre")
-    code = (pre.get_text() if pre else block.get_text()).strip("\n")
+    if pre:
+        code = pre.get_text().strip("\n")
+    elif block.find("table"):  # Python cells: one table row per line, code in the last cell
+        code = "\n".join(tr.find_all("td")[-1].get_text() for tr in block.find("table").find_all("tr")
+                         if tr.find_all("td")).strip("\n")
+    else:
+        code = block.get_text().strip("\n")
     shot = (f"![Run output {number}](_images/{image_name})" if image_name
             else f"[Run output {number}: not captured. Re-run with --screenshots]")
     token = f"@@SPARK-CELL-{len(tokens)}@@"
     tokens[token] = f"{shot}\n\n```python\n{code}\n```"
+    marker = soup.new_tag("p")
+    marker.string = token
+    block.replace_with(marker)
+
+
+def regex_cards(soup, block, tokens, image_name, number):
+    """Regex example cards (python_strings_advanced): a screenshot of the stacked cards as the UI draws
+    them, then the text of each card (pattern, description, example -> match) so it stays searchable."""
+    shot = (f"![Regex examples](_images/{image_name})" if image_name
+            else "[Regex examples: not captured. Re-run with --screenshots]")
+    items = []
+    for card in block.find_all("code"):
+        body = card.find_parent("div", class_=lambda c: c and "flex-1" in c)
+        if body is None:
+            continue
+        desc = body.find("p")
+        spans = [sp.get_text(strip=True) for sp in body.find_all("span")]
+        example = f"`{spans[0]}` -> `{spans[-1]}`" if len(spans) >= 3 else ""
+        items.append(f"- `{card.get_text(strip=True)}`: {desc.get_text(' ', strip=True) if desc else ''}"
+                     + (f" Example: {example}" if example else ""))
+    token = f"@@REGEX-CARDS-{len(tokens)}@@"
+    tokens[token] = shot + "\n\n" + "\n".join(items)
     marker = soup.new_tag("p")
     marker.string = token
     block.replace_with(marker)
@@ -379,12 +410,12 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=()):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=(), regex_images=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
     drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
-    cells: file names of the run-output screenshots, one per executable_spark block in page order
+    cells: file names of the run-output screenshots, one per executable_spark / executable_python block in page order
     (record_cells); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
@@ -403,7 +434,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         p.string = EXERCISE_TOKEN.format(i)
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
-    diagrams_seen = animations_seen = cells_seen = 0
+    diagrams_seen = animations_seen = cells_seen = regex_seen = 0
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
@@ -430,7 +461,11 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             new = soup.new_tag("p")
             new.string = token
             block.replace_with(new)
-        elif kind == "executable_spark":
+        elif kind == "regex_cards":
+            name = regex_images[regex_seen] if regex_seen < len(regex_images) else None
+            regex_seen += 1
+            regex_cards(soup, block, tokens, name, regex_seen)
+        elif kind in CELL_KINDS:
             name = cells[cells_seen] if cells_seen < len(cells) else None
             cells_seen += 1
             spark_cell(soup, block, tokens, name, cells_seen)
@@ -1892,11 +1927,46 @@ _HIDE_FIXED = """() => { for (const e of document.querySelectorAll('body *'))
 _CELL_ERROR = re.compile(r"Traceback|Error\b|Exception\b", re.I)
 
 
-def record_cells(url, out_dir, slug, count):
-    """Click Run on every executable_spark cell and save the whole cell as <slug>_cell_<n>.png.
+def _click_run(page, block, kind):
+    """Press the cell's run control. Spark: the "Run" button, and the output is drawn by JavaScript, so
+    wait until the cell text changes and then stays quiet for 1.5 s. Python: the ">>>" button reveals the
+    output the page already holds; wait until the cell grows taller. Returns (text before, text after)."""
+    before = block.inner_text()
+    if kind == "executable_spark":
+        block.get_by_role("button", name="Run", exact=True).click()
+        began = time.monotonic()
+        last, stable_since = before, None
+        while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
+            page.wait_for_timeout(300)
+            now = block.inner_text()
+            if now != last:
+                last, stable_since = now, time.monotonic()
+            elif stable_since and time.monotonic() - stable_since >= 1.5:
+                break
+        return before, last
+    h0 = block.bounding_box()["height"]
+    buttons = block.get_by_role("button", name=">>>", exact=True)
+    if buttons.count() != 1:
+        print(f"warning: cell has {buttons.count()} '>>>' buttons, expected 1", file=sys.stderr)
+    buttons.first.click()
+    began = time.monotonic()
+    grew = False
+    while time.monotonic() - began < 8:  # the output panel animates open
+        page.wait_for_timeout(200)
+        if block.bounding_box()["height"] > h0 + 5:
+            grew = True
+            break
+    if not grew:
+        print("warning: cell did not grow after '>>>' (output not revealed?)", file=sys.stderr)
+    page.wait_for_timeout(1200)  # let the open animation finish
+    return before, block.inner_text()
+
+
+def record_cells(url, out_dir, slug, count, kind="executable_spark"):
+    """Click the run control of every runnable cell and save the whole cell as <slug>_cell_<n>.png.
 
     Returns the file names in page order (None for a cell that could not be captured). Warns
-    about cells that show no output or an error.
+    about cells that show no output or an error. See _click_run for the control each kind uses.
     """
     if not count:
         return []
@@ -1914,28 +1984,18 @@ def record_cells(url, out_dir, slug, count):
                                 color_scheme="light", device_scale_factor=2)
         page.goto(url, wait_until="domcontentloaded")
         page.wait_for_timeout(4000)
-        blocks = page.locator('[data-note-block-type="executable_spark"]')
+        blocks = page.locator(f'[data-note-block-type="{kind}"]')
         if blocks.count() != count:
             print(f"warning: page has {blocks.count()} runnable cells, the HTML has {count}", file=sys.stderr)
         for i in range(min(count, blocks.count())):
             block = blocks.nth(i)
             block.scroll_into_view_if_needed()
             page.wait_for_timeout(800)
-            before = block.inner_text()
-            block.get_by_role("button", name="Run", exact=True).click()
-            began = time.monotonic()
-            last, stable_since = before, None
-            while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
-                page.wait_for_timeout(300)
-                now = block.inner_text()
-                if now != last:
-                    last, stable_since = now, time.monotonic()
-                elif stable_since and time.monotonic() - stable_since >= 1.5:
-                    break
+            before, last = _click_run(page, block, kind)
             result = last[len(before):] if last.startswith(before) else last
-            if last == before:
+            if kind == "executable_spark" and last == before:
                 print(f"warning: cell {i + 1} showed no output after Run", file=sys.stderr)
-            elif _CELL_ERROR.search(result):
+            elif kind == "executable_spark" and _CELL_ERROR.search(result):
                 print(f"warning: cell {i + 1} output looks like an error: {result.strip()[:120]!r}",
                       file=sys.stderr)
             page.evaluate(_HIDE_FIXED)
@@ -1945,6 +2005,32 @@ def record_cells(url, out_dir, slug, count):
         names += [None] * (count - len(names))
         browser.close()
     return names
+
+
+def record_regex_cards(url, out_dir, slug, count):
+    """Save each regex_cards block (the stacked pattern cards) as <slug>_regex_<n>.png at 2x."""
+    if not count:
+        return []
+    from playwright.sync_api import sync_playwright
+    img_dir = os.path.join(out_dir, "_images")
+    os.makedirs(img_dir, exist_ok=True)
+    names = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="regex_cards"]')
+        for i in range(min(count, blocks.count())):
+            blocks.nth(i).scroll_into_view_if_needed()
+            page.wait_for_timeout(600)
+            page.evaluate(_HIDE_FIXED)
+            name = f"{slug}_regex_{i + 1}.png"
+            blocks.nth(i).screenshot(path=os.path.join(img_dir, name))
+            names.append(name)
+        browser.close()
+    return names + [None] * (count - len(names))
 
 
 def screenshot_diagrams(url, out_dir, slug):
@@ -2008,8 +2094,12 @@ def main():
         for _, name in entries:
             if name.endswith(".mp4"):
                 upload_animation(name)
-    n_cells = len(BeautifulSoup(html, "html.parser").find_all(attrs={"data-note-block-type": "executable_spark"}))
-    cells = record_cells(url, out_dir, slug, n_cells) if "--screenshots" in sys.argv else []
+    soup0 = BeautifulSoup(html, "html.parser")
+    cell_kind = next((k for k in CELL_KINDS if soup0.find(attrs={"data-note-block-type": k})), "executable_spark")
+    n_cells = len(soup0.find_all(attrs={"data-note-block-type": cell_kind}))
+    cells = record_cells(url, out_dir, slug, n_cells, cell_kind) if "--screenshots" in sys.argv else []
+    n_regex = len(soup0.find_all(attrs={"data-note-block-type": "regex_cards"}))
+    regex_images = record_regex_cards(url, out_dir, slug, n_regex) if "--screenshots" in sys.argv else []
     path = os.path.join(out_dir, slug + ".md")
     tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
     with open(tmp_path, "w", encoding="utf-8") as f:
@@ -2041,7 +2131,7 @@ def main():
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
-                       load_drops(slug), cells))
+                       load_drops(slug), cells, regex_images))
     os.replace(tmp_path, path)
     print(path)
 
