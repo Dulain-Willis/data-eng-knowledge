@@ -411,7 +411,7 @@ In a batch, the same calls repeat with the same arguments: the rate for `"eur"` 
 
 The pattern takes 3 lines inside the function. If the key is missing from the cache, compute the value and store it; either way, return what the cache holds. In the program below, `slow_rate` stands in for an expensive lookup and counts how often it runs.
 
-https://github.com/user-attachments/assets/d864524b-147c-49ba-812f-944e206e4083
+https://github.com/user-attachments/assets/4487dede-14af-445e-83ed-92f96fa01917
 
 *Across 8 events with 3 distinct currencies, slow_rate runs once per currency and the dict answers every repeat*
 
@@ -515,7 +515,7 @@ A loop handles nesting only as deep as the loops you wrote. An event payload wit
 
 Every recursive function has 2 parts. The **base case** answers directly, without calling itself, for input small enough to need no further splitting. The **recursive case** calls the function on a smaller piece and builds its answer from the result. Each call gets a frame of its own, with its own local variables, and a frame waits until the call it made returns.
 
-https://github.com/user-attachments/assets/42c1c7c6-7121-4503-8f05-69415e15ac98
+https://github.com/user-attachments/assets/c1d315e1-2eee-4aef-b13a-8c383f097a04
 
 *factorial(5) stacks 5 frames, and each waits for the call below it to return*
 
@@ -526,7 +526,7 @@ https://github.com/user-attachments/assets/42c1c7c6-7121-4503-8f05-69415e15ac98
 
 ### Nested lists of any depth
 
-https://github.com/user-attachments/assets/ddb0405b-777a-4fff-a885-5e53ee786035
+https://github.com/user-attachments/assets/0112a31a-0ac9-4c26-9c3d-3771c064267c
 
 *Each inner list opens a deeper frame, and the subtotals add up as those frames return*
 

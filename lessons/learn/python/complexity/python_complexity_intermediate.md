@@ -403,7 +403,7 @@ On 8 ids that is 19 checks against 8. On 10,000,000 distinct ids the pairwise lo
 
 Joining orders to customers with nested loops compares every order with every customer: O(n × m) time and no extra memory. Building a dict keyed by customer id first costs 1 pass over the customers and memory for m entries; after that, each order finds its customer in 1 lookup, O(n + m) overall.
 
-https://github.com/user-attachments/assets/59be4f9a-003b-4489-beb8-e6198e9800d1
+https://github.com/user-attachments/assets/98dfcdc3-3197-4f38-9425-c89b7795649d
 
 *The dict holds 1 entry per customer; each order then costs 1 lookup.*
 
@@ -470,7 +470,7 @@ One edge case remains in the fast version: an order whose customer_id is missing
 
 Some questions ask which combination of items is best: which sources to backfill tonight, which checks fit inside a time budget. Each item is in the combination or out of it, so 1 item gives 2 choices, 2 items give 2 × 2 = 4, and n items give 2ⁿ. Code that tries every combination does O(2ⁿ) work.
 
-https://github.com/user-attachments/assets/d48283e4-b3fd-415f-b89d-16fa856b24b7
+https://github.com/user-attachments/assets/eeb2099e-d271-4185-8a4b-a067a997f805
 
 *Each new item copies every existing combination once, with the item added.*
 

@@ -377,7 +377,7 @@ print("s" in tags, "sale" in tags)
 
 `set(items)` removes repeats and forgets which came first. When first appearance matters, a list recording the order and a set answering 'seen before?' work as a pair. The set does the fast check; the list grows only when the check says new.
 
-https://github.com/user-attachments/assets/aeb1a44d-5c7a-4075-88df-4fb19484b22f
+https://github.com/user-attachments/assets/28ead674-41ef-45e6-80ea-2a5be57eb9e9
 
 *The set answers the membership test; the list keeps arrival order.*
 
