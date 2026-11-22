@@ -1,6 +1,7 @@
-"""Checks the opening frames of the Interview Python MP4s (external behaviour: only the video is looked at).
+"""Checks the opening frames of the python_animation MP4s (external behaviour: only the video is looked at).
+This gates every python_animation recording: Interview Python (py_pattern_*) and Learn Python (python_*).
 
-  python3 checks/animation_first_frames.py                  # every ~/animation-mp4s/py_pattern_*.mp4
+  python3 checks/animation_first_frames.py                  # every ~/animation-mp4s/py_pattern_*.mp4 and python_*.mp4
   python3 checks/animation_first_frames.py a.mp4 b.mp4      # just these
   python3 checks/animation_first_frames.py --list FILE      # file names (one per line), looked up in ~/animation-mp4s
 
@@ -107,9 +108,12 @@ def problems(path):
 def main():
     args = sys.argv[1:]
     if args[:1] == ["--list"]:
+        if len(args) != 2:
+            sys.exit("usage: animation_first_frames.py [--list FILE | a.mp4 b.mp4 ...]")
         paths = [os.path.join(DIR, n.strip()) for n in open(args[1]) if n.strip()]
     else:
-        paths = args or sorted(glob.glob(os.path.join(DIR, "py_pattern_*.mp4")))
+        paths = args or sorted(glob.glob(os.path.join(DIR, "py_pattern_*.mp4"))
+                               + glob.glob(os.path.join(DIR, "python_*.mp4")))
     bad = 0
     for p in paths:
         pr = problems(p)
