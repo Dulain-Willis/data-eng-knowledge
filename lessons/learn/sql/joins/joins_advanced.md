@@ -109,32 +109,86 @@ The cost_allocs table holds the tax bands: each row is a min_income, a max_incom
 
 x BETWEEN a AND b means x >= a AND x <= b, inclusive on both sides. That matters at the seams. If 2 bands touch at 40,000, so that one ends at 40,000 and the next starts at 40,000, an income of exactly 40,000 satisfies both, and that employee comes back twice. Switch between the 3 queries below to see the duplicate appear and then disappear.
 
+**BETWEEN**
+
 Closed bands that end 1 below the next band's start, joined with BETWEEN.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | e.name, |
-|  | e.salary, |
-|  | t.rate AS tax_rate |
-|  | FROM employee_metrics AS e |
-|  | JOIN tax_bands AS t |
-|  | ON e.salary BETWEEN t.min_income |
-|  | AND t.max_income |
-|  | ORDER BY e.name |
+```sql
+SELECT
+  e.name,
+  e.salary,
+  t.rate AS tax_rate
+FROM employee_metrics AS e
+JOIN tax_bands AS t
+  ON e.salary BETWEEN t.min_income
+  AND t.max_income
+ORDER BY e.name
+```
 
-Result
+Result:
 
-| name | salary | tax_rate |
-| --- | --- | --- |
-| Alice | 75000 | 22% |
-| Bob | 35000 | 12% |
-| Carol | 95000 | 32% |
-| Dave | 40000 | 22% |
+```
+name | salary | tax_rate
+Alice | 75000 | 22%
+Bob | 35000 | 12%
+Carol | 95000 | 32%
+Dave | 40000 | 22%
+```
 
-4 rows
+**Touching**
 
-The first tab returns 4 rows, 1 per employee, because the bands end at 39,999 and 84,999 and leave no value inside 2 bands at once. The second tab returns 5 rows: Dave's 40,000 matches the band ending at 40,000 and the band starting at 40,000, so he is taxed at 12% on one row and 22% on the next. The third tab returns 4 rows again without touching the data. A lower bound tested with >= and an upper bound tested with < make each band half open, and a value on a seam belongs to exactly 1 band. Half open bands also survive decimals: a closed band ending at 39,999 leaves a salary of 39,999.50 matching nothing, while a half open band ending below 40,000 catches it.
+Bands that touch at 40,000 and 85,000, joined with BETWEEN: Dave's 40,000 matches 2 of them.
+
+```sql
+SELECT
+  e.name,
+  e.salary,
+  t.rate AS tax_rate
+FROM employee_metrics AS e
+JOIN tax_bands_touching AS t
+  ON e.salary BETWEEN t.min_income
+  AND t.max_income
+ORDER BY e.name
+```
+
+Result:
+
+```
+name | salary | tax_rate
+Alice | 75000 | 22%
+Bob | 35000 | 12%
+Carol | 95000 | 32%
+Dave | 40000 | 12%
+Dave | 40000 | 22%
+```
+
+**Half-open**
+
+The same touching bands with >= on the lower bound and < on the upper: each value matches 1 band.
+
+```sql
+SELECT
+  e.name,
+  e.salary,
+  t.rate AS tax_rate
+FROM employee_metrics AS e
+JOIN tax_bands_touching AS t
+  ON e.salary >= t.min_income
+    AND e.salary < t.max_income
+ORDER BY e.name
+```
+
+Result:
+
+```
+name | salary | tax_rate
+Alice | 75000 | 22%
+Bob | 35000 | 12%
+Carol | 95000 | 32%
+Dave | 40000 | 22%
+```
+
+The first version returns 4 rows, 1 per employee, because the bands end at 39,999 and 84,999 and leave no value inside 2 bands at once. The second version returns 5 rows: Dave's 40,000 matches the band ending at 40,000 and the band starting at 40,000, so he is taxed at 12% on one row and 22% on the next. The third version returns 4 rows again without touching the data. A lower bound tested with >= and an upper bound tested with < make each band half open, and a value on a seam belongs to exactly 1 band. Half open bands also survive decimals: a closed band ending at 39,999 leaves a salary of 39,999.50 matching nothing, while a half open band ending below 40,000 catches it.
 
 **A parcel weighs exactly 5.0 kg. The rate table has a band from 0 to 5 and a band from 5 to 10, and the join condition is weight BETWEEN min_kg AND max_kg. How many rows does this parcel produce?**
 
