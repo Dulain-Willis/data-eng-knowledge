@@ -113,7 +113,7 @@ print(mixed["tags"])
 
 <br>
 
-### Practice
+Exercise: [Creating Your First Dictionary](_exercises/python_dictionaries_beginner_exercise_1.md)
 
 **What does this program print?**
 
@@ -234,7 +234,7 @@ When a value is a list, `user["tags"]` hands you that list, and `.append` change
 
 <br>
 
-### Practice
+Exercise: [Reading and Updating Values](_exercises/python_dictionaries_beginner_exercise_2.md)
 
 **What does the last line print?**
 
@@ -357,7 +357,7 @@ print(len(cart))
 
 <br>
 
-### Practice
+Exercise: [Removing Items](_exercises/python_dictionaries_beginner_exercise_3.md)
 
 Real programs mix the removal tools, and the order of the calls decides what each one finds. Trace this session cleanup line by line before you run it:
 
@@ -493,7 +493,7 @@ The integer `1` and the string `"1"` are different keys, because they're differe
 
 <br>
 
-### Practice
+Exercise: [Checking for Keys and Key Types](_exercises/python_dictionaries_beginner_exercise_4.md)
 
 **What does this program print?**
 
@@ -631,7 +631,7 @@ A dictionary that translates one value into another is a lookup table. Code 418 
 
 <br>
 
-### Capstone: a tiny inventory
+### A tiny inventory
 
 This program starts from a stocked dictionary and runs each order through a membership test before touching the counts with bracket reads and writes. One removal comes at the end. Predict every printed line before you reveal the output.
 
@@ -656,8 +656,6 @@ Order by order: `"fig"` fails the `not in` test and prints `not stocked`, with n
 
 
 <br>
-
-### Practice
 
 **What does the final line print?**
 

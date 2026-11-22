@@ -693,6 +693,8 @@ print(set(flagged) <= mon | tue)
 print(set(flagged) <= mon & tue)
 ```
 
+Exercise: [Changing a set in place](_exercises/python_sets_intermediate_exercise_1.md)
+
 
 <br>
 

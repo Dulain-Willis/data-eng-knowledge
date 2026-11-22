@@ -572,6 +572,8 @@ years ** 2 runs first and gives 4, then bonus * 4 gives 20, then base + 20 gives
 
 </details>
 
+Exercise: [Operators and Readability](_exercises/python_expressions_beginner_exercise_1.md)
+
 A fixed fee plus a per-item cost needs no parentheses, because `*` runs before `+`: `5.0 + 4 * 1.5` multiplies to 6.0 first and sums to 11.0. Swap the 2 operators and `5.0 * 4 + 1.5` gives 21.5. Working the line through with real numbers shows whether each operator sits where it belongs.
 
 String operators share the same precedence. In `"-" * 3 + "x"` the repetition runs first and produces `---`. The join then gives `---x`. Writing `"x" + "-" * 3` gives `x---` for the same reason: the `*` on the right finishes before the join begins.

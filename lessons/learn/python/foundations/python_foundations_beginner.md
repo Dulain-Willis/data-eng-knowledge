@@ -73,6 +73,8 @@ Python refuses its 35 reserved keywords as names with a `SyntaxError`, so `class
 
 The most common error in a new programmer's first week is a `NameError`: the code reads a name that no assignment has bound yet, because of a typo, a capital letter, or an assignment that sits below the line that uses it. Python reports the exact name it could not find, and the fix is to match the spelling of the name that was bound.
 
+Exercise: [A name that was never bound](_exercises/python_foundations_beginner_exercise_1.md)
+
 Reading the name in the message and searching the file for it is the whole technique, and it works the same way when the missing name is a variable assigned further down the file than the line that reads it.
 
 
@@ -117,6 +119,8 @@ print(True + True)
 ```
 
 Conversion toward a narrower type loses information. `int(49.99)` is 49: the fractional part is discarded rather than rounded, and `int(-49.99)` is -49, truncating toward 0. `round()` is a separate operation: `round(48.5)` is 48 and `round(49.5)` is 50, because Python rounds a half to the even neighbour to avoid bias across many sums. `bool()` is `False` for zero numbers, the empty string, `None` and empty containers, and `True` for nonzero numbers and non-empty strings, including the text `"0"`, so a flag that arrives as `"0"` goes through `int` first. `True + True` is 2 because `bool` is a subclass of `int`, which lets a sum over comparisons count matching rows.
+
+Exercise: [Converting between types](_exercises/python_foundations_beginner_exercise_2.md)
 
 
 <br>
@@ -167,6 +171,8 @@ print(f"{subtotal_cents * 3:,} cents across 3 orders")
 The second line shows the same 3 values delimited with `|`, which is how a quick export to a delimited file begins. The third and fourth calls together produce a single line, because the first of them ended with a space instead of a newline. The f-string divides inside the braces and renders the result with 2 decimals, so the cents integer reads as dollars with no extra variable. The last line applies `:,` to an integer expression computed inside the braces, and 44991 comes out as `44,991`.
 
 The spec sits after the colon and reads in a fixed order: fill and alignment, then width, then the comma, then precision, then the type letter. `f"{amount:>12,.2f}"` right-aligns a number with thousands separators and 2 decimals in 12 characters, which is how a report column lines up. A spec that rounds for display changes nothing in the value: `f"{149.97:.0f}"` shows `150` while the stored number stays 149.97, which is the kind of mismatch that sends an analyst hunting for a 3-cent discrepancy between a report and the table underneath it.
+
+Exercise: [f-strings](_exercises/python_foundations_beginner_exercise_3.md)
 
 
 <br>
@@ -243,6 +249,8 @@ Operators bind in a fixed order, and `-2 ** 2` is -4 because the power binds tig
 | 6 | `not` | `not 3 > 4` is True |
 | 7 | `and` | `a or b and c` is `a or (b and c)` |
 | Binds last | `or` | `x or y` returns the first truthy |
+
+Exercise: [Precedence and augmented assignment](_exercises/python_foundations_beginner_exercise_4.md)
 
 
 <br>

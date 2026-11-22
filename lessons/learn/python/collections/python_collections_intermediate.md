@@ -773,6 +773,10 @@ zip() makes 2 pairs because counts has 2 items, and the first list() consumes th
 
 </details>
 
+### A ranking step end to end
+
+Exercise: [A ranking step end to end](_exercises/python_collections_intermediate_exercise_1.md)
+
 Ties deserve their own check because a wrong tie order raises nothing. Records built from parallel lists keep the order of those lists, so a track's position in the source decides which of 2 tied tracks takes first place under `reverse=True`. Flip the ties with `[::-1]` and the top of the report changes while every count stays the same.
 
 

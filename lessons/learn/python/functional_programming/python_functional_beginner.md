@@ -676,6 +676,10 @@ show_fee("card", rate_fee({"card": 29}, "card", 10000))
 
 The first signature is a complete call guide: a dict from method names to int rates, a method name, an amount in cents, and an int back, here 290. `-> None` on `show_fee` says the opposite thing: call it for the line it prints and do not keep its result. That is the same trap as `result = prices.append(8)`, now stated in the signature where a reader sees it before writing the call. The program prints `card 290`.
 
+### One Pricing Pipeline
+
+Exercise: [One Pricing Pipeline](_exercises/python_functional_beginner_exercise_1.md)
+
 #### Lists of Dicts Have 2 Layers
 
 A list of dicts can be changed at 2 levels: the list itself, and each dict inside it. A function can build a brand new list and still hand the caller's data back changed, if the loop writes a key into each old dict before appending it.

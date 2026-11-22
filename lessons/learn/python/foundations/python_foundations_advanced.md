@@ -113,8 +113,6 @@ print("still running")
 
 <br>
 
-### Practice
-
 **What does this program print before it ends?**
 
 ```python
@@ -288,8 +286,6 @@ except FileNotFoundError:
 
 <br>
 
-### Practice
-
 **What does this program print?**
 
 ```python
@@ -408,8 +404,6 @@ print(a.share(24))
 
 
 <br>
-
-### Practice
 
 **What does the last line print?**
 
@@ -575,8 +569,6 @@ print("done")
 
 <br>
 
-### Practice
-
 **In what order do the printed lines appear?**
 
 ```python
@@ -721,8 +713,6 @@ with open("plays.txt", "r") as src, open("plays.tmp", "w") as dst:
 
 
 <br>
-
-### Practice
 
 **What does this program print before it ends?**
 

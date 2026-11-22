@@ -551,7 +551,7 @@ any() stops at 4. The only value left is 6, which is positive, so all() returns 
 
 <br>
 
-### Capstone: a batch quality gate
+### A batch quality gate
 
 The last example combines a batch generator with both checks. Order totals arrive in batches of 3. A batch with any negative total is rejected, and a clean batch that contains a 0 is loaded with a warning. The short final batch goes through the same gate.
 

@@ -103,6 +103,8 @@ print(first_order)
 
 Keeping the first value per key is one use. The other, returning a mutable object that the caller then fills, drives the grouping pattern in the nested-data section. The `default` argument is evaluated on every call, even when the key already exists, so `setdefault(key, load_lookup())` calls `load_lookup()` once per record whether it is needed.
 
+Exercise: [Iterating and Dictionary Views](_exercises/python_dictionaries_intermediate_exercise_1.md)
+
 
 <br>
 
@@ -139,6 +141,8 @@ Read the chain left to right as lowest priority to highest: the layer that must 
 A module-level `DEFAULTS` lives as long as the process. A runner that loops over 3 jobs and calls `DEFAULTS.update(job_overrides)` leaves job 1's `retries: 0` in place when job 2 builds its config, and job 2 never asked for it. Tests that run one job per process never catch this. `|` and `{**a, **b}` build a fresh dict on every call, so the shared base never changes. `update` and `|=` belong on dicts the current code owns, such as one it built a line earlier.
 
 `{**a, **b}` also accepts literal keys after the unpacks: `{**DEFAULTS, **env, "run_id": run_id}` stamps a value no earlier layer can override. `|` requires a dict on both sides and raises `TypeError` for a list of pairs, while `|=` and `update` accept any iterable of pairs.
+
+Exercise: [Merging Dictionaries](_exercises/python_dictionaries_intermediate_exercise_2.md)
 
 
 <br>
@@ -317,6 +321,8 @@ print(record["meta"], full["items"] is record["items"])
 ### Copy at the boundary
 
 Functions are where shared state bites. A dict passed as an argument is the caller's object, so a function that adds a field to it, or to anything nested inside it, edits the caller's data. A function that returns a modified record should copy each level it changes before changing it.
+
+Exercise: [Copying Dictionaries](_exercises/python_dictionaries_intermediate_exercise_3.md)
 
 
 <br>

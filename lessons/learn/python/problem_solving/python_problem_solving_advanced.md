@@ -618,6 +618,10 @@ Both starts are at most 12, and max(12, 4) and max(12, 6) leave the end at 12, s
 
 A missing sort sometimes leaves a visible trace. In the closest-pair loop run on arrival order, `b - a` goes negative whenever a later timestamp is smaller, as 140 - 905 = -765 is. A negative gap is smaller than every real gap, so it wins. Any gap below 0 means the order the loop relies on is missing.
 
+### The fullest gap
+
+Exercise: [The fullest gap](_exercises/python_problem_solving_advanced_exercise_1.md)
+
 
 <br>
 
