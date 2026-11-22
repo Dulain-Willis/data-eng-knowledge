@@ -2260,6 +2260,20 @@ def topic_dir(slug):
     return os.path.join("lessons", folder)
 
 
+def restore_astral_code(html):
+    """The site renders inline code one UTF-16 unit per span, so an emoji outside the BMP (a flag, say)
+    reaches the HTML as two U+FFFD spans per character. The page's embedded JSON still holds the real
+    character: put it back, matching each code value to its run of U+FFFD spans."""
+    for m in re.finditer(r'\\"type\\":\\"python_inline_code\\",\\"value\\":\\"([^"\\]+)\\"', html):
+        val = m.group(1)
+        if not re.search("[\U00010000-\U0010ffff]", val):
+            continue
+        run = "".join("(?:<span[^>]*>\ufffd</span>){2}" if ord(c) > 0xFFFF
+                      else "(?:<span[^>]*>" + re.escape(c) + "</span>)" for c in val)
+        html = re.sub(run, lambda _: "<span>" + val + "</span>", html, count=1)
+    return html
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
@@ -2269,6 +2283,7 @@ def main():
     out_dir = args[1] if len(args) > 1 else topic_dir(slug)
     req = urllib.request.Request(url, headers={"User-Agent": "lesson-to-md/1.0"})
     html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
+    html = restore_astral_code(html)
     os.makedirs(out_dir, exist_ok=True)
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
