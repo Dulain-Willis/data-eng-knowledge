@@ -742,7 +742,7 @@ The text holds 5 characters, ï takes 2 bytes in UTF-8, and index 2 is its first
 
 `errors="ignore"` drops every byte that does not belong to a complete character, wherever it sits. On bytes you encoded and then sliced, only the cut character can break, so at most 3 bytes fall away. On input from outside, the same flag hides corruption that `errors="replace"` would show.
 
-`len` counts code points, which is not always what a reader sees as 1 symbol. The flag `����` is 2 code points, the regional indicator letters F and R, so `len` gives 2 and its UTF-8 form takes 8 bytes.
+`len` counts code points, which is not always what a reader sees as 1 symbol. The flag `🇫🇷` is 2 code points, the regional indicator letters F and R, so `len` gives 2 and its UTF-8 form takes 8 bytes.
 
 
 <br>
