@@ -60,31 +60,55 @@ A DOUBLE keeps 53 bits for its digits, so above 2 to the 53rd power it can only 
 
 ### Text that holds numbers sorts as text
 
-Raw logs often land with every field as text. Keeping `watch_ms` as VARCHAR costs more bytes than INTEGER and changes how values compare: text is compared character by character, so '15000' sorts ahead of '800' because '1' comes before '8'. Predict the order in each tab before you run it.
+Raw logs often land with every field as text. Keeping `watch_ms` as VARCHAR costs more bytes than INTEGER and changes how values compare: text is compared character by character, so '15000' sorts ahead of '800' because '1' comes before '8'. Predict the order in each version before you run it.
+
+**As VARCHAR**
 
 Orders by the VARCHAR column, comparing the text a character at a time.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | view_id, |
-|  | watch_ms_text |
-|  | FROM raw_views |
-|  | ORDER BY watch_ms_text |
+```sql
+SELECT
+  view_id,
+  watch_ms_text
+FROM raw_views
+ORDER BY watch_ms_text
+```
 
-Result
+Result:
 
-| view_id | watch_ms_text |
-| --- | --- |
-| 2 | 15000 |
-| 4 | 31000 |
-| 3 | 4200 |
-| 5 | 800 |
-| 1 | 900 |
+```
+view_id | watch_ms_text
+2 | 15000
+4 | 31000
+3 | 4200
+5 | 800
+1 | 900
+```
 
-5 rows
+**As INTEGER**
 
-The VARCHAR tab returns 15000, 31000, 4200, 800, 900, the order a word list would file them in. The INTEGER tab returns 800, 900, 4200, 15000, 31000. The cast fixes the order, and the worst-case rule from earlier decides which integer type it targets. A single view's milliseconds stay under INTEGER's ceiling. A column that adds views together keeps growing, so its worst case is its largest future total.
+Casts to INTEGER first, so ORDER BY compares numeric values.
+
+```sql
+SELECT
+  view_id,
+  CAST(watch_ms_text AS INTEGER) AS watch_ms
+FROM raw_views
+ORDER BY watch_ms
+```
+
+Result:
+
+```
+view_id | watch_ms
+5 | 800
+1 | 900
+3 | 4200
+2 | 15000
+4 | 31000
+```
+
+The VARCHAR version returns 15000, 31000, 4200, 800, 900, the order a word list would file them in. The INTEGER version returns 800, 900, 4200, 15000, 31000. The cast fixes the order, and the worst-case rule from earlier decides which integer type it targets. A single view's milliseconds stay under INTEGER's ceiling. A column that adds views together keeps growing, so its worst case is its largest future total.
 
 **A video_stats table keeps a row per reel with lifetime_watch_ms, the total milliseconds all viewers have spent on that reel. Which type should the column use?**
 
