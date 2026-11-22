@@ -1,6 +1,6 @@
 # What the converter skips
 
-`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for all 120 lessons in `lessons/` plus the 45 Spark slugs, the 60 Interview Python slugs (checked 2026-11-17) and the 48 Interview SQL slugs (checked 2026-11-21). For all 120 lessons the count equals the "N challenges" number in the header line, and for the 90 learn/interview lessons it also equals the number of `Exercise k of N` entries in the file.
+`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for the lessons in `lessons/` (345 now) plus, when they were added, the 45 Spark slugs, the 60 Interview Python slugs (checked 2026-11-17) and the 48 Interview SQL slugs (checked 2026-11-21). The `<level> · N min · N challenges` header line is no longer in any lesson (see Header line below), so the counts are not stated in the files; for lessons that keep their exercises the count equals the number of `Exercise k of N` entries in the file.
 
 ## Exercises, by area
 
@@ -407,7 +407,7 @@
   </details>
 
 - **Airflow today:** the `dag_repair` conversion code (20 exercises, in 4 lessons) still exists in `main()` but is switched off, so Airflow lessons contain no exercises. Reason recorded in the code: the exercises are buggy and Run/Submit need a login.
-- **Header line:** every lesson starts with `<tier>·<area> · N min · N challenges`. The converter leaves it as is, so for Airflow, dbt, Kafka (and Spark) lessons it states a number of exercises that are not in the file.
+- **Header line:** the page's `<level> · <area> · N min · N challenges` line is removed from every lesson, because for Airflow, dbt, Kafka, Spark and the other left-out tools it stated a number of exercises that are not in the file. `checks/no_meta_first_line.py` verifies that no lesson (and optionally no converter output for a saved page) starts with it.
 
 ## Other content dropped or changed
 

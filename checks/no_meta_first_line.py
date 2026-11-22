@@ -15,7 +15,7 @@ META = re.compile(r"^(Beginner|Intermediate|Advanced)\s*·.*\bmin\b.*\bchallenge
 
 
 def has_meta_line(text):
-    return bool(META.match(text.split("\n", 1)[0]))
+    return bool(META.match(text.lstrip("\n \t\r").split("\n", 1)[0]))
 
 
 def main():
@@ -25,7 +25,7 @@ def main():
             if n.endswith(".md"):
                 p = os.path.join(base, n)
                 with open(p, encoding="utf-8") as f:
-                    if has_meta_line(f.readline()):
+                    if has_meta_line(f.read(2000)):
                         bad.append(os.path.relpath(p, ROOT))
     sys.path.insert(0, os.path.join(ROOT, "tools"))
     for page in sys.argv[1:]:
@@ -39,4 +39,5 @@ def main():
     sys.exit(1 if bad else 0)
 
 
-main()
+if __name__ == "__main__":
+    main()
