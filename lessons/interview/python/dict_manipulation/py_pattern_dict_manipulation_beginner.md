@@ -234,7 +234,7 @@ GROUP BY COALESCE(a.campaign, 'UNKNOWN'), c.country
 
 Every distinct combination of GROUP BY columns becomes 1 dict key, written as a tuple, and every aggregate becomes a slot in the value. Below, the value is a list holding click count and cost sum. The program enriches 5 clicks and groups them by campaign and country in a single pass. Before playing, predict which group the click on ad 7 lands in.
 
-https://github.com/user-attachments/assets/597ad904-c08c-4c72-8123-5e5bd04160a1
+https://github.com/user-attachments/assets/ac023f9e-d148-43eb-a114-23ab8c71a36a
 
 *Build the lookup once. Each click probes it, then adds to the totals under a (campaign, country) key.*
 

@@ -69,7 +69,7 @@ Every decode involves 2 schemas: the writer schema the bytes were produced with,
 
 The program below models resolution with each schema as a dict from field name to a `(type, has_default)` pair, and `can_read(reader, writer)` returns `ok` or the first reason a decode would fail. BACKWARD asks whether the new schema can read old data, so it calls `can_read(v2, v1)`. FORWARD asks whether the old schema can read new data and flips the arguments. Predict all 4 lines before playing it; the instructive ones pass in one direction and fail in the other.
 
-https://github.com/user-attachments/assets/43d481f5-a572-43ac-ad29-7d0e78889985
+https://github.com/user-attachments/assets/84d55397-dd04-453c-97d7-1df85bf6b36d
 
 *Each schema change checked in both directions against version 1.*
 
@@ -130,7 +130,7 @@ Evolve looks like the best of both, and its cost is operational: every unseen ke
 
 The program below implements 3 of these policies over the same 3 records. Record `e2` sends `user_id` as a string, and record `e3` carries a `device` key the schema lacks. Predict every line, and give the `fail` run extra attention, since its `e2` line is where answers tend to go wrong.
 
-https://github.com/user-attachments/assets/39d1c48c-3974-43f0-aad6-028f026d4c40
+https://github.com/user-attachments/assets/0269b59b-0ebb-4212-a84d-6a3e7dfb3580
 
 *The same 3 records loaded under 3 policies for keys and types the schema does not expect.*
 
@@ -272,7 +272,7 @@ Each column type is there for a reason. raw_payload is VARCHAR so that a truncat
 
 Raw text in Bronze turns a parser bug into a rerun instead of lost data. The program below lands 4 records in Bronze. One is malformed and another duplicates an earlier one. Then it builds Silver twice: first with a strict contract that requires `amount` to be a JSON number, then with a corrected contract that also accepts a numeric string. Predict both Silver dicts and both quarantine lists, and notice that Bronze is not touched between the 2 builds.
 
-https://github.com/user-attachments/assets/1c397a50-597b-4f64-a616-f1c39b51e7af
+https://github.com/user-attachments/assets/571209da-00f2-46ed-9121-e340815cf4d6
 
 *Bronze stays fixed while Silver is rebuilt under 2 contract versions.*
 
@@ -341,7 +341,7 @@ The output shows 3 effects worth naming in an interview. Order `o2` is gone: a c
 
 The program below models both joins over the same 3 orders: `inner` behaves like the cross join, and `outer` substitutes a 1-element placeholder when an array is empty. Predict the shipping sums before playing it. Bringing `o2` back changes the total, though not in the direction you might hope.
 
-https://github.com/user-attachments/assets/2471251a-e566-4082-bb59-1c8a111ef2ed
+https://github.com/user-attachments/assets/205ec871-f89b-4977-8e65-7baaee59238f
 
 *Flattening repeats each parent's fee once per item, and the empty order drops or returns.*
 

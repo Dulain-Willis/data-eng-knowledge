@@ -18,7 +18,7 @@ A Python list keeps its items in 1 contiguous block of memory slots, usually wit
 
 Picture an array that doubles its capacity whenever it fills. Starting from 1 slot, 6 appends trigger resizes at the 2nd, 3rd and 5th append, and each resize copies only the items already stored.
 
-https://github.com/user-attachments/assets/d872772e-3b57-43bc-a90a-3ccd125061dc
+https://github.com/user-attachments/assets/68135d82-07ff-4715-b2af-ce65ff441fa1
 
 *Each resize copies every stored item; appends between resizes write 1 slot.*
 
@@ -105,7 +105,7 @@ Two design patterns sit behind many of the fast algorithms you already use. Divi
 
 Merge sort is the standard case. A list of 1 item is already sorted, and 2 sorted lists merge into 1 in a single pass that walks a pointer through each, the two-pointer technique applied to merging.
 
-https://github.com/user-attachments/assets/756d9451-ee5c-4260-8575-b5a562cf97b7
+https://github.com/user-attachments/assets/715a60c5-d063-4f41-b89e-f16c08ff65ee
 
 *Each printed line is 1 combine step; the smallest merges finish first.*
 
@@ -216,7 +216,7 @@ On a cluster, the step that dominates is moving a row between machines: the row 
 
 Input arrives split into partitions, each on a worker, in whatever order it was written. Grouping by user_id needs every row for a user on the same worker, so the engine computes a target worker from each key and sends the row there. That redistribution is a **shuffle**. Below, partition i starts on worker i, and the target is user_id % 3.
 
-https://github.com/user-attachments/assets/e4de1811-d7d7-4f42-8a15-25c0e6e879b0
+https://github.com/user-attachments/assets/a67a07a9-3faa-4c10-966c-b34127523b0d
 
 *Every row for a user ends on 1 worker; rows whose target differs from their source cross the network.*
 

@@ -43,7 +43,7 @@ A node turns BLACK only after every node it can reach is BLACK, so appending it 
 
 Before you play the animation, write down the list it prints. The outer loop starts walks in dict order, so `raw` goes first and `users` second; watch the color of `joined` when the walk from `users` reaches it.
 
-https://github.com/user-attachments/assets/a3c0507e-9a8b-4c7f-84c4-7225b14d183d
+https://github.com/user-attachments/assets/2c893034-fdfb-4e63-b8f9-95c46b533255
 
 The finish order is `report`, `joined`, `clean`, `raw`, `users`, so the program prints `['users', 'raw', 'clean', 'joined', 'report']`. When the walk from `users` arrives, `joined` is already BLACK and the edge is skipped: the exact case where a lone visited set would report a cycle that does not exist.
 
@@ -179,7 +179,7 @@ The loop keeps 3 structures: `need`, each task's count of unfinished inputs; `re
 
 Predict both printed numbers before playing. The first run ranks every task equally, so ties fall to alphabetical order. The second ranks each task by its tail: its own duration plus the longest chain of durations after it.
 
-https://github.com/user-attachments/assets/bdd772ca-0039-410c-88ea-96dc54513594
+https://github.com/user-attachments/assets/83f1e9cb-067c-4d65-b9ef-6871ab0b0506
 
 Alphabetical order prints 15. When `raw` finishes at minute 4, a worker comes free with `audit` and `clean` both ready; `audit` wins the tie and holds that worker until 9, so `clean` runs 9 to 12, `joined` 12 to 14 and `report` 14 to 15. Tail ranking prints 12: `clean` runs 4 to 7, `audit` 7 to 12, `joined` 9 to 11 and `report` 11 to 12. Both runs use the same tasks and the same workers, so the 3 minutes come entirely from how the tie was broken.
 

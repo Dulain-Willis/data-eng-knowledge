@@ -67,7 +67,7 @@ Dates skip well because the file was written in arrival order, so each group cov
 
 The animation shrinks this to 24 order amounts in 4 row groups of 6 and plans a read for `amount >= 90`. Predict how many groups each pass reads before playing it: arrival order first, then sorted.
 
-https://github.com/user-attachments/assets/3a6138a3-b936-4cef-a5ee-b503c3b63a5b
+https://github.com/user-attachments/assets/4529f6ff-92c0-4561-b897-6d4b5e3f5ba6
 
 *Each tuple is one row group's (min, max), as the footer would store it.*
 
@@ -258,7 +258,7 @@ WHERE order_date = DATE '2024-03-02'
 
 The animation runs the planner over 3 day directories, each a file of 2 row groups with 5 columns, for `dt >= '2024-03-02' AND amount > 60` selecting 2 columns. Predict 3 counts before playing: footers read, row groups fetched, column chunks fetched.
 
-https://github.com/user-attachments/assets/82c2cdfc-75f9-4ad5-a27c-d7c808767c66
+https://github.com/user-attachments/assets/e5db5551-268c-4551-8151-98d114d4ac65
 
 *Path check first, footer statistics second, selected columns last.*
 

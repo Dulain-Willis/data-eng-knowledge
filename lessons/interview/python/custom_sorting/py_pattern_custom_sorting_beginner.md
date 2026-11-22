@@ -235,7 +235,7 @@ The first line prints `[('Nova', 30), ('Arlo', 30), ('Kite', 50), ('Mira', 50)]`
 
 Stability turns a multi-field sort into a sequence of single-field sorts. Sort by the least important field first and by the most important field last. Each later pass reorders only by its own field, and among rows that tie on it, the order left by the earlier pass survives. This solves the case a tuple key cannot express: 2 string fields in opposite directions, such as artist from Z to A with tracks from A to Z inside each artist.
 
-https://github.com/user-attachments/assets/a263a076-17d5-4e57-9121-1cadf2b078e2
+https://github.com/user-attachments/assets/ce5e0759-96df-477a-925e-bb93cc6486c0
 
 *Pass 1 orders tracks A to Z; pass 2 orders artists Z to A and keeps pass 1's order within each artist.*
 

@@ -33,7 +33,7 @@ The lowest common ancestor (LCA) of nodes `p` and `q` is the deepest node with b
 
 The values have no ordering, so the only way to locate `p` and `q` is to search for them. Each recursive call returns 1 of 3 things: a node matching `p` or `q`, an LCA already settled further down, or `None`. A node whose left and right calls both come back non-null sits exactly where the 2 searches split, so it is the answer. A node with 1 non-null side passes that result upward unchanged. Before playing the run below, predict its 3 printed lines; the third deserves the most thought.
 
-https://github.com/user-attachments/assets/76921704-90fb-4e6b-af0a-42e6c150d3d5
+https://github.com/user-attachments/assets/bdd5e66d-9aef-4cb9-bfbe-f87e2a14a285
 
 *A call that finds a value returns at once; a node hearing back from both sides is the LCA.*
 
@@ -136,7 +136,7 @@ A path question asks for something along a route through the tree: every root-to
 
 Backtracking keeps a single `path` list for the whole search. Entering a node appends its value; leaving the node pops it, so when control returns to the parent the list is exactly what the parent had. Each node is pushed once and popped once, and the only copying happens at a match, where the current route is saved.
 
-https://github.com/user-attachments/assets/6b60642c-f14d-4205-a7b2-863c31f5cd1b
+https://github.com/user-attachments/assets/0e1b96e2-0f28-4da1-b3d6-6443ee5b8f0d
 
 *One path list grows on the way down and shrinks on the way back up.*
 
@@ -248,7 +248,7 @@ print(max_depth(root))
 
 Inorder can't visit a node when it first reaches it, because the whole left subtree comes first. The loop runs down the left edge pushing every node, pops the deepest one, visits it, then moves to its right child and repeats. On a BST the visits come out sorted.
 
-https://github.com/user-attachments/assets/41819d4a-8a3b-4560-8000-99a4bce3c3a9
+https://github.com/user-attachments/assets/efe323c1-3500-478a-8007-f6bba2bbfc53
 
 *The stack holds the left edge still waiting to be visited.*
 
@@ -316,7 +316,7 @@ It prints `{'ts': 1700000000, 'user.geo.zip': '69001', 'user.geo.city': 'Lyon', 
 
 A trie, or prefix tree, stores strings 1 character per level, so every word that shares a prefix shares the nodes spelling it. In Python the leanest version is a dict of dicts, where each node maps a character to its child node. A word ends at a node holding the marker key `"$"`. That marker is what separates the stored word `car` from the first 3 letters of `card`.
 
-https://github.com/user-attachments/assets/eee9ef94-a22a-4abd-8cbf-f20372f44c70
+https://github.com/user-attachments/assets/44cbded4-b51f-4807-8e9f-78dc73415ce2
 
 *Words sharing a prefix share its dicts; the $ key marks where a word ends.*
 
@@ -423,7 +423,7 @@ Serializing a tree turns linked node objects into a flat string that can be stor
 
 Values alone cannot do it. A root 1 with left child 2 and a root 1 with right child 2 both have preorder `1,2`, so the receiver cannot tell them apart. Writing a marker for every missing child removes the ambiguity, since the reader then knows exactly where each subtree stops. Predict the string the run below prints before playing it.
 
-https://github.com/user-attachments/assets/fc2cd308-60f7-4003-a21b-2dc13eb1fe52
+https://github.com/user-attachments/assets/0a2a1ce0-6d14-422f-a44c-b1f41ce935e9
 
 *Every empty child slot becomes a # token, so the reader knows where each subtree stops.*
 

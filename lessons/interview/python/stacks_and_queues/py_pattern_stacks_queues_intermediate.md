@@ -408,7 +408,7 @@ The first value popped is the right operand. Pop them the other way round and th
 
 Infix input needs a second stack for operators that cannot run yet. Four rules cover it. A number goes onto `nums`. An opening parenthesis goes onto `ops`. A closing parenthesis applies operators until the matching opening one surfaces, then discards it. An operator first applies every waiting operator on top of `ops` whose precedence is at least its own, then pushes itself. At the end, apply whatever is left. This is Dijkstra's shunting-yard algorithm with its output step replaced by evaluation.
 
-https://github.com/user-attachments/assets/13a4326b-0f23-4818-b779-e6a16d56bae4
+https://github.com/user-attachments/assets/3265b72e-8ac1-49de-b54f-74b2dbe2f176
 
 *Each apply_top pops 1 operator and 2 numbers and pushes 1 result.*
 

@@ -62,7 +62,7 @@ Greedy spends 3 batches. DP compares all 3 possible first batches, each followed
 
 The recurrence fib(n) = fib(n-1) + fib(n-2) branches twice per call, and the 2 branches recompute the same smaller values. The animation runs fib(5) both ways and counts every call. Watch the naive version re-enter n = 2 and n = 1 again and again while the memoized version answers repeats of 2 and above with a dictionary lookup.
 
-https://github.com/user-attachments/assets/3f2fd053-0f1a-479a-bf29-9de89221046f
+https://github.com/user-attachments/assets/01232438-fc34-44a3-9e99-98f84a6089de
 
 *Naive fib(5) makes 15 calls. The memoized version makes 9 and stores 4 results.*
 
@@ -130,7 +130,7 @@ def min_batches(target, sizes):
 
 Placing @lru_cache(maxsize=None) above the `def` leaves the body untouched. The program below writes out by hand what that wrapper does: build a key from the arguments, look it up, and count hits and misses. It calls the function with the sizes as a list, then as a tuple. Predict its first printed line before you play it.
 
-https://github.com/user-attachments/assets/b4a7473d-f18a-489c-9983-1e275bf15794
+https://github.com/user-attachments/assets/26547447-27e7-4d51-91f5-5d43fcc91a59
 
 *Hits return from the cache without running the body, so only misses enter the loop.*
 
@@ -332,7 +332,7 @@ A team reserves a single worker slot overnight for backfill jobs. Each job has a
 
 The table is already sorted by end hour. **State**: dp[i] is the best score using only the first i jobs. **Recurrence**: either drop job i and keep dp[i - 1], or run it and add its score to dp[p], where p counts the earlier jobs that end no later than job i starts. This is the promotion recurrence with a jump back to p in place of a fixed jump of 2.
 
-https://github.com/user-attachments/assets/82521572-1b96-478d-966a-89095fe77e56
+https://github.com/user-attachments/assets/e35af58f-4c40-4c7b-a504-b3b4c123b897
 
 *p is found by scanning the earlier jobs, which are sorted by end hour.*
 

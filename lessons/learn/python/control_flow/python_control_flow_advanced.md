@@ -270,7 +270,7 @@ The class below holds the state and exposes `handle` as the only way to change i
 
 `__init__` runs once, when `PipelineRun()` creates a run, and sets its starting state. `self.state` is the variable each run carries with it, so 2 runs can sit in different states. `handle` is a function attached to the run: `run.handle("start")` calls it with `event` set to `"start"`, and `self` is that same run.
 
-https://github.com/user-attachments/assets/1ab1c9c6-f84f-4397-ba10-a7b8364bb50d
+https://github.com/user-attachments/assets/422aeb0d-7661-48e3-a06a-138f02fdcf70
 
 *Each call checks a single (state, event) pair; the 2 rejected events leave state unchanged.*
 

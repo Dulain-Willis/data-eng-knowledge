@@ -197,7 +197,7 @@ A `for` loop over a generator calls `iter()` on it, which returns the generator 
 
 Swap the square brackets of a list comprehension for parentheses and you get a generator expression: the same `for` and `if` clauses, the same result values, and a completely different moment of evaluation. `[parse(s) for s in lines]` runs `parse` on every line before the assignment finishes. `(parse(s) for s in lines)` runs nothing until a consumer pulls, then runs `parse` once per pull.
 
-https://github.com/user-attachments/assets/d38db0e8-1833-41b4-a1e9-1fe82adc75fa
+https://github.com/user-attachments/assets/1b1273de-56c2-45b1-a6c7-fcdd434ae892
 
 *The list parses every line up front; the generator parses on each pull*
 

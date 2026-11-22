@@ -523,7 +523,7 @@ build_job("hourly_clicks")
 
 When the function also declares a parameter by name, a keyword with that name goes to the parameter, and the dictionary never sees it. A wrapper can pass its own dictionary along with `**` in a call, which spreads the dictionary back into keyword arguments:
 
-https://github.com/user-attachments/assets/97d18264-65c4-4399-b4e0-234784d5ea94
+https://github.com/user-attachments/assets/e480eb11-0391-45f2-ae6c-da218d9b9366
 
 *run_step holds 3 options; write_table claims mode and keeps the other 2.*
 

@@ -43,7 +43,7 @@ Every version of this question reduces to a single number: the largest count of 
 
 Sort by start. Keep a min-heap holding the end time of every room opened so far, so `rooms[0]` is the room that frees up soonest. For each meeting, compare its start with `rooms[0]`. If that room is free by then, the meeting reuses it: pop the old end time and push the new one. If not, push alone, which opens a room. Each meeting costs 1 push and at most 1 pop, O(log n) apiece, after the O(n log n) sort.
 
-https://github.com/user-attachments/assets/03630521-f0f6-407b-b1f6-bd07051ee786
+https://github.com/user-attachments/assets/adecb41b-6cc3-4ca4-945f-3203fb08a3cd
 
 *Every meeting pushes once; a pop happens only when the soonest-free room is free by its start.*
 
@@ -219,7 +219,7 @@ Everything so far assumed the full input was known before the first answer. A bo
 
 If accepted bookings never overlap, sorting them by start sorts them by end as well. A new request `[s, e)` can then collide only with the stored interval immediately before its insertion point or the one sitting at it. `bisect` finds that point in O(log n), 2 comparisons settle the conflict, and inserting at the found index keeps the list sorted.
 
-https://github.com/user-attachments/assets/5467f306-bef8-4425-a372-958d25b670f3
+https://github.com/user-attachments/assets/01eab741-6191-4f1a-a30f-21c88cd7b795
 
 *Each request is checked against its 2 neighbors in the sorted list and nothing else.*
 
@@ -381,7 +381,7 @@ Fusing the boundaries is the sort-and-scan from earlier interval work. The follo
 
 Sums and counts combine safely; so do min and max, and so do set unions. Merging A with B, then with C, gives what merging A with the combination of B and C gives. An average does not, because averaging 2 averages weights a span of 1 event the same as a span of 1,000. Carry `events` and `total_ms` through the merge and divide once, after the last fusion.
 
-https://github.com/user-attachments/assets/3b197947-545d-45d7-a172-866fb2576d73
+https://github.com/user-attachments/assets/855721c0-925d-4958-aaed-718f22aac41b
 
 *Sums and counts ride through the merge; the average is computed only when printing.*
 

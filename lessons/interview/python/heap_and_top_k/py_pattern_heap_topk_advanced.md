@@ -240,7 +240,7 @@ Spread a priority queue across 20 machines and the heap stops being the hard par
 
 The standard plan computes a top-K on each partition, ships the small lists to 1 place and merges them, the K-way merge at cluster scale. It is correct under 1 condition: each key's full score lives on exactly 1 partition. In the run below, key z is split across 2 partitions with 8 on each. Predict which keys the merge reports as the top 2, and which keys truly lead.
 
-https://github.com/user-attachments/assets/2155df62-1c01-499f-9b84-7f4fa7bb5d2a
+https://github.com/user-attachments/assets/82d7d1bf-9750-4014-b51a-d94045283348
 
 *Key z holds 8 on each partition.*
 

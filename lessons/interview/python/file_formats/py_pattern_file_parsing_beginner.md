@@ -114,7 +114,7 @@ Both tools parse CSV correctly. The choice between them turns on 2 numbers and 1
 
 `csv.reader` accepts any iterable of strings and returns an iterator, so it parses a line only when the loop asks for the next row. Wrapping it in a generator function with `yield` keeps that laziness while handing each row to the caller as a dict keyed by the header. Every field arrives as `str`: `"40.00"` stays text until the code calls `float` on it. The animation runs the pattern over an order file of 4 rows.
 
-https://github.com/user-attachments/assets/133097a2-3b1c-47c1-844b-20e64dbf22f4
+https://github.com/user-attachments/assets/6fe9039d-cd62-463f-8733-9197dc171239
 
 *Rows stream through the generator 1 at a time while totals accumulates.*
 
@@ -394,7 +394,7 @@ handle.close()
 
 The `int("five")` call raises inside `sum`, and execution leaves before `handle.close()` is reached. A `with` statement moves the cleanup into `__exit__`, which Python calls whether the block finishes normally or by an exception. The exception still propagates unless `__exit__` returns True, so `with` guarantees cleanup without swallowing errors. The animation uses a small class with `__enter__` and `__exit__` to make each call visible.
 
-https://github.com/user-attachments/assets/bffbe349-cff9-468d-b12c-a450de23e98b
+https://github.com/user-attachments/assets/c08d476b-14bf-400f-980d-8e99529f7775
 
 *__exit__ runs on success and on ValueError alike, and the error still reaches except.*
 

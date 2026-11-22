@@ -244,7 +244,7 @@ Two rows escape an `except json.JSONDecodeError` clause. `None` raises `TypeErro
 
 ### A try/except loop with a dead letter
 
-https://github.com/user-attachments/assets/bbfeb9b5-22ef-4e7f-92ed-1f620f04b634
+https://github.com/user-attachments/assets/321b8fd9-141e-4f8e-a800-02a1c5237a53
 
 *Five raw lines through 1 try/except: good records to parsed, failures to dead_letter with their error.*
 
@@ -388,7 +388,7 @@ record_path names the list whose elements become rows, so 2 orders produce 3 row
 
 The logic underneath fits in a dozen lines of plain Python. Watch order 103, whose `items` list is empty, as the loop reaches it.
 
-https://github.com/user-attachments/assets/11b1e9ea-b8d9-4b1c-8991-99c2e9e1b1ae
+https://github.com/user-attachments/assets/2ac56958-f4a5-4f90-8b7b-5f19447825e3
 
 *Record-path flattening by hand: each item becomes a row carrying its order's fields.*
 
@@ -514,7 +514,7 @@ It prints 1 2. The good rows go on to the curated table and the bad rows to a qu
 
 The animation models each mode with the same `try/except` around `json.loads()` from the dead-letter loop, run over the same 3 lines, so you can follow where line 2 ends up in each run.
 
-https://github.com/user-attachments/assets/ba8e6b27-0dae-42d7-baf1-b75b8d4a6a47
+https://github.com/user-attachments/assets/b99fc44b-2d7f-48eb-9c86-95255753c37c
 
 *One loop, 3 policies for the line that fails to parse.*
 

@@ -97,7 +97,7 @@ A function name follows the rules for variable names: letters, digits and unders
 
 The function below holds the Uber formula once. The names in its parentheses, `miles` and `minutes`, stand in for the numbers each trip supplies, and the next section covers how a call fills them. Step through the run and watch the body execute 3 times with 3 sets of numbers:
 
-https://github.com/user-attachments/assets/7ae13587-d064-42f7-9a2f-215c74a72006
+https://github.com/user-attachments/assets/c29dc841-103b-4d51-9444-18560fe08066
 
 *Each call runs the body once with its own miles and minutes.*
 
@@ -224,7 +224,7 @@ Running it raises `TypeError: describe_trip() missing 1 required positional argu
 
 A call inside a loop runs the body once per pass, and each pass delivers new arguments. Surge pricing multiplies a base fare by a level from 1 to 3; the loop below passes the same `cents` each time and a different `multiplier`, and the final call fills both slots by keyword:
 
-https://github.com/user-attachments/assets/6bb94079-de60-4efa-affc-33646d8cc9b6
+https://github.com/user-attachments/assets/a8447bd3-5127-4d95-a81e-d9dd725789c6
 
 *Three positional calls from the loop, then one call that fills both slots by keyword.*
 
