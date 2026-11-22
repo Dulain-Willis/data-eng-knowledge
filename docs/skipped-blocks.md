@@ -16,7 +16,8 @@
 | Learn: Spark | 45 | 600 | `spark`, no `form` key | **To be left out.** The Spark lessons are not in `main`, and the separate Spark PR was not open when checked (`gh pr list --state all` shows PRs 1 to 6 only; no Spark branch on the remote). |
 | Learn: Python | 42 | 811 | `python`, no `form` key; 720 have `{{ }}` blanks in `starter_code` (152 of them also a `tile_bank` of draggable snippets), 91 are `debug` tasks (`debug` key, no blanks); all have `test_examples` | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Interview: Python | 60 | 169 | `python`, no `form` key; every one has `starter_code` with `{{ }}` blanks, `input_bindings` and `test_examples` (no seed tables, no tile bank) | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
-| Interview: SQL | 48 | 147 | `sql`, no `form` key; every one has `starter_sql` (99 with `{{ }}` blanks), `data_tables` and `sampleData` | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
+| Interview: SQL | 48 | 147 | `sql`, no `form` key; every one has `starter_sql` (99 with `{{ }}` blanks), `data_tables` and `sampleData` | **Left out** (`SKIP| Learn: SQL | 30 | 515 | `sql`, no `form` key (practice database tables, fill-in and write-the-query tasks) | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
+PED_TOOL_EXERCISES`) |
 
 - **Kept exercises** (574 in total) are one file per lesson, numbered continuously (`Exercise 1 of N` to `N of N`). Each has the task, the starting canvas if there is one, and the solution in a collapsed fold. Inline multiple-choice questions are not exercises; they stay in the lesson.
 - **Spark exercises** (600, 45 lessons x 3 tiers, none has a `form` key; all have PySpark `starter_code`):
@@ -156,6 +157,155 @@
 
   Totals: 147 exercises left out, 130 animation blocks kept (129 MP4 videos and 1 still image: `sql_pattern_ctes_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, like the four Spark still-image cases).
   One sentence was trimmed by hand in the Markdown (not by the converter): in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. Re-running the converter on that lesson brings the clause back.
+- **Learn SQL exercises** (515 in 30 lessons, 10 cards x 3 tiers; all `sql`). Per lesson, with the run cells (`executable_sql`, 191 in all) that stay, the drag-the-tiles blocks (`sql_parsons`) left out, the animation blocks kept (all MP4 except 1 still) and the tab blocks (`sql_switcher`, converted as first tab only, see below):
+
+  <details><summary>Per-lesson counts</summary>
+
+  | Lesson | Card folder | Exercises left out | Run cells kept | Tile puzzles left out | Animations kept | Tab blocks (pending #22) | Regex blocks |
+  |---|---|---|---|---|---|---|---|
+  | `query_structure_beginner` | query_structure | 13 | 8 | 1 | 2 | 1 | 0 |
+  | `query_structure_intermediate` | query_structure | 22 | 3 | 1 | 5 | 1 | 0 |
+  | `query_structure_advanced` | query_structure | 14 | 3 | 1 | 2 | 2 | 0 |
+  | `data_types_beginner` | data_types | 10 | 5 | 1 | 1 | 1 | 0 |
+  | `data_types_intermediate` | data_types | 15 | 7 | 0 | 1 | 1 | 0 |
+  | `data_types_advanced` | data_types | 12 | 7 | 1 | 1 | 1 | 0 |
+  | `filtering_beginner` | filtering | 18 | 4 | 1 | 5 | 1 | 0 |
+  | `filtering_intermediate` | filtering | 18 | 3 | 1 | 3 | 4 | 1 |
+  | `filtering_advanced` | filtering | 19 | 4 | 1 | 4 | 2 | 1 |
+  | `aggregating_beginner` | aggregating | 28 | 3 | 1 | 8 | 1 | 0 |
+  | `aggregating_intermediate` | aggregating | 21 | 4 | 2 | 2 | 3 | 0 |
+  | `aggregating_advanced` | aggregating | 19 | 8 | 1 | 2 | 5 | 0 |
+  | `null_values_beginner` | null_values | 11 | 5 | 0 | 4 | 2 | 0 |
+  | `null_values_intermediate` | null_values | 13 | 12 | 3 | 5 | 1 | 0 |
+  | `null_values_advanced` | null_values | 18 | 5 | 1 | 2 | 4 | 0 |
+  | `joins_beginner` | joins | 10 | 2 | 1 | 4 | 1 | 0 |
+  | `joins_intermediate` | joins | 17 | 4 | 1 | 7 | 4 | 0 |
+  | `joins_advanced` | joins | 15 | 8 | 1 | 3 | 1 | 0 |
+  | `string_functions_beginner` | string_functions | 21 | 9 | 1 | 5 | 1 | 0 |
+  | `string_functions_intermediate` | string_functions | 17 | 8 | 2 | 2 | 2 | 0 |
+  | `string_functions_advanced` | string_functions | 19 | 9 | 1 | 2 | 2 | 0 |
+  | `dates_beginner` | dates | 13 | 9 | 1 | 5 | 1 | 0 |
+  | `dates_intermediate` | dates | 22 | 6 | 2 | 2 | 5 | 0 |
+  | `dates_advanced` | dates | 19 | 13 | 2 | 1 | 4 | 0 |
+  | `complex_data_beginner` | complex_data | 19 | 9 | 1 | 3 | 0 | 0 |
+  | `complex_data_intermediate` | complex_data | 14 | 11 | 1 | 1 | 2 | 0 |
+  | `complex_data_advanced` | complex_data | 19 | 3 | 1 | 1 | 1 | 0 |
+  | `window_functions_beginner` | window_functions | 19 | 4 | 1 | 5 | 1 | 0 |
+  | `window_functions_intermediate` | window_functions | 21 | 7 | 1 | 4 | 2 | 0 |
+  | `window_functions_advanced` | window_functions | 19 | 8 | 1 | 1 | 1 | 0 |
+
+  </details>
+
+  Totals: 515 exercises left out, 34 tile puzzles left out, 93 animation blocks kept (92 MP4 videos and 1 still image: `complex_data_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, the same fallback as `sql_pattern_ctes_advanced`), 191 run cells kept as a screenshot of the whole cell after the table-icon "Show result" button was clicked (the other 2 buttons, "Animate this query" and "Edit and run this query", are never clicked) plus the code as a ```` ```sql ```` fence, 2 regex-cards blocks (`filtering_intermediate`, `filtering_advanced`) kept as a screenshot plus the pattern text. 5 of the 93 animations are `table_visualization` blocks (all in `aggregating_beginner`), which share the `sql_animation` player and are recorded the same way; the other 3 players in that lesson are `sql_animation`. 11 recordings failed the recorder's first-frame check ("no step counter drawn") and were re-recorded automatically.
+
+- **Learn SQL tabs, pending ticket #22.** 58 `sql_switcher` blocks (152 tabs) have no rule yet. The converter keeps only the first tab of each (generic conversion) and prints `no rule for block type 'sql_switcher'`; the owner decides how to render them (draft PR #24 / ticket #22). Per lesson, the tab names of each block (the first one is what the Markdown shows):
+
+  <details><summary>Tab blocks (58 blocks, 152 tabs)</summary>
+
+  | Lesson | Block | Tabs |
+  |---|---|---|
+  | `query_structure_beginner` | 1 | Star, Named, New table |
+  | `query_structure_intermediate` | 1 | Top 3, No ORDER BY, Page 2 |
+  | `query_structure_advanced` | 1 | EXCEPT, Reversed, Counted |
+  | `query_structure_advanced` | 2 | Registered, Paying, Counted |
+  | `data_types_beginner` | 1 | Text sort, Number sort, Text filter |
+  | `data_types_intermediate` | 1 | Wall clock, With zone |
+  | `data_types_advanced` | 1 | As VARCHAR, As INTEGER |
+  | `filtering_beginner` | 1 | Match, Exclude, Lowercase |
+  | `filtering_intermediate` | 1 | Implicit, Grouped, Explicit |
+  | `filtering_intermediate` | 2 | Prefix, Contains, Any first |
+  | `filtering_intermediate` | 3 | Page 1, Page 2, Page 3 |
+  | `filtering_intermediate` | 4 | BETWEEN, Half-open |
+  | `filtering_advanced` | 1 | No orders, No paid, Paid only |
+  | `filtering_advanced` | 2 | NOT IN, NOT EXISTS, IN |
+  | `aggregating_beginner` | 1 | COUNT(*), COUNT(col), DISTINCT |
+  | `aggregating_intermediate` | 1 | Row-level, Aggregate, Grouped |
+  | `aggregating_intermediate` | 2 | Exact, Approximate, Tighter |
+  | `aggregating_intermediate` | 3 | Alias, Expression, Position, Unselected |
+  | `aggregating_advanced` | 1 | All values, DISTINCT |
+  | `aggregating_advanced` | 2 | MAP_AGG, Arrays first |
+  | `aggregating_advanced` | 3 | No ORDER BY, By time, By length |
+  | `aggregating_advanced` | 4 | WHERE, COUNT_IF |
+  | `aggregating_advanced` | 5 | As rows, As columns |
+  | `null_values_beginner` | 1 | = 'US', <> 'US', both |
+  | `null_values_beginner` | 2 | AVG, SUM/COUNT(*), SUM/COUNT(x) |
+  | `null_values_intermediate` | 1 | Filter only, With IS NULL |
+  | `null_values_advanced` | 1 | UNION ALL, UNION, With source |
+  | `null_values_advanced` | 2 | Using <>, IS DISTINCT |
+  | `null_values_advanced` | 3 | No fix, Fix output, Fix input |
+  | `null_values_advanced` | 4 | NOT IN, Filtered, NOT EXISTS, EXCEPT |
+  | `joins_beginner` | 1 | Right key, Wrong key, Cast text |
+  | `joins_intermediate` | 1 | Key column, Total column |
+  | `joins_intermediate` | 2 | Right: ON, Right: WHERE, Left: ON, Left: WHERE |
+  | `joins_intermediate` | 3 | INNER last, LEFT last |
+  | `joins_intermediate` | 4 | Two joins, CTE first |
+  | `joins_advanced` | 1 | BETWEEN, Touching, Half-open |
+  | `string_functions_beginner` | 1 | CONCAT, Pipes, With CAST |
+  | `string_functions_intermediate` | 1 | Negative, LENGTH math, Off by one |
+  | `string_functions_intermediate` | 2 | Raw join, TRIM in ON |
+  | `string_functions_advanced` | 1 | Raw ;, REPLACE, Wider delim |
+  | `string_functions_advanced` | 2 | String =, LOWER, Bytes = |
+  | `dates_beginner` | 1 | Nights, Hours |
+  | `dates_intermediate` | 1 | Month only, Year + month |
+  | `dates_intermediate` | 2 | Days passed, Midnights, Months |
+  | `dates_intermediate` | 3 | Divided, Int divide, Not divided |
+  | `dates_intermediate` | 4 | Month only, Year + month |
+  | `dates_intermediate` | 5 | Week start, Month start |
+  | `dates_advanced` | 1 | Named zone, Fixed offset |
+  | `dates_advanced` | 2 | month(), date_trunc |
+  | `dates_advanced` | 3 | Month first, Day first |
+  | `dates_advanced` | 4 | By label, By date |
+  | `complex_data_intermediate` | 1 | NOT contains, COALESCE |
+  | `complex_data_intermediate` | 2 | Text sort, Cast first |
+  | `complex_data_advanced` | 1 | lambdas, unnest |
+  | `window_functions_beginner` | 1 | Plain SUM, GROUP BY, SUM OVER () |
+  | `window_functions_intermediate` | 1 | Default, Full window, Flip order |
+  | `window_functions_intermediate` | 2 | ROWS, RANGE |
+  | `window_functions_advanced` | 1 | Two keys, One key, Filter first |
+
+  </details>
+
+- **Learn SQL drops and trims.** Drops are in `tools/drops.json` under the comment key `_comment_sql_learn` (14 places): the drag-the-tiles puzzles and the prose that only introduces or explains them. The trims are hand edits of the Markdown in their own commit ("Learn SQL hand trims"); re-running the converter on those lessons brings the sentences back.
+
+  <details><summary>Drops (14 places)</summary>
+
+  | Lesson | Block starts with |
+  |---|---|
+  | `window_functions_beginner` | "The practice table employees in the platform" |
+  | `window_functions_beginner` | "Among the distractors, ORDER BY department runs" |
+  | `window_functions_beginner` | "The blanks below ask for that shape on the practice" |
+  | `window_functions_beginner` | "Every distractor runs. ORDER BY salary gives a" |
+  | `window_functions_beginner` | "The puzzle below is the inner query, split into" |
+  | `joins_beginner` | "The correct tile matches the item's product_id to" |
+  | `joins_beginner` | "The ON tile holds the pairing condition and the" |
+  | `query_structure_advanced` | "Drill: expand the features" |
+  | `query_structure_advanced` | "The drill hands over an accounts table with a" |
+  | `query_structure_advanced` | "Assemble the subtraction" |
+  | `string_functions_beginner` | "Put the duplicate finder together yourself. The" |
+  | `data_types_beginner` | "The same query, descending, assembled from tiles." |
+  | `aggregating_beginner` | "The leftover tile, WHERE COUNT ( * ) > 2 , is the" |
+  | `filtering_beginner` | "The order that holds the query together is SELECT ," |
+
+  </details>
+
+  <details><summary>Hand trims (10 sentences in 5 lessons)</summary>
+
+  | Lesson | Cut |
+  |---|---|
+  | `aggregating_beginner` | "The practice `orders` table has a `profit` per order and a `region`; fill in the 2 aggregates that give total and average profit per region." |
+  | `aggregating_beginner` | "The practice `orders` table has a `region` and a `profit` per order; complete the query that keeps only regions with more than 1 order." |
+  | `aggregating_beginner` | "Assemble the same query from its pieces below; 1 tile does not belong." |
+  | `data_types_beginner` | "Supply the operator." |
+  | `joins_beginner` | clause ", and the blank below is that condition" (the paragraph now ends at "primary key on the product side.") |
+  | `joins_beginner` | "The tiles below assemble a join followed by a filter over the practice database's `stores` and `retail_orders` tables, in the order the engine reads them." |
+  | `query_structure_intermediate` | "The blank below is the same construction over the practice database." |
+  | `query_structure_intermediate` | "The practice database splits notification sends between `push_notifs` and `push_notifs_2fa`. Both tables have the same columns, which is the shape the next widget stacks." |
+  | `query_structure_advanced` | "Arrange the tiles. Two of them do not belong." |
+
+  </details>
+
+  Left in on purpose, flagged for the owner's review: `data_types_beginner` "A `quantity` of 3 at a price of 19.99 returns 59.97..."; `aggregating_beginner` "`SUM(profit)` and `AVG(profit)` in the same row..."; `complex_data_advanced` h3 "Capstone: long tracks by id" with "The final query combines the lesson..."; `query_structure_beginner` "List those names after `SELECT` in the order the..."; `query_structure_advanced` "The signup table counts attempts..." (a headingless sentence after the dropped h3).
+
 - **Learn Python exercises** (811 in 42 lessons, 14 cards x 3 tiers; all `python`; 720 fill-in-the-blank, 152 of those with a `tile_bank`, 91 `debug`). Per lesson, with the animations each lesson keeps and the run cells (`executable_python`, 548 in all) that stay:
 
   <details><summary>Per-lesson counts</summary>
@@ -266,13 +416,17 @@
 | Star ratings ("Daily Life", "Interviews") | `convert()` | Drawn on a canvas by JavaScript; the page source has no values |
 | `placed_challenge` stubs ("Loading the challenge") | `SKIPPED_BLOCKS` | Empty placeholder where an exercise widget would load; none left in the committed lessons |
 | Python run cells (`executable_python`, 548) | `record_cells` + `spark_cell` | Kept as lesson content: click `>>>` (reveals the output), one 2x screenshot of the whole cell, code as a fence under it |
-| `regex_cards` (1, `python_strings_advanced`) | `record_regex_cards` + `regex_cards` | Screenshot of the stacked cards, pattern text kept as bullets |
+| SQL run cells (`executable_sql`, 191) | `record_cells` + `CELL_FENCE` | Kept as lesson content: click the table-icon "Show result" button, one 2x screenshot of the whole cell, code as a ```` ```sql ```` fence under it |
+| `sql_parsons` (34, drag-the-tiles) | `SKIPPED_BLOCKS` | Interactive puzzle, answers not in the page; the prose that only introduces them is in `tools/drops.json` |
+| `table_visualization` (5, `aggregating_beginner`) | `ANIMATION_RE` / `ANIMATION_SELECTOR` | Same player as `sql_animation`, recorded as MP4 |
+| `sql_switcher` (58, 152 tabs) | generic conversion | First tab only, pending ticket #22 (see above) |
+| `regex_cards` (3: 1 in `python_strings_advanced`, 2 in Learn SQL) | `record_regex_cards` + `regex_cards` | Screenshot of the stacked cards, pattern text kept as bullets |
 | `schema_story` blocks | `SKIPPED_BLOCKS` | Interactive, no answers in the page, so only a dangling question would remain |
 | "Official <tool> resources" panel (logo, version, quote, doc buttons) on Airflow, dbt, Kafka | `clean()` drops `[data-tool-partner-panel]` | Not wanted. The trademark line after it stays. |
 | Prose that introduces a dropped exercise | `tools/drops.json` (hand-kept, applied only when exercises are left out) | See below |
 | Interactive pipeline/schema widgets | Screenshots or text | A live widget cannot be copied, so diagrams become 2x screenshots |
 
-**`tools/drops.json` today (4 entries, matched on the start of the block text):**
+**`tools/drops.json` today (4 Interview/Kafka/data modeling entries, 27 Learn Python places, 14 Learn SQL places; the 4 below are matched on the start of the block text; the Python and SQL ones are listed in their own sections above):**
 
 | Lesson | Block starts with |
 |---|---|
@@ -285,7 +439,7 @@ The two data-modeling entries do nothing today: `drops.json` is applied only whe
 
 **Kept on purpose:** `multiple_choice` (question, lettered options and a Solution fold, read from the page's embedded JSON); animations of every `*_animation` type (recorded as hosted MP4s; Interview Python has 255, all `python_animation`); tips, callouts, tables, code and diagrams.
 
-**Block types the converter maps today:** `static_code`, `big_number`, `tip`, `callout`, `fun_fact`, `key_takeaways`, `synthesis`, `icon_list`, `info_list`, `pipeline_diagram`, `schema_diagram`, `multiple_choice`, `best_practices`, `comparison`, plus plain ones (`lesson_title`, `learning_objectives`, `section_header`, `h3`, `h4`, `body_text`, `rich_text`, `static_table`, `side_by_side_tables`, `note_text`, `rich_info_list`, `full_width`) and any block type ending in `_animation`. Anything else prints `warning: no rule for block type '<type>'` and falls back to generic conversion. The Spark lessons contain one such type, `executable_spark` (a runnable code cell); the Spark PR is meant to add a rule for it.
+**Block types the converter maps today:** `static_code`, `big_number`, `tip`, `callout`, `fun_fact`, `key_takeaways`, `synthesis`, `icon_list`, `info_list`, `pipeline_diagram`, `schema_diagram`, `multiple_choice`, `best_practices`, `comparison`, plus plain ones (`lesson_title`, `learning_objectives`, `section_header`, `h3`, `h4`, `body_text`, `rich_text`, `static_table`, `side_by_side_tables`, `note_text`, `rich_info_list`, `full_width`) `executable_sql` (run cell), `table_visualization` (as an animation), `sql_parsons` (skipped) and any block type ending in `_animation`. Anything else prints `warning: no rule for block type '<type>'` and falls back to generic conversion. `sql_switcher` (Learn SQL) is left unmapped until ticket #22. The Spark lessons contain one such type, `executable_spark` (a runnable code cell); the Spark PR is meant to add a rule for it.
 
 ## How to change it
 
