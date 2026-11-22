@@ -76,7 +76,7 @@ Open with the shape. "This is a running total, so 5 rows come back, and each one
 
 Interviewers pick this question because the table fits on 1 screen, a correct answer is short, and the follow-ups give the rest of the slot somewhere to go: which rows the sum sees on a given row, what changes if the `ORDER BY` is removed, how you would prove the 5 numbers.
 
-The pull toward `GROUP BY` comes from the word total, since most earlier SQL practice used total to mean collapse the rows. Listen instead for the word that names a moment: after, so far, as of, to date, since launch. A moment is a row, and a total taken at a row is a running total. The signature reads the same on a transactions table as on a donations table or an inventory ledger, which is why the capstones at the end of this lesson arrive in 4 different vocabularies.
+The pull toward `GROUP BY` comes from the word total, since most earlier SQL practice used total to mean collapse the rows. Listen instead for the word that names a moment: after, so far, as of, to date, since launch. A moment is a row, and a total taken at a row is a running total. The signature reads the same on a transactions table as on a donations table or an inventory ledger.
 
 
 <br>
