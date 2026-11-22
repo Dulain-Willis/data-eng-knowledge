@@ -584,9 +584,9 @@ Event 1 returns `['t4', 't7']`. Event 2's producer sent the string `none` where 
 
 <br>
 
-### Capstone: long tracks by id
+### Long tracks by id
 
-The final query combines the lesson: 2 parallel arrays, a pairing lambda, a filter and no UNNEST. For each playlist it returns the ids of tracks longer than 180 seconds as an array; on playlists 101 and 102 that is `['t9', 't7']` and `['t2', 't8']`.
+Exercise: [Long tracks by id](_exercises/complex_data_advanced_exercise_1.md)
 
 
 <br>
