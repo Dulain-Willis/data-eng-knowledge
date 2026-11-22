@@ -58,6 +58,22 @@
  ],
  "joins_beginner": [
   {
+   "name": "Join key and filter",
+   "places": [
+    "D"
+   ],
+   "after": "The logical execution order from earlier lessons places",
+   "moved": [
+    "The right key is `user_id` on both sides, the users primary key against the sessions foreign key, and the filter names the column the question asked about. The engine pairs first and filters second, so `s.pages_viewed` in the `WHERE` is a column of the paired row."
+   ],
+   "trim": [
+    [
+     "\n\nThe right key is `user_id` on both sides, the users primary key against the sessions foreign key, and the filter names the column the question asked about. The engine pairs first and filters second, so `s.pages_viewed` in the `WHERE` is a column of the paired row.",
+     ""
+    ]
+   ]
+  },
+  {
    "trim_only": true,
    "name": "trims",
    "places": [
