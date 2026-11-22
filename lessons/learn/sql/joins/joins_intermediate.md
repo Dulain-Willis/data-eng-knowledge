@@ -114,28 +114,50 @@ Alice's 2 rows and Carol's 1 row carry an `order_id`, so the test is false and t
 
 ### Test a column that cannot be NULL
 
-Whether the answer is right depends on which column you test with IS NULL. The right table's primary key is the safe choice, and the right table's join key column is equally safe, since a row that matched must hold a value there. A column that can be NULL in a real row breaks the pattern, as the 2 tabs below show.
+Whether the answer is right depends on which column you test with IS NULL. The right table's primary key is the safe choice, and the right table's join key column is equally safe, since a row that matched must hold a value there. A column that can be NULL in a real row breaks the pattern, as the 2 versions below show.
+
+**Key column**
 
 The test uses order_id, which every real order has, so NULL can only mean a padded row.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | c.name |
-|  | FROM customers AS c |
-|  | LEFT JOIN orders AS o |
-|  | ON c.cust_id = o.cust_id |
-|  | WHERE o.order_id IS NULL |
+```sql
+SELECT
+  c.name
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+WHERE o.order_id IS NULL
+```
 
-Result
+Result:
 
-| name |
-| --- |
-| Bob |
+```
+name
+Bob
+```
 
-1 row
+**Total column**
 
-Carol has an order whose `total` was never recorded. The first tab reports Bob as the only customer without orders, which is true. The second tab reports Bob and Carol, and Carol's order is real: her row is a match that happens to carry a NULL, and the test cannot tell it from a padded row.
+The test uses total, which a real order can leave empty, so a match with a missing total looks like no match.
+
+```sql
+SELECT
+  c.name
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+WHERE o.total IS NULL
+```
+
+Result:
+
+```
+name
+Bob
+Carol
+```
+
+Carol has an order whose `total` was never recorded. The first version reports Bob as the only customer without orders, which is true. The second version reports Bob and Carol, and Carol's order is real: her row is a match that happens to carry a NULL, and the test cannot tell it from a padded row.
 
 
 <br>
@@ -275,30 +297,101 @@ Move the same condition into ON and it becomes part of the pairing test. Alice's
 
 For a condition about the right table: put it in ON to keep every left row, or in WHERE to drop the left rows that have no qualifying partner. For a condition about the left table, WHERE does what you expect and ON does something that surprises most people on first sight. A left-table condition in ON under a LEFT JOIN removes no left row. It only decides which left rows are allowed to find partners; the rest are still preserved, padded.
 
+**Right: ON**
+
 A right-table condition in ON: every customer stays, and only shipped orders may pair.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | c.name, |
-|  | o.order_id, |
-|  | o.status |
-|  | FROM customers AS c |
-|  | LEFT JOIN orders AS o |
-|  | ON c.cust_id = o.cust_id |
-|  | AND o.status = 'shipped' |
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.status
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+    AND o.status = 'shipped'
+```
 
-Result
+Result:
 
-| name | order_id | status |
-| --- | --- | --- |
-| Alice | O1 | shipped |
-| Bob | NULL | NULL |
-| Carol | NULL | NULL |
+```
+name | order_id | status
+Alice | O1 | shipped
+Bob | NULL | NULL
+Carol | NULL | NULL
+```
 
-3 rows
+**Right: WHERE**
 
-Run all 4 tabs. The right-table condition in ON keeps 3 customers, with an order only for Alice, and in WHERE it keeps Alice alone. The left-table condition in ON keeps all 3 customers and gives Bob and Carol nothing to pair with, 4 rows in total because Alice pairs twice. In WHERE it keeps only Alice's 2 rows.
+The same condition in WHERE: padded rows carry NULL status and are dropped.
+
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.status
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+WHERE o.status = 'shipped'
+```
+
+Result:
+
+```
+name | order_id | status
+Alice | O1 | shipped
+```
+
+**Left: ON**
+
+A left-table condition in ON: every customer stays, but only Alice is allowed partners.
+
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.status
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+    AND c.name = 'Alice'
+```
+
+Result:
+
+```
+name | order_id | status
+Alice | O1 | shipped
+Alice | O2 | cancelled
+Bob | NULL | NULL
+Carol | NULL | NULL
+```
+
+**Left: WHERE**
+
+The same condition in WHERE: customers other than Alice are removed after the join.
+
+```sql
+SELECT
+  c.name,
+  o.order_id,
+  o.status
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+WHERE c.name = 'Alice'
+```
+
+Result:
+
+```
+name | order_id | status
+Alice | O1 | shipped
+Alice | O2 | cancelled
+```
+
+Run all 4 versions. The right-table condition in ON keeps 3 customers, with an order only for Alice, and in WHERE it keeps Alice alone. The left-table condition in ON keeps all 3 customers and gives Bob and Carol nothing to pair with, 4 rows in total because Alice pairs twice. In WHERE it keeps only Alice's 2 rows.
 
 | Condition is about | In ON | In WHERE |
 | --- | --- | --- |
@@ -411,29 +504,54 @@ The `customers` to `orders` join runs first: Alice has 2 orders and Bob has 1, s
 
 A LEFT JOIN early in the chain can be undone by an INNER JOIN later. The padded rows carry NULL in every column from the right table, and if a later ON condition uses one of those columns, it evaluates to NULL for the padded rows, which the INNER JOIN treats as no match. The row you preserved 1 join ago disappears without a warning.
 
+**INNER last**
+
 Bob survives the LEFT JOIN to orders, then meets an INNER JOIN on a column that is NULL for him.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | c.name, |
-|  | p.product_name |
-|  | FROM customers AS c |
-|  | LEFT JOIN orders AS o |
-|  | ON c.cust_id = o.cust_id |
-|  | INNER JOIN products AS p |
-|  | ON o.prod_id = p.prod_id |
+```sql
+SELECT
+  c.name,
+  p.product_name
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+INNER JOIN products AS p
+  ON o.prod_id = p.prod_id
+```
 
-Result
+Result:
 
-| name | product_name |
-| --- | --- |
-| Alice | Widget |
-| Alice | Gadget |
+```
+name | product_name
+Alice | Widget
+Alice | Gadget
+```
 
-2 rows
+**LEFT last**
 
-In the first tab Bob is preserved by the LEFT JOIN, arrives at the products join with `prod_id` NULL, matches nothing, and is dropped: 2 rows, both Alice. In the second tab the products join is also a LEFT JOIN, so Bob comes through padded: 3 rows. Once a chain starts preserving rows, every later join that hangs off the preserved side's nullable columns must preserve them too, or the first LEFT JOIN was for nothing.
+Both joins preserve rows, so Bob arrives at the end with NULL for the product.
+
+```sql
+SELECT
+  c.name,
+  p.product_name
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+LEFT JOIN products AS p
+  ON o.prod_id = p.prod_id
+```
+
+Result:
+
+```
+name | product_name
+Alice | Widget
+Alice | Gadget
+Bob | NULL
+```
+
+In the first version Bob is preserved by the LEFT JOIN, arrives at the products join with `prod_id` NULL, matches nothing, and is dropped: 2 rows, both Alice. In the second version the products join is also a LEFT JOIN, so Bob comes through padded: 3 rows. Once a chain starts preserving rows, every later join that hangs off the preserved side's nullable columns must preserve them too, or the first LEFT JOIN was for nothing.
 
 
 <br>
@@ -451,32 +569,73 @@ Fan-out happens even when every row matches. Join a parent to 2 child tables tha
 
 Each order total now appears twice, once per ticket, so a SUM over the column counts it twice, and each ticket appears once per order. The fix is to aggregate each child table down to 1 row per parent before joining, which the CTEs from the query structure lesson make readable.
 
+**Two joins**
+
 Both children join at row level, and Alice's orders and tickets multiply into 4 rows before the SUM runs.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | c.name, |
-|  | SUM(o.total) AS spent, |
-|  | COUNT(t.ticket_id) AS tickets |
-|  | FROM customers AS c |
-|  | LEFT JOIN orders AS o |
-|  | ON c.cust_id = o.cust_id |
-|  | LEFT JOIN tickets AS t |
-|  | ON c.cust_id = t.cust_id |
-|  | GROUP BY c.name |
-|  | ORDER BY c.name |
+```sql
+SELECT
+  c.name,
+  SUM(o.total) AS spent,
+  COUNT(t.ticket_id) AS tickets
+FROM customers AS c
+LEFT JOIN orders AS o
+  ON c.cust_id = o.cust_id
+LEFT JOIN tickets AS t
+  ON c.cust_id = t.cust_id
+GROUP BY c.name
+ORDER BY c.name
+```
 
-Result
+Result:
 
-| name | spent | tickets |
-| --- | --- | --- |
-| Alice | 160 | 4 |
-| Bob | 20 | 0 |
+```
+name | spent | tickets
+Alice | 160 | 4
+Bob | 20 | 0
+```
 
-2 rows
+**CTE first**
 
-The first tab reports Alice spending 160 and holding 4 tickets, both double the truth. The second reports 80 and 2. Bob has 1 order and no tickets, so he is right in both versions, which is how fan-out hides: the inflated rows belong to the busy customers, and busy customers are the ones nobody checks by hand.
+Each child is reduced to 1 row per customer in a CTE, so the final joins are one-to-one and nothing inflates.
+
+```sql
+WITH order_totals AS (
+  SELECT
+    cust_id,
+    SUM(total) AS spent
+  FROM orders
+  GROUP BY cust_id
+),
+ticket_counts AS (
+  SELECT
+    cust_id,
+    COUNT(*) AS tickets
+  FROM tickets
+  GROUP BY cust_id
+)
+
+SELECT
+  c.name,
+  COALESCE(ot.spent, 0) AS spent,
+  COALESCE(tc.tickets, 0) AS tickets
+FROM customers AS c
+LEFT JOIN order_totals AS ot
+  ON c.cust_id = ot.cust_id
+LEFT JOIN ticket_counts AS tc
+  ON c.cust_id = tc.cust_id
+ORDER BY c.name
+```
+
+Result:
+
+```
+name | spent | tickets
+Alice | 80 | 2
+Bob | 20 | 0
+```
+
+The first version reports Alice spending 160 and holding 4 tickets, both double the truth. The second reports 80 and 2. Bob has 1 order and no tickets, so he is right in both versions, which is how fan-out hides: the inflated rows belong to the busy customers, and busy customers are the ones nobody checks by hand.
 
 | ✓ Do | ✗ Don't |
 | --- | --- |
