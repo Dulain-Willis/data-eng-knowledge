@@ -123,37 +123,112 @@ The same per-row mechanism powers `EXISTS`, where the subquery returns no value 
 
 ### Signups that never confirmed
 
-The billing team's funnel logs every signup attempt in `all_signups` and every email confirmation in `confirmed_signups`. User 2 signed up twice, on March 2 and March 10, and confirmed once. Users 1 and 3 never confirmed, and user 4 confirmed a day after signing up. The switcher runs 3 formulations over those rows: plain `EXCEPT`, `EXCEPT ALL`, and the numbered-row rewrite that reproduces `EXCEPT ALL` on an engine without it.
+The billing team's funnel logs every signup attempt in `all_signups` and every email confirmation in `confirmed_signups`. User 2 signed up twice, on March 2 and March 10, and confirmed once. Users 1 and 3 never confirmed, and user 4 confirmed a day after signing up. The examples run 3 formulations over those rows: plain `EXCEPT`, `EXCEPT ALL`, and the numbered-row rewrite that reproduces `EXCEPT ALL` on an engine without it.
+
+**EXCEPT**
 
 Users with an unconfirmed signup, each listed once.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | user_id |
-|  | FROM all_signups |
-|  |  |
-|  | EXCEPT |
-|  |  |
-|  | SELECT |
-|  | user_id |
-|  | FROM confirmed_signups |
-|  | ORDER BY user_id |
+```sql
+SELECT
+  user_id
+FROM all_signups
 
-Result
+EXCEPT
 
-| user_id |
-| --- |
-| 1 |
-| 3 |
+SELECT
+  user_id
+FROM confirmed_signups
+ORDER BY user_id
+```
 
-2 rows
+Result:
 
-The first tab returns users 1 and 3. User 2 does not appear, because `EXCEPT` removes every copy of a row that has any match on the right, and user 2 has one. The second tab swaps the sides and returns nothing: both confirmed users also signed up, so subtracting the signups leaves no row. The order of the sides decides the question. The third tab is the counted version. Written `EXCEPT ALL`, the operator subtracts occurrence counts, so 2 copies of user 2 on the left minus 1 on the right leaves 1: the March 10 attempt that nobody confirmed. PostgreSQL, Trino and DuckDB accept `EXCEPT ALL`. On an engine without it, the tab numbers each occurrence with `ROW_NUMBER` and subtracts the pairs. That second attempt becomes the row (2, 2), which has no partner on the right and survives, so the tab returns 1, 2 and 3.
+```
+user_id
+1
+3
+```
+
+**Reversed**
+
+The same operator with the sides swapped: confirmations with no signup.
+
+```sql
+SELECT
+  user_id
+FROM confirmed_signups
+
+EXCEPT
+
+SELECT
+  user_id
+FROM all_signups
+ORDER BY user_id
+```
+
+Result:
+
+```
+user_id
+```
+
+**Counted**
+
+EXCEPT ALL's result, rebuilt from numbered occurrences for engines without it.
+
+```sql
+WITH a AS (
+  SELECT
+    user_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY signup_date
+    ) AS n
+  FROM all_signups
+),
+c AS (
+  SELECT
+    user_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY confirmed_date
+    ) AS n
+  FROM confirmed_signups
+)
+
+SELECT
+  user_id
+FROM (
+  SELECT
+    user_id,
+    n
+  FROM a
+
+  EXCEPT
+
+  SELECT
+    user_id,
+    n
+  FROM c
+) AS unmatched
+ORDER BY user_id
+```
+
+Result:
+
+```
+user_id
+1
+2
+3
+```
+
+The first version returns users 1 and 3. User 2 does not appear, because `EXCEPT` removes every copy of a row that has any match on the right, and user 2 has one. The second version swaps the sides and returns nothing: both confirmed users also signed up, so subtracting the signups leaves no row. The order of the sides decides the question. The third version is the counted version. Written `EXCEPT ALL`, the operator subtracts occurrence counts, so 2 copies of user 2 on the left minus 1 on the right leaves 1: the March 10 attempt that nobody confirmed. PostgreSQL, Trino and DuckDB accept `EXCEPT ALL`. On an engine without it, the version numbers each occurrence with `ROW_NUMBER` and subtracts the pairs. That second attempt becomes the row (2, 2), which has no partner on the right and survives, so the version returns 1, 2 and 3.
 
 https://github.com/user-attachments/assets/71f6ba72-cfdf-4062-998f-abfc5b8d744a
 
-The animation plays the first tab. The 5 rows of `all_signups` come in, each is compared against the 2 confirmed rows, and rows 2 and 4 find a match and leave. Rows 1 and 3 remain, and the second copy of user 2 is removed as well, since the match is on the value, not on a particular row.
+The animation plays the first version. The 5 rows of `all_signups` come in, each is compared against the 2 confirmed rows, and rows 2 and 4 find a match and leave. Rows 1 and 3 remain, and the second copy of user 2 is removed as well, since the match is on the value, not on a particular row.
 
 | user_id | copies in all_signups | copies in confirmed | EXCEPT | EXCEPT ALL |
 | --- | --- | --- | --- | --- |
@@ -196,37 +271,114 @@ The signup table counts attempts, so the query that lists unconfirmed attempts, 
 
 ### Users who are both known and active
 
-The `users` table holds 5 registered users. `user_sessions` holds 4 session rows for users 2, 2, 4 and 6, and `user_purchases` holds 5 purchase rows for users 2, 2, 2, 4 and 7. User 6 has sessions and no `users` row, and user 7 has purchases and no row either, which is the kind of orphan the previous section's `EXCEPT` would surface. The switcher asks 3 questions of those tables.
+The `users` table holds 5 registered users. `user_sessions` holds 4 session rows for users 2, 2, 4 and 6, and `user_purchases` holds 5 purchase rows for users 2, 2, 2, 4 and 7. User 6 has sessions and no `users` row, and user 7 has purchases and no row either, which is the kind of orphan the previous section's `EXCEPT` would surface. The examples ask 3 questions of those tables.
+
+**Registered**
 
 Registered users with at least one session.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | user_id |
-|  | FROM users |
-|  |  |
-|  | INTERSECT |
-|  |  |
-|  | SELECT |
-|  | user_id |
-|  | FROM user_sessions |
-|  | ORDER BY user_id |
+```sql
+SELECT
+  user_id
+FROM users
 
-Result
+INTERSECT
 
-| user_id |
-| --- |
-| 2 |
-| 4 |
+SELECT
+  user_id
+FROM user_sessions
+ORDER BY user_id
+```
 
-2 rows
+Result:
 
-The first tab returns 2 and 4, the registered users with at least one session. User 6 is dropped because the left side never produces it. The second tab returns 2 and 4 again: users with both sessions and purchases. The third tab returns 2, 2 and 4, the result `INTERSECT ALL` gives on engines that support it. Here it is rebuilt by numbering each user's rows on both sides and intersecting the numbered pairs. `INTERSECT ALL` keeps each row as many times as the smaller side holds it. User 2 appears 2 times in sessions and 3 times in purchases, so the pairs (2, 1) and (2, 2) match and (2, 3) has no partner. User 4 appears once on each side.
+```
+user_id
+2
+4
+```
+
+**Paying**
+
+Users with both a session and a purchase, each listed once.
+
+```sql
+SELECT
+  user_id
+FROM user_sessions
+
+INTERSECT
+
+SELECT
+  user_id
+FROM user_purchases
+ORDER BY user_id
+```
+
+Result:
+
+```
+user_id
+2
+4
+```
+
+**Counted**
+
+INTERSECT ALL's result, rebuilt by numbering copies on each side.
+
+```sql
+WITH s AS (
+  SELECT
+    user_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY session_date
+    ) AS n
+  FROM user_sessions
+),
+p AS (
+  SELECT
+    user_id,
+    ROW_NUMBER() OVER (
+      PARTITION BY user_id
+      ORDER BY amount
+    ) AS n
+  FROM user_purchases
+)
+
+SELECT
+  user_id
+FROM (
+  SELECT
+    user_id,
+    n
+  FROM s
+
+  INTERSECT
+
+  SELECT
+    user_id,
+    n
+  FROM p
+) AS matched
+ORDER BY user_id
+```
+
+Result:
+
+```
+user_id
+2
+2
+4
+```
+
+The first version returns 2 and 4, the registered users with at least one session. User 6 is dropped because the left side never produces it. The second version returns 2 and 4 again: users with both sessions and purchases. The third version returns 2, 2 and 4, the result `INTERSECT ALL` gives on engines that support it. Here it is rebuilt by numbering each user's rows on both sides and intersecting the numbered pairs. `INTERSECT ALL` keeps each row as many times as the smaller side holds it. User 2 appears 2 times in sessions and 3 times in purchases, so the pairs (2, 1) and (2, 2) match and (2, 3) has no partner. User 4 appears once on each side.
 
 https://github.com/user-attachments/assets/e6ab98d9-a17d-4d84-b342-35b90ca0c2b5
 
-The animation plays the first tab. Each of the 5 user rows is checked against the session rows; 2 and 4 find matches and move to the result, and the second session for user 2 adds nothing, since the result holds each value once.
+The animation plays the first version. Each of the 5 user rows is checked against the session rows; 2 and 4 find matches and move to the result, and the second session for user 2 adds nothing, since the result holds each value once.
 
 | user_id | session rows | purchase rows | INTERSECT | INTERSECT ALL |
 | --- | --- | --- | --- | --- |
@@ -262,7 +414,7 @@ The smaller count is the number of pairs that can be matched one to one. Two ses
 
 ### INTERSECT against a join
 
-An `INNER JOIN` on `user_id` with `DISTINCT` answers the same question and leaves 2 choices open that `INTERSECT` closes. The join compares only the columns in its `ON`, so `users.plan` and `user_sessions.session_date` can both come out; `INTERSECT` can only compare rows whose columns line up, which is why each tab projects to `user_id` first. The join also fans out: user 2 with 2 sessions and 3 purchases produces 6 joined rows before `DISTINCT`, while `INTERSECT` never multiplies. For a key-only overlap check, `INTERSECT` is the shorter and the safer query; for anything that needs columns from both sides, the join.
+An `INNER JOIN` on `user_id` with `DISTINCT` answers the same question and leaves 2 choices open that `INTERSECT` closes. The join compares only the columns in its `ON`, so `users.plan` and `user_sessions.session_date` can both come out; `INTERSECT` can only compare rows whose columns line up, which is why each version projects to `user_id` first. The join also fans out: user 2 with 2 sessions and 3 purchases produces 6 joined rows before `DISTINCT`, while `INTERSECT` never multiplies. For a key-only overlap check, `INTERSECT` is the shorter and the safer query; for anything that needs columns from both sides, the join.
 
 Funnel analysis is the usual home: viewers who also purchased, trial accounts that also opened a support ticket, keys present in both of 2 systems before a migration cutover. Chaining is allowed, so `sessions INTERSECT purchases INTERSECT tickets` finds the users present in all 3, a question that `EXCEPT` cannot express without nesting.
 
