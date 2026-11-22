@@ -238,7 +238,7 @@ The 3 calls print `loader for orders in batches of 500`, then `[TableLoader(tabl
 
 A default value in a `def` line is evaluated once, when Python executes the `def`, and the resulting object is stored on the function. Every later call that leaves the argument out receives that same object. For an int or a string the sharing is harmless, because nothing can change those in place. For a list or a dict, every instance that took the default holds a reference to a single shared container, and an append through any of them shows up in all of them.
 
-https://github.com/user-attachments/assets/de19bb63-c317-4886-82e9-312d26cd0da0
+https://github.com/user-attachments/assets/7005f1e1-2dfe-407e-af6d-4902dcd921f0
 
 *Both loaders hold the default list that lives on the function*
 

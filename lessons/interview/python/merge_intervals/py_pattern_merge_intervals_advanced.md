@@ -35,7 +35,7 @@ The question arrives as a job graph: 7 tasks, each with a duration in minutes an
 
 Kahn's algorithm visits tasks in topological order. Keep a queue of tasks whose parents have all been placed, pop one, fix its end time, and decrement the in-degree of each child. A child's earliest start is the latest end among its parents, so each finished parent raises it to max(current start, parent end). When the queue empties, the largest end is the makespan, equal to the length of the longest chain of durations, the critical path. A sweep over start and end events then counts how many tasks run at once in this as-soon-as-possible (ASAP) schedule.
 
-https://github.com/user-attachments/assets/2e512228-548d-48d9-ae91-97279b3da9d2
+https://github.com/user-attachments/assets/cf08118e-f30b-4a1e-8a9c-c049a681dd92
 
 The run prints each task with its interval, then makespan 10 peak 3. The critical path is ext_orders, clean, fact, report: 3 + 4 + 2 + 1 = 10. The peak lands at minute 2, when ext_orders is still running and dim_users and audit both start. Tuple order matters at that minute: (2, -1) sorts before (2, 1), so ext_users frees its worker before its children claim one. Sort starts ahead of ends at equal times, and the same data reports a peak of 4.
 

@@ -136,7 +136,7 @@ Per-record isolation disguised a job-level failure as a pile of record-level one
 
 In the batch runner, Monday carries 1 unparseable fare in 4 rows and max_skip_ratio is 0.25. Tuesday arrives after the rename. Predict both printed lines before playing it.
 
-https://github.com/user-attachments/assets/6bc0163c-2663-4dda-b843-ea26499975cd
+https://github.com/user-attachments/assets/41a2fa41-60c8-46a3-ae7f-d6c353ecc5c8
 
 *Bad rows go to the DLQ, and a ratio above the threshold fails the batch.*
 
@@ -284,7 +284,7 @@ Order matters as much as location: the consumer increments the count before it h
 
 In the consumer program, attempts_store stands in for the durable table because it outlives each call to run_consumer, and each call plays 1 consumer process. Predict how many restarts drain the partition with max_attempts=3. Then predict the output if attempts_store = {} moved inside run_consumer.
 
-https://github.com/user-attachments/assets/0e3e62f7-4061-45de-afa9-c627cf99abbf
+https://github.com/user-attachments/assets/281c91ff-1e59-45ab-b222-50fd0d0c7921
 
 *The attempt count outlives each consumer process, so the 4th start skips the poison record.*
 

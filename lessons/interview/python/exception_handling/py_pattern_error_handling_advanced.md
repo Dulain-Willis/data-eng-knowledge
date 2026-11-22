@@ -116,7 +116,7 @@ Retries help when a dependency drops 1 request in 50. When it is down, they mult
 
 The model below drops threads and locks to show the transitions alone. It replays 8 calls at fixed timestamps, and each call is tagged with whether the fare service would have answered. Predict the state printed at t=12, t=40 and t=50.
 
-https://github.com/user-attachments/assets/e621150a-70e2-4689-b691-5eedf8bd7d85
+https://github.com/user-attachments/assets/afca44a3-03f0-4274-b678-ba635acd72b3
 
 *Threshold 3, cooldown 30 seconds, a single probe per cooldown.*
 
@@ -402,7 +402,7 @@ The ledger and the bank are separate services with no shared transaction, so the
 
 The program runs the cross-service half of the job as a 3-step saga: mark the payout batch pending, post the ledger debit, then call the bank, which fails. Predict the batch status, the ledger contents and the order of the 5 saga log lines.
 
-https://github.com/user-attachments/assets/fcf0294d-4a9b-4c39-83e6-1b880875cfc5
+https://github.com/user-attachments/assets/65ac3d91-8408-486c-84bf-d07fa27247e9
 
 *Compensations run newest first and append new facts.*
 

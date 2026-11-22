@@ -144,7 +144,7 @@ Schema inference reads a sample of raw text and guesses a type for each field. T
 
 Each stage answers its own question. Detection asks which registered format and version a line belongs to. Parsing turns a line of a known format into named fields. Validation checks those fields against the format's contract: required fields present, types coercible, values in range. Collapsed into one function, a format change surfaces as `ValueError: not enough values to unpack` from deep inside the parser, with nothing saying which source or version moved. Kept apart, every failure carries the stage that raised it, and supporting a new format means adding a detector rule and a parser without touching validation.
 
-https://github.com/user-attachments/assets/6abe2b72-2048-4f2a-92fa-e86338330795
+https://github.com/user-attachments/assets/30ca732f-e225-4b33-8255-3b094102f644
 
 *Each line is detected, then parsed, then validated, and lands in the bucket of the stage that rejected it.*
 

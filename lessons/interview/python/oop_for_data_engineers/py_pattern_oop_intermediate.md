@@ -217,7 +217,7 @@ The inheritance version of a connector framework writes every axis of variation 
 
 In the composed design a stage is any object with a `process` method that takes a list of rows and returns a list of rows, and `Pipeline` holds those objects in the order they run. `Pipeline` never asks what class a stage is. Predict the 3 counts the program prints, then the final rows.
 
-https://github.com/user-attachments/assets/92c42da6-dc81-491d-bece-15a15107355c
+https://github.com/user-attachments/assets/3b7277e1-ebab-42dc-8164-33cdb0b154d0
 
 *The Pipeline calls process on each stage in list order and logs the row count after each.*
 

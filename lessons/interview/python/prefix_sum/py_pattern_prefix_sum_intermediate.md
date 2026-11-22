@@ -384,7 +384,7 @@ LEFT JOIN daily_revenue AS r
 
 With PARTITION BY merchant_id, the engine shuffles each merchant's rows to one worker, which sorts and scans them once, so the work spreads across workers by merchant. Remove PARTITION BY and ask for one running total over the whole table, and every row funnels into a single sorted scan on one task. Parallelising it takes 2 passes, and the second pass is itself a prefix sum.
 
-https://github.com/user-attachments/assets/37c221b6-f30f-4379-86cb-30e5d911a989
+https://github.com/user-attachments/assets/98b3a06d-4b92-46ae-b986-6cd39d676e87
 
 *Pass 1 per chunk, a prefix sum over chunk totals, then pass 2*
 

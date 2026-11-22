@@ -381,7 +381,7 @@ The 1D layout carries over with a zero border on both axes. P[i][j] holds the su
 
 Each new entry combines 4 known quantities: the grid cell itself, the block above it `P[i][j + 1]`, the block to its left `P[i + 1][j]`, and the block those 2 share, `P[i][j]`, above and to the left. The shared block was counted inside both of the others, so it is subtracted once.
 
-https://github.com/user-attachments/assets/950ea0dc-1f74-44bc-ad1b-47187aa4605a
+https://github.com/user-attachments/assets/c195e64d-9c8a-489e-9708-fdaa94e7febf
 
 *Each entry adds its cell to the blocks above and to the left, then removes their overlap.*
 
