@@ -1812,6 +1812,7 @@ def record_animations(url, out_dir, slug, info, only=None):
                 box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 name = f"{slug}_animation_{k + 1}.png"
+                page.evaluate(_HIDE_FIXED)  # the pinned "Ask AI" button would sit on top of the still
                 bb = block.bounding_box()
                 shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
                     "format": "png", "captureBeyondViewport": True, "clip": {
