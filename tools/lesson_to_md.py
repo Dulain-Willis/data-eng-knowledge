@@ -1541,6 +1541,22 @@ def _bar_region_diff(fr, ref, w, h, geom, ox=0.0, oy=0.0, scale=None, ref_geom=N
     return worst
 
 
+def _panel_corr(fr, ref, w, h):
+    """Pearson correlation of the top of the code panel (top left of the crop, 1600 px wide frames, rgb24)
+    between a frame and the reference frame: about 0.95 for the same panel, about 0 for anything else (page text)."""
+    ys = range(14, min(175, h), 2)
+    xs = range(30, 620, 2)
+    a = [sum(fr[(y * w + x) * 3:(y * w + x) * 3 + 3]) for y in ys for x in xs]
+    b = [sum(ref[(y * w + x) * 3:(y * w + x) * 3 + 3]) for y in ys for x in xs]
+    n = len(a)
+    if not n:
+        return 0.0
+    ma, mb = sum(a) / n, sum(b) / n
+    sab = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+    saa, sbb = sum((x - ma) ** 2 for x in a), sum((y - mb) ** 2 for y in b)
+    return sab / ((saa * sbb) ** 0.5 or 1)
+
+
 def _code_diff(fr, ref, w, h, geom):
     """Python player only (geom has the code panel): mean colour difference between frame `fr` and `ref` over the
     top of the code panel, which does not change while it plays (the page text, which can sit there in a frame
@@ -1599,7 +1615,7 @@ def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
     frs = [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)]
     for i in range(len(frs) - 2):
         if all(_bar_region_diff(frs[i + j], ref, vw, vh, g0, ref_geom=geom) <= geom.get("tol", _BAR_TOL)
-               and _code_diff(frs[i + j], ref, vw, vh, geom) <= _CODE_TOL for j in range(3)):
+               and (not geom.get("code") or _panel_corr(frs[i + j], ref, vw, vh) >= 0.8) for j in range(3)):
             return lo + i / fps
     raise RuntimeError("the player's control bar never showed at its expected spot in the recording")
 
