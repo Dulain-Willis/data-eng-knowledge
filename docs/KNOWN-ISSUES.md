@@ -7,3 +7,6 @@
   - `kafka_in_the_pipeline_beginner` animation_1 (both tabs): row count cut. Animation_2 (both tabs): "0 rows" touches the edge.
   - `kafka_in_the_pipeline_intermediate` animation_2: row count in table headers cut.
   - `dbt_models_advanced` animation_2 and `dbt_models_intermediate` animation_1: right-hand table columns cut.
+- Learn SQL tab screenshots (site's own UI; recorded as-is):
+  - `aggregating_advanced_switcher_2_2.png` (Arrays, first tab): one result cell is truncated by the app (`rock=[Basalt, Ci…`).
+  - `dates_intermediate_switcher_2_3.png` (Months tab): the last word of line 6 (`month_boundaries`) sits under the code box's buttons, so the bottom of the letters is covered.
