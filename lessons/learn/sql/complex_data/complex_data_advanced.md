@@ -479,29 +479,52 @@ Nested data in production arrives in volume, in loose formats and with holes. Th
 
 Both paths count, per playlist, the tracks longer than 180 seconds. The UNNEST path multiplies rows by the array length, then GROUP BY sends every row with the same `playlist_id` to the same worker, which in a distributed engine means writing those rows to the network and reading them back. The lambda path reads each playlist once and returns it once.
 
+**lambdas**
+
 Each playlist row is answered in place, and playlist 103's empty array returns 0.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | playlist_id, |
-|  | CARDINALITY(FILTER(durations_sec, x -> x > 180)) AS long_tracks |
-|  | FROM playlists |
-|  | ORDER BY playlist_id |
+```sql
+SELECT
+  playlist_id,
+  CARDINALITY(FILTER(durations_sec, x -> x > 180)) AS long_tracks
+FROM playlists
+ORDER BY playlist_id
+```
 
-Result
+Result:
 
-| playlist_id | long_tracks |
-| --- | --- |
-| 101 | 2 |
-| 102 | 2 |
-| 103 | 0 |
+```
+playlist_id | long_tracks
+101 | 2
+102 | 2
+103 | 0
+```
 
-3 rows
+**unnest**
 
-Playlists 101 and 102 show 2 long tracks in both tabs. The row that vanishes from the second tab is the dangerous part: any average, ratio or join built on it excludes every playlist with an empty array, and nothing in the output says so.
+Rows are grouped back by playlist, and playlist 103 has no rows to group, so it is missing.
 
-**A dashboard averages long_tracks over the rows it receives. What does it show when it reads the unnest tab's result instead of the lambda tab's?**
+```sql
+SELECT
+  p.playlist_id,
+  COUNT_IF(t.sec > 180) AS long_tracks
+FROM playlists AS p
+CROSS JOIN UNNEST(p.durations_sec) AS t(sec)
+GROUP BY p.playlist_id
+ORDER BY p.playlist_id
+```
+
+Result:
+
+```
+playlist_id | long_tracks
+101 | 2
+102 | 2
+```
+
+Playlists 101 and 102 show 2 long tracks in both versions. The row that vanishes from the second version is the dangerous part: any average, ratio or join built on it excludes every playlist with an empty array, and nothing in the output says so.
+
+**A dashboard averages long_tracks over the rows it receives. What does it show when it reads the unnest version's result instead of the lambda version's?**
 
 - **A.** 1.33, because both versions count 4 long tracks over 3 playlists
 - **B.** NULL, because playlist 102's NULL duration makes its count NULL
