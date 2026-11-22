@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 35 min · 2 challenges
-
 # Incremental Loading: Intermediate
 
 Ines is 2 interviews into a data engineering loop at Uber, whose engineers published how they moved large tables off snapshot rebuilds, which cost too much and left data a day stale, onto incremental upserts. The interviewer draws a 40 million row orders table and says: the nightly full refresh takes 4 hours and the window is 3, what do you do? Ines says incremental, filtered on updated_at. The interviewer nods and asks what happens to a row deleted at the source. Then what happens when a transaction commits 45 seconds after her watermark passed its timestamp. Then how she reloads last March. Then how the customer table keeps old addresses. Each question is the same pattern: an incremental load that is only correct for inserts. This lesson works through the 4 ways it breaks and the property that fixes each.

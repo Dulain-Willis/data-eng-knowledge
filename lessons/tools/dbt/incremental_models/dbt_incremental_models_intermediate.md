@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Incremental Models: Intermediate
 
 A DoorDash order moves from placed to picked up to delivered, and each change lands in an orders feed as a new version of the same order_id. Tonight an incremental fct_orders model loads them. Appended, that order counts 3 times in the day's revenue. Merged on its key, it counts once, carrying its latest status.
@@ -70,11 +68,11 @@ Order 1002 matches, so its status becomes shipped and its `updated_at` moves to 
 
 **+incremental_strategy: append**
 
-![+incremental_strategy: append](_images/dbt_incremental_models_intermediate_animation_1_incremental-strategy-append.gif)
+https://github.com/user-attachments/assets/32e66d22-4c03-4039-b9fd-8b946bbf54ab
 
 **+unique_key: order_id**
 
-![+unique_key: order_id](_images/dbt_incremental_models_intermediate_animation_1_unique-key-order-id.gif)
+https://github.com/user-attachments/assets/2aad76ff-e6ed-47c9-b2d7-96ccd43c3559
 
 *$ dbt run*
 

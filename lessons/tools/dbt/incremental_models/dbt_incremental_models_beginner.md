@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 10 challenges
-
 # Incremental Models: Beginner
 
 Spotify Wrapped lands each December and turns a year of a listener's streams into top songs, top artists and minutes listened. A plays table feeding it, 1 row per stream, rebuilt every night from the first stream ever recorded to add 1 day, would finish later each night as history grows. The fix is a model that writes only the plays it has not seen.
@@ -196,11 +194,11 @@ The animation builds plays from the same 3 rows, then adds 2 rows and builds aga
 
 **+materialized: table**
 
-![+materialized: table](_images/dbt_incremental_models_beginner_animation_1_materialized-table.gif)
+https://github.com/user-attachments/assets/e0a0dd4b-5e26-413b-b42f-e6ce85fc0868
 
 **+materialized: incremental**
 
-![+materialized: incremental](_images/dbt_incremental_models_beginner_animation_1_materialized-incremental.gif)
+https://github.com/user-attachments/assets/e1133c8f-99b5-4727-a07e-c003f3643525
 
 *$ dbt run*
 
@@ -447,7 +445,7 @@ Event 2 was recorded with 9,000 ms played. The next day the app re-sends it with
 
 A plain run has no way to find that row. Its filter looks only past the watermark, and dbt keeps no list of the source rows that changed, so the repair for a rewrite behind the line is to read everything again.
 
-![Animation](_images/dbt_incremental_models_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/3294e858-c20b-4f6c-b25b-6b1bfd16feaf
 
 *$ dbt run*
 

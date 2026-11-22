@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 17 challenges
-
 # Partitioning: Advanced
 
 A data engineer at Uber has a pricing job that reruns every hour, joining yesterday's 2TB of trips to drivers. Each run reshuffles all 2TB by `driver_id`, an older table partitioned by city leaves a single task grinding through New York, and a GPS pings table piles up 2,400 small files an hour. All 3 problems come from how the files are laid out.

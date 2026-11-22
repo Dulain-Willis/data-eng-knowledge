@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 11 challenges
-
 # Idempotent Reruns: Advanced
 
 Uber has written publicly about processing Uber Eats ad clicks exactly once, because each click becomes money a restaurant pays. Suppose the click aggregator crashes at 7:58 p.m. during the Friday dinner rush, holding 40 seconds of clicks it has counted but not yet acknowledged. On restart, those clicks arrive again. Whether 3,000 restaurants pay twice for them depends on choices this lesson teaches.

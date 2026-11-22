@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 11 challenges
-
 # Lazy Evaluation: Beginner
 
 An analyst at Uber opens a notebook against a day of trip records and chains a filter and a cast onto it, then a groupBy. Every line returns in under a second. Then collect() runs for 20 minutes and dies with a traceback pointing at collect(). The bug is 3 lines up and the 20 minutes are gone. This lesson explains why Spark works this way.

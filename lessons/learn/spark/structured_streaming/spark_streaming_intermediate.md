@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 14 challenges
-
 # Structured Streaming: Intermediate
 
 Take the Uber stream that turns finished trips into driver payout lines. At 02:13 the Spark application crashes in the middle of batch 41, and on-call restarts it. Batch 41 held 634 trips. Will those trips be paid out never, once, or twice? The answer is written in the query's checkpoint folder and in what its sink does when the same batch arrives a second time.

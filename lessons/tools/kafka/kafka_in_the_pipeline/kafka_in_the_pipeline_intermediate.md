@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Kafka in the Pipeline: Intermediate
 
 A Shopify merchant cuts a jacket's price from $120 to $96 at 9:00 on Black Friday morning. Before the first shopper checks out, that 1 row update has to be in the storefront search index and the analytics warehouse, and in the ads feed as well. This lesson follows it out of the database log, through a schema check and a connector, into a table you can rebuild.
@@ -68,8 +66,7 @@ An event names the row's state before the change, its state after, the kind of c
 
 The record's key is the primary key, {"id": 1042} for a JSON key. Keys pick partitions, so every change to row 1042 lands on 1 partition and is read in the order it was committed: price 120, then 96, never the reverse. Send the events with no key and the 2 updates may land on 2 partitions, where 2 sink tasks apply them in whichever order they happen to poll, and the table can finish on the old price with no error anywhere. The animation plays both.
 
-![Animation](_images/kafka_in_the_pipeline_intermediate_animation_1.gif)
-
+https://github.com/user-attachments/assets/f5262cc2-5dee-47e9-af54-a7eff3c3354f
 
 <br>
 
@@ -397,7 +394,7 @@ A new sink connector, which is a new consumer group named connect-<name>, starts
 
 The sink must apply each record as an upsert on the key and must delete the row on a tombstone. An insert-only sink replayed once over a table it already filled holds every row twice, and a sink that skips tombstones keeps rows the source deleted a year ago.
 
-![Animation](_images/kafka_in_the_pipeline_intermediate_animation_2.gif)
+https://github.com/user-attachments/assets/de965af5-e375-49db-ba7d-1a9e27137280
 
 The crash in the animation lands after the sink writes and before the offset commits, the blind spot from the consumer lessons. On restart the task reads the same records again and writes the same rows again. Upsert absorbs that: writing c-1 as Ana gold a second time leaves c-1 as Ana gold. The insert variant shows the alternative, 1 extra row for every record replayed and a table that is wrong without any task having failed.
 

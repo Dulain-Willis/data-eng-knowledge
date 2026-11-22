@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 25 min · 4 challenges
-
 # Where Data Lives: Intermediate
 
 Ines is 40 minutes into a data engineering loop at Netflix, whose engineers designed an open table format after directory-based tables on object storage kept failing them at scale. The interviewer sketches a viewing-events table: Parquet files, partitioned by day, fed by a streaming job. Then come the probes, each one a step deeper. Why is the `device_type` column a hundredth the size of `session_id`? Queries got slower after the streaming job went live; what happened? A member asks to be forgotten; how many files must change? Finance wants the storage bill halved. And how does every engine find the same version of this table? Ines knows each piece in isolation. What the loop is testing is whether she can attach a mechanism and a number to every answer, and say what each fix costs.

@@ -43,16 +43,27 @@ CUSTOM_BLOCKS = {
     "static_code", "big_number", "tip", "callout", "fun_fact", "key_takeaways",
     "synthesis", "icon_list", "info_list", *DIAGRAM_LABELS,
     "multiple_choice", "schema_story", "best_practices", "comparison", "placed_challenge",
-    "executable_spark",
+    "executable_spark", "executable_python", "executable_sql", "regex_cards", "sql_switcher",
 }
+# Runnable cells: block type -> how the run control is found. Spark has a "Run" button and draws its
+# output with JavaScript; Python cells have a ">>>" button that reveals the output the page already holds.
+CELL_KINDS = ("executable_spark", "executable_python", "executable_sql")
+CELL_FENCE = {"executable_spark": "python", "executable_python": "python", "executable_sql": "sql"}
 # Interactive exercise with no answers in the page, so what's left is a dangling question.
 # Dropped. (multiple_choice used to be here; its answers ARE in the page's embedded JSON.)
-SKIPPED_BLOCKS = {"schema_story", "placed_challenge"}  # placed_challenge: empty stub for Airflow exercises
+# placed_challenge: empty stub for Airflow exercises; sql_parsons: a drag-the-tiles exercise (Learn SQL), left out with the SQL exercises
+SKIPPED_BLOCKS = {"schema_story", "placed_challenge", "sql_parsons"}
 GENERIC_BLOCKS = {
     "lesson_title", "learning_objectives", "section_header", "h3", "body_text",
     "rich_text", "static_table", "side_by_side_tables", "comparison",
     "note_text", "rich_info_list", "h4", "full_width",
 }
+
+
+# Animation players: every "*_animation" block, plus table_visualization (Learn SQL, aggregating_beginner),
+# which is the same player under another block type name.
+ANIMATION_RE = re.compile(r"(_animation|^table_visualization)$")
+ANIMATION_SELECTOR = '[data-note-block-type$="_animation"], [data-note-block-type="table_visualization"]'
 
 
 def block_type(tag):
@@ -84,6 +95,12 @@ def clean(soup):
         panel.decompose()
     for t in soup.select(".sr-only"):
         t.decompose()
+    # the row above the title (level, minutes, challenge count, tool logo): the level is in the
+    # title, the exercises live in their own folders, so the lesson starts at its title
+    for h1 in soup.find_all("h1"):
+        row = h1.find_previous_sibling("div")
+        if row is not None and row.select_one(".mini-bars"):
+            row.decompose()
     # decorative "//" that sits beside some headings
     for span in soup.find_all("span"):
         if span.get_text(strip=True) == "//" and not span.find_parent("td"):
@@ -312,18 +329,154 @@ def tick_cross(soup, block, tokens):
     block.replace_with(marker)
 
 
-def spark_cell(soup, block, tokens, image_name, number):
+def spark_cell(soup, block, tokens, image_name, number, lang="python"):
     """A runnable PySpark cell: a screenshot of the cell after Run (tables, code and output), then the
     code as a ```python fence. The page draws the editor and result with JavaScript, so the image
     can only be a screenshot (see record_cells); the fence keeps the code as text, because long
     lines scroll sideways in the screenshot. Built as Markdown and swapped in after markdownify.
     """
     pre = block.find("pre")
-    code = (pre.get_text() if pre else block.get_text()).strip("\n")
+    if pre:
+        code = pre.get_text().strip("\n")
+    elif block.find("table"):  # Python cells: one table row per line, code in the last cell
+        code = "\n".join(tr.find_all("td")[-1].get_text() for tr in block.find("table").find_all("tr")
+                         if tr.find_all("td")).strip("\n")
+    else:
+        code = block.get_text().strip("\n")
     shot = (f"![Run output {number}](_images/{image_name})" if image_name
             else f"[Run output {number}: not captured. Re-run with --screenshots]")
     token = f"@@SPARK-CELL-{len(tokens)}@@"
-    tokens[token] = f"{shot}\n\n```python\n{code}\n```"
+    tokens[token] = f"{shot}\n\n```{lang}\n{code}\n```"
+    marker = soup.new_tag("p")
+    marker.string = token
+    block.replace_with(marker)
+
+
+def switcher_panel(html):
+    """Parse the HTML of one sql_switcher block in one tab state into
+    {"caption", "sql", "result"}. The block holds the tab bar, one caption div, one code table
+    (a row per line, code in the last cell) and a Result table (rendered in the DOM even while it
+    is collapsed on the page). `result` is a list of rows (header first), or [] if there is none."""
+    soup = parse(html)  # keeps the indentation spans of the code cells
+    content = soup.find(attrs={"data-note-content": True}) or soup
+    caption = ""
+    tables = soup.find_all("table")
+    code_table = next((t for t in tables if t.find("td", attrs={"data-ln": True})), None)
+    if code_table is None:
+        print("warning: sql_switcher panel has no code table; fields left empty", file=sys.stderr)
+        return {"caption": "", "sql": "", "result": []}
+    sql = "\n".join(tr.find_all("td")[-1].get_text() for tr in code_table.find_all("tr")
+                    if tr.find_all("td")).strip("\n")
+    # the caption is the first plain text div (no tab buttons, tables or nested divs): it sits between the
+    # tab bar and the code; the saved HTML has no buttons (clean() drops them), the live one does
+    for el in content.find_all("div"):
+        if el.find(["div", "table", "button"]) or el.find_parent("table"):
+            continue
+        text = " ".join(el.get_text(" ").split())
+        if text:
+            caption = text
+            break
+    result = []
+    result_table = next((t for t in tables if t is not code_table and t.find("th")), None)
+    if result_table:
+        result = [[" ".join(c.get_text(" ").split()) for c in tr.find_all(["th", "td"])]
+                  for tr in result_table.find_all("tr")]
+    return {"caption": caption, "sql": sql, "result": result}
+
+
+def switcher_markdown(tabs):
+    """Option B (owner decision): every tab stays as text and gets a screenshot. A bold label with the
+    tab's name, its caption, one 2x screenshot of the tab panel (tab bar, caption, code and the revealed
+    result table, see sql_switcher_tabs), then its SQL as a ```sql fence, the same "screenshot + fence" pair
+    as an executable_sql cell. `tabs` is [{"name", "caption", "sql", "result", "image"}] in tab order
+    (switcher_panel plus the tab button's name; "image" is the file name in _images, or None). A tab with
+    no image (run without --screenshots) falls back to Option A: its result as text after the fence."""
+    parts = []
+    for t in tabs:
+        part = [f"**{t['name']}**"]
+        if t["caption"]:
+            part.append(t["caption"])
+        if t.get("image"):
+            part.append(f"![{t['name']} result](_images/{t['image']})")
+        part.append(f"```sql\n{t['sql']}\n```")
+        if t["result"] and not t.get("image"):
+            rows = "\n".join(" | ".join(r) for r in t["result"])
+            part.append(f"Result:\n\n```\n{rows}\n```")
+        parts.append("\n\n".join(part))
+    return "\n\n".join(parts)
+
+
+def sql_switcher_tabs(url, out_dir=None, slug=None):
+    """Click every tab of every sql_switcher block on the live page and return, per block, the list of
+    {"name", "caption", "sql", "result", "image"}. The saved page HTML holds only the first tab's panel, so
+    the other tabs exist only after a click. Returns [] without playwright.
+
+    With out_dir (the --screenshots run), each tab is also shot: after the tab click the "Show result" button
+    is pressed exactly as for an executable_sql cell (_click_run; a tab switch collapses the result again, so
+    it is pressed for every tab) and the whole block, tab bar, caption, code and result table, is saved at 2x as
+    <slug>_switcher_<block>_<tab>.png (both numbers from 1). A tab whose shot fails has image None."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        print("playwright not installed; tab panels not captured", file=sys.stderr)
+        return []
+    img_dir = os.path.join(out_dir, "_images") if out_dir else None
+    if img_dir:
+        os.makedirs(img_dir, exist_ok=True)
+    out = []
+    with sync_playwright() as p:
+      browser = p.chromium.launch()
+      try:
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="sql_switcher"]')
+        for i in range(blocks.count()):
+            block = blocks.nth(i)
+            block.scroll_into_view_if_needed()
+            # the 3 icon buttons have a title; tabs do not. Click by position: has_text would match substrings
+            tab_buttons = block.locator("button").evaluate_all(
+                "els => els.map((e, i) => [i, !e.title && !e.getAttribute('aria-label'), e.innerText.trim()])"
+                ".filter(t => t[1]).map(t => [t[0], t[2]])")
+            tabs = []
+            for k, (idx, n) in enumerate(tab_buttons):
+                block.locator("button").nth(idx).click()
+                page.wait_for_timeout(350)
+                tab = {"name": n, **switcher_panel(block.evaluate("e => e.outerHTML")), "image": None}
+                if img_dir:
+                    try:
+                        _click_run(page, block, "executable_sql")
+                        page.evaluate(_HIDE_FIXED)
+                        name = f"{slug}_switcher_{i + 1}_{k + 1}.png"
+                        block.screenshot(path=os.path.join(img_dir, name))
+                        tab["image"] = name
+                    except Exception as e:
+                        print(f"warning: switcher {i + 1} tab {k + 1} ({n!r}) not captured: {e}", file=sys.stderr)
+                tabs.append(tab)
+            out.append(tabs)
+      finally:
+        browser.close()
+    return out
+
+
+def regex_cards(soup, block, tokens, image_name, number):
+    """Regex example cards (python_strings_advanced): a screenshot of the stacked cards as the UI draws
+    them, then the text of each card (pattern, description, example -> match) so it stays searchable."""
+    shot = (f"![Regex examples](_images/{image_name})" if image_name
+            else "[Regex examples: not captured. Re-run with --screenshots]")
+    items = []
+    for card in block.find_all("code"):
+        body = card.find_parent("div", class_=lambda c: c and "flex-1" in c)
+        if body is None:
+            continue
+        desc = body.find("p")
+        spans = [sp.get_text(strip=True) for sp in body.find_all("span")]
+        example = f"`{spans[0]}` -> `{spans[-1]}`" if len(spans) >= 3 else ""
+        items.append(f"- `{card.get_text(strip=True)}`: {desc.get_text(' ', strip=True) if desc else ''}"
+                     + (f" Example: {example}" if example else ""))
+    token = f"@@REGEX-CARDS-{len(tokens)}@@"
+    tokens[token] = shot + "\n\n" + "\n".join(items)
     marker = soup.new_tag("p")
     marker.string = token
     block.replace_with(marker)
@@ -337,7 +490,7 @@ def animation_info(html):
     """
     soup = parse(html)
     out = []
-    for block in soup.find_all(attrs={"data-note-block-type": re.compile(r"_animation$")}):
+    for block in soup.find_all(attrs={"data-note-block-type": ANIMATION_RE}):
         labels = [b.get_text(strip=True) for b in block.find_all("button", attrs={"role": "radio"})]
         caption = ""
         for para in block.find_all("p"):
@@ -373,13 +526,14 @@ def animation(soup, block, tokens, info, files):
     block.replace_with(marker)
 
 
-def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=()):
+def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercise_refs=False, drops=(), cells=(), regex_images=(), switchers=()):
     """diagram_images: screenshot file names, in page order, one per diagram block.
     drop_exercise_refs: the exercises are left out, so drop the blocks listed in `drops`
     (text prefixes from tools/drops.json) that only introduce one; an entry that matches
     nothing prints a warning.
-    cells: file names of the run-output screenshots, one per executable_spark block in page order
-    (record_cells); empty without --screenshots.
+    switchers: per sql_switcher block in page order, its tabs (sql_switcher_tabs); empty means first tab only.
+    cells: {block kind: file names of its run-output screenshots, in page order} (record_cells, one call per kind;
+    a plain list is taken for every kind); empty without --screenshots.
     exercises: [(anchor block id or None, markdown)]; each goes right after its anchor block,
     and the ones with no anchor are returned by the caller to append."""
     dropped = set()
@@ -397,11 +551,12 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
         p.string = EXERCISE_TOKEN.format(i)
         block.insert_after(p)
         tokens[EXERCISE_TOKEN.format(i)] = md_text
-    diagrams_seen = animations_seen = cells_seen = 0
+    diagrams_seen = animations_seen = cells_seen = regex_seen = switchers_seen = 0
+    kind_seen = dict.fromkeys(CELL_KINDS, 0)  # per kind: each kind has its own list of screenshots
     questions = embedded_questions(html)
     for block in soup.find_all(attrs={"data-note-block-type": True}):
         kind = block_type(block)
-        if kind not in CUSTOM_BLOCKS | GENERIC_BLOCKS and not kind.endswith("_animation"):
+        if kind not in CUSTOM_BLOCKS | GENERIC_BLOCKS | SKIPPED_BLOCKS and not ANIMATION_RE.search(kind):
             print(f"warning: no rule for block type '{kind}'; used generic conversion",
                   file=sys.stderr)
         if kind in SKIPPED_BLOCKS:
@@ -424,10 +579,27 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             new = soup.new_tag("p")
             new.string = token
             block.replace_with(new)
-        elif kind == "executable_spark":
-            name = cells[cells_seen] if cells_seen < len(cells) else None
+        elif kind == "regex_cards":
+            name = regex_images[regex_seen] if regex_seen < len(regex_images) else None
+            regex_seen += 1
+            regex_cards(soup, block, tokens, name, regex_seen)
+        elif kind in CELL_KINDS:
+            names = cells.get(kind, []) if isinstance(cells, dict) else cells
+            name = names[kind_seen[kind]] if kind_seen[kind] < len(names) else None
+            kind_seen[kind] += 1
             cells_seen += 1
-            spark_cell(soup, block, tokens, name, cells_seen)
+            spark_cell(soup, block, tokens, name, cells_seen, CELL_FENCE[kind])
+        elif kind == "sql_switcher":
+            tabs = switchers[switchers_seen] if switchers_seen < len(switchers) else None
+            switchers_seen += 1
+            if not tabs:  # no live capture: the saved HTML holds the first tab only
+                print("warning: sql_switcher tabs not captured; first tab only", file=sys.stderr)
+                tabs = [{"name": "Tab 1", **switcher_panel(str(block))}]
+            token = f"@@SWITCHER-{len(tokens)}@@"
+            tokens[token] = switcher_markdown(tabs)
+            marker = soup.new_tag("p")
+            marker.string = token
+            block.replace_with(marker)
         elif kind == "static_code":
             code_block(soup, block)
         elif kind == "big_number":
@@ -444,7 +616,7 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
             info_list(soup, block)
         elif kind in ("best_practices", "comparison"):
             tick_cross(soup, block, tokens)
-        elif kind.endswith("_animation"):
+        elif ANIMATION_RE.search(kind):
             info = animation_infos[animations_seen] if animations_seen < len(animation_infos) else {}
             animation(soup, block, tokens, info, (animations or {}).get(animations_seen))
             animations_seen += 1
@@ -478,10 +650,6 @@ def convert(html, diagram_images=(), exercises=(), animations=None, drop_exercis
     # escape_underscores=False keeps names like fare_amount readable
     # BACKSLASH line breaks survive the per-line rstrip in add_section_breaks;
     # the default two trailing spaces would not
-    # Tool logos are site-relative (/tool-marks/x.png); point them at the copies vendored in
-    # lessons/tools/tool-marks/ so they render on GitHub (lessons live two levels below tools/, in a topic folder).
-    for img in soup.find_all("img", src=re.compile(r"^/tool-marks/")):
-        img["src"] = "../../" + img["src"].lstrip("/")
     md = markdownify(str(soup), heading_style="ATX", bullets="-", code_language="sql",
                      escape_underscores=False, newline_style="BACKSLASH")
     for token, text in tokens.items():
@@ -724,10 +892,10 @@ def exercises_markdown(challenges, images=None, start=0):
 # login), so none go into the Markdown. Animations are unaffected. Set True to bring back the
 # repair-the-DAG conversion below.
 INCLUDE_AIRFLOW_EXERCISES = False
-# The dbt and Kafka exercises (challenge_type "dbt" / "kafka"; their own forms such as
+# The dbt, Kafka, Spark and Python exercises (challenge_type "dbt" / "kafka"; their own forms such as
 # compile_it or read_the_tape, not Airflow's) are left out the same way. There is no
 # conversion code for them: to bring them back, one has to be written. Animations are kept.
-SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark"}
+SKIPPED_TOOL_EXERCISES = {"dbt", "kafka", "spark", "python", "sql"}
 
 
 def challenge_path(c):
@@ -1068,6 +1236,16 @@ def upload_animation(name, force=False):
     """Upload ANIM_DIR/<name> as a user-attachments asset (undocumented GitHub endpoint), remember its URL
     in tools/animation_urls.json and return it. Needs `gh auth login`. The token goes to curl through a
     mode-600 config file (never on the command line, where `ps` could show it) that is deleted afterwards."""
+    import fcntl  # several converter runs may upload at once: serialize the read-modify-write of the URL file
+    lock = open(URLS_FILE + ".lock", "w")
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    try:
+        return _upload_animation(name, force)
+    finally:
+        lock.close()
+
+
+def _upload_animation(name, force):
     urls = json.load(open(URLS_FILE)) if os.path.exists(URLS_FILE) else {}
     if force or name not in urls:  # force: upload a re-recorded file as a NEW asset
         tok = subprocess.run(["gh", "auth", "token"], capture_output=True, text=True, check=True).stdout.strip()
@@ -1099,6 +1277,39 @@ def _media_stats(path):
     out = subprocess.run(["ffmpeg", "-i", path, "-vf", "mpdecimate,showinfo", "-f", "null", "-"],
                          capture_output=True, text=True).stderr
     return dur, out.count("pts_time") / dur
+
+
+def _max_gap(path):
+    """Longest stretch (s) in a video between two distinct frames (frames mpdecimate keeps): a frozen video."""
+    out = subprocess.run(["ffmpeg", "-i", path, "-vf", "mpdecimate,showinfo", "-f", "null", "-"],
+                         capture_output=True, text=True).stderr
+    ts = [float(m) for m in re.findall(r"pts_time:([0-9.]+)", out)]
+    return max((b - a for a, b in zip(ts, ts[1:])), default=0.0)
+
+
+def _start_corr(path):
+    """Python player START CHECK by content: the code panel (top left of the crop) does not change while the
+    player plays, so frame 0 must look like the frames 1.2 s and 2.4 s later (Pearson correlation of the top of
+    the panel, about 0.95 for the same panel, about 0 when frame 0 shows page text or a shifted layout)."""
+    W = 1600
+
+    def region(t):
+        raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(t), "-i", path, "-frames:v", "1",
+                              "-vf", f"scale={W}:-2", "-f", "rawvideo", "-pix_fmt", "gray", "-"],
+                             capture_output=True, stdin=subprocess.DEVNULL).stdout
+        return [raw[y * W + x] for y in range(14, min(175, len(raw) // W), 2) for x in range(30, 620, 2)]
+
+    def corr(a, b):
+        n = len(a)
+        if not n or n != len(b):
+            return 0.0
+        ma, mb = sum(a) / n, sum(b) / n
+        sab = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+        saa, sbb = sum((x - ma) ** 2 for x in a), sum((y - mb) ** 2 for y in b)
+        return sab / ((saa * sbb) ** 0.5 or 1)
+
+    first = region(0)
+    return min(corr(first, region(t)) for t in (1.2, 2.4))
 
 
 def _wait_idle(block, page, began, cap=150):
@@ -1349,7 +1560,7 @@ def record_animation(browser, url, k, m, label, dest, box_css):
         page.wait_for_timeout(3000)
         page.evaluate("document.documentElement.style.zoom = 2")
         page.wait_for_timeout(1000)
-        block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+        block = page.locator(ANIMATION_SELECTOR).nth(k)
         # All setup happens while the player is still below the fold: the site starts playing the moment
         # the player scrolls into view, so that jump is the start of the recording (nothing of step 1 is lost).
         page.evaluate(_HIDE_PINNED)  # the pinned "Ask AI" button would sit on top of the player
@@ -1442,6 +1653,342 @@ def record_animation(browser, url, k, m, label, dest, box_css):
     return {"live": live, "box": box, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
 
 
+# Per-type player rules. The Spark and dbt players (title-bar dots, "n / m" counter) use record_animation above.
+# The Airflow, Kafka and pipeline players share another frame (.smv-frame: header and body, the control bar
+# (.smv-bar) at its bottom) and have no dots and no usable "n / m" counter (Airflow shows a clock, Kafka
+# "t = 1.3 s"), and the common ancestor of their buttons is only the 42 px control bar. For these:
+#   box    the .smv-frame that holds the buttons (full player, bar included);
+#   start  the first video frame where the frame's static control-bar buttons (Restart, speed) are drawn
+#          like in the finished recording, i.e. the player is on screen; the site starts it on mount;
+#   end    the control bar's play button turns into "Replay" (the playback is over); the tail is 2 s after.
+BAR_PLAYER_TYPES = {"airflow_animation", "kafka_animation", "pipeline_animation", "python_animation"}
+_BAR_BOX = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame, .pmv');
+    if (!f) return null; const r = f.getBoundingClientRect();
+    return {x: r.x + scrollX, y: r.y + scrollY, w: r.width, h: r.height}; }"""
+_BAR_GEOM_JS = """(block) => {
+  const bs = [...block.querySelectorAll('button')]; const b0 = bs[0]; const f = b0 && b0.closest('.smv-frame, .pmv');
+  if (!f) return null;
+  const r = f.getBoundingClientRect();
+  const rel = e => { if (!e) return null; const q = e.getBoundingClientRect(); return [q.x - r.x, q.y - r.y, q.width, q.height]; };
+  const restart = block.querySelector('button[aria-label="Restart"]');
+  const speed = bs.find(b => /^Playback speed/.test(b.getAttribute('aria-label') || ''));
+  const bar = f.querySelector('.smv-bar');
+  if (!restart || !speed || !bar) return null;
+  return {x: r.x, y: r.y, w: r.width, h: r.height, restart: rel(restart), speed: rel(speed), bar: rel(bar),
+          code: rel(f.querySelector('.pmv-code')),
+          replay: !!block.querySelector('button[aria-label="Replay"]'), text: bar.innerText.replace(/\\s+/g, ' ')};
+}"""
+_HIDE_AFTER_PLAYER = """(block) => { const b = block.querySelector('button'); const f = b && b.closest('.smv-frame, .pmv');
+  const hide = e => { e.style.visibility = 'hidden'; };
+  if (f) for (let s = f.nextElementSibling; s; s = s.nextElementSibling) hide(s);   // the caption under the frame
+  else block.querySelectorAll(':scope > p').forEach(hide);                          // not mounted yet
+  for (let n = block; n && n !== document.body; n = n.parentElement)
+    for (let s = n.nextElementSibling; s; s = s.nextElementSibling) hide(s); }"""
+_PY_BAR_TOL = 20  # the Python player's controls start dimmer (fade-in) than in the last frame: a little more room
+_BAR_TOL = 14  # mean colour difference (0..255) of a control-bar button between a frame and the finished recording
+
+
+def _bar_region_diff(fr, ref, w, h, geom, ox=0.0, oy=0.0, scale=None, ref_geom=None):
+    """Worst mean absolute colour difference, over the Restart and speed buttons, between frame `fr` (buttons
+    where `geom` puts them) and `ref` (buttons where `ref_geom` puts them; default `geom`), both w x h rgb24,
+    the player box with its top-left at (ox, oy). The two differ for a player that grows while it plays: its
+    control bar sits lower at the end. 999 if a button is outside."""
+    s = scale or (w / geom["w"])
+    rg = ref_geom or geom
+    worst = 0
+    for key in ("restart", "speed"):
+        bx, by, bw, bh = geom[key]
+        rx, ry, _, _ = rg[key]
+        x0, y0 = int(round(ox + bx * s)), int(round(oy + by * s))
+        x1, y1 = int(round(x0 + bw * s)), int(round(y0 + bh * s))
+        rx0, ry0 = int(round(ox + rx * s)), int(round(oy + ry * s))
+        if x0 < 0 or y0 < 0 or x1 > w or y1 > h or rx0 < 0 or ry0 < 0 or rx0 + (x1 - x0) > w or ry0 + (y1 - y0) > h:
+            return 999
+        tot = 0
+        for y in range(y1 - y0):
+            a, b = ((y0 + y) * w + x0) * 3, ((y0 + y) * w + x1) * 3
+            c = ((ry0 + y) * w + rx0) * 3
+            tot += sum(abs(p - q) for p, q in zip(fr[a:b], ref[c:c + (b - a)]))
+        worst = max(worst, tot / ((x1 - x0) * (y1 - y0) * 3))
+    return worst
+
+
+def _panel_corr(fr, ref, w, h):
+    """Pearson correlation of the top of the code panel (top left of the crop, 1600 px wide frames, rgb24)
+    between a frame and the reference frame: about 0.95 for the same panel, about 0 for anything else (page text)."""
+    ys = range(14, min(175, h), 2)
+    xs = range(30, 620, 2)
+    a = [sum(fr[(y * w + x) * 3:(y * w + x) * 3 + 3]) for y in ys for x in xs]
+    b = [sum(ref[(y * w + x) * 3:(y * w + x) * 3 + 3]) for y in ys for x in xs]
+    n = len(a)
+    if not n:
+        return 0.0
+    ma, mb = sum(a) / n, sum(b) / n
+    sab = sum((x - ma) * (y - mb) for x, y in zip(a, b))
+    saa, sbb = sum((x - ma) ** 2 for x in a), sum((y - mb) ** 2 for y in b)
+    return sab / ((saa * sbb) ** 0.5 or 1)
+
+
+def _code_diff(fr, ref, w, h, geom):
+    """Python player only (geom has the code panel): mean colour difference between frame `fr` and `ref` over the
+    top of the code panel, which does not change while it plays (the page text, which can sit there in a frame
+    from before the player is on screen, differs a lot). 0 for other players."""
+    c = geom.get("code")
+    if not c:
+        return 0
+    s = w / geom["w"]
+    x0, y0 = int(c[0] * s), int(c[1] * s)
+    x1, y1 = min(w, int((c[0] + c[2]) * s)), min(h, int((c[1] + min(c[3], 120)) * s))
+    if x1 <= x0 or y1 <= y0:
+        return 999
+    tot = n = 0
+    for y in range(y0, y1, 3):
+        a, b = (y * w + x0) * 3, (y * w + x1) * 3
+        tot += sum(abs(p - q) for p, q in zip(fr[a:b:7], ref[a:b:7]))
+        n += len(fr[a:b:7])
+    return tot / max(n, 1)
+
+
+_CODE_TOL = 12
+
+
+def _bar_has_buttons(ref, w, h, geom):
+    """The reference frame really shows the buttons (they have some contrast), so matching them means something."""
+    s = w / geom["w"]
+    bx, by, bw, bh = geom["restart"]
+    x0, y0, x1, y1 = (int(round(v)) for v in (bx * s, by * s, (bx + bw) * s, (by + bh) * s))
+    vals = [sum(_px(ref, w, x, y)) / 3 for y in range(y0, y1) for x in range(x0, x1)]
+    return bool(vals) and max(vals) - min(vals) >= 25
+
+
+def _body_blank(fr, w, h, geom):
+    """True if the player body (everything above the control bar) is one flat colour."""
+    s = w / geom["w"]
+    y1 = int(geom["bar"][1] * s)
+    vals = [sum(_px(fr, w, x, y)) / 3 for y in range(0, max(y1, 1), 6) for x in range(0, w, 6)]
+    return max(vals) - min(vals) < 25
+
+
+def _bar_start_frame(webm, geom, x, y, w, h, lo, span, fps=30):
+    """Time (s) of the first frame in [lo, lo+span] of the raw recording where the player is on screen:
+    cropped like the final video, its Restart and speed buttons look like the same buttons in the last frame
+    of the recording, and the next two frames still do. Raises if there is none."""
+    vf = f"crop={w}:{h}:{x}:{y},scale=1600:-2:flags=lanczos"
+    vw, vh = 1600, int(round(h * 1600 / w / 2)) * 2
+    size = vw * vh * 3
+    g0 = dict(geom, **geom.get("start", {}))  # where the buttons were when the player mounted
+    ref = subprocess.run(["ffmpeg", "-loglevel", "error", "-sseof", "-0.5", "-i", webm, "-vf", vf + ",fps=30",
+                          "-frames:v", "15", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+                         capture_output=True).stdout[-size:]
+    if len(ref) != size or not _bar_has_buttons(ref, vw, vh, geom):
+        raise RuntimeError("the last frame of the recording does not show the control bar")
+    raw = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", f"{lo:.2f}", "-t", str(span), "-i", webm,
+                          "-vf", f"fps={fps}," + vf, "-f", "rawvideo", "-pix_fmt", "rgb24", "-"], capture_output=True).stdout
+    frs = [raw[i * size:(i + 1) * size] for i in range(len(raw) // size)]
+    for i in range(len(frs) - 2):
+        if all(_bar_region_diff(frs[i + j], ref, vw, vh, g0, ref_geom=geom) <= geom.get("tol", _BAR_TOL)
+               and (not geom.get("code") or _panel_corr(frs[i + j], ref, vw, vh) >= 0.8) for j in range(3)):
+            return lo + i / fps
+    raise RuntimeError("the player's control bar never showed at its expected spot in the recording")
+
+
+def bar_start_check(path, geom):
+    """START CHECK for a bar player: the first 3 frames already show the control bar buttons (the video does not
+    open on page text or a half-mounted player) and the body is not blank."""
+    fr, w, h = _read_frames(path, 8)
+    if len(fr) < 3:
+        return False, ["video has fewer than 3 frames"]
+    ref = _read_frames(path, 1, start=max(0.0, _duration(path) - 0.5))[0]
+    if not ref or not _bar_has_buttons(ref[0], w, h, geom):
+        return False, ["last frame: no control bar"]
+    problems = []
+    g0 = dict(geom, **geom.get("start", {}))  # the control bar at the start (a growing player has it higher up)
+    for i in range(3):
+        d = _bar_region_diff(fr[i], ref[-1], w, h, g0, ref_geom=geom)
+        if d > geom.get("tol", _BAR_TOL):
+            problems.append(f"frame {i} does not show the control bar (difference {d:.0f})")
+        cd = _code_diff(fr[i], ref[-1], w, h, geom)
+        if cd > _CODE_TOL:
+            problems.append(f"frame {i} does not show the player's code panel (difference {cd:.0f})")
+    step = 7  # sampling stride in pixels: a page-text first frame turning into the player is a big jump, normal motion is not
+    jump = sum(abs(a - b) for a, b in zip(fr[0][::step * 3 + 1], fr[2][::step * 3 + 1])) / len(fr[0][::step * 3 + 1])
+    if jump > 5:
+        problems.append(f"frame 0 is not the player (jump of {jump:.0f} to frame 2)")
+    if _body_blank(fr[2], w, h, g0):
+        problems.append("the player body is blank in the first frames")
+    elif len(fr) >= 8:  # a half-drawn body (the player still mounting) shows much less than frame 7 does
+        s = w / geom["w"]
+        y1 = int(g0["bar"][1] * s)
+        ink = lambda f: sum(1 for y in range(int(y1 * .12), y1, 3) for x in range(0, w, 3) if sum(_px(f, w, x, y)) / 3 > 70)
+        ref_ink = ink(fr[7])
+        for i in range(3):
+            if ref_ink and ink(fr[i]) < 0.8 * ref_ink:
+                problems.append(f"frame {i}: the player body is still half drawn")
+    return not problems, problems
+
+
+def bar_end_check(path, geom):
+    """END CHECK for a bar player: the DOM showed "Replay" (playback finished), and the last frame shows the
+    control bar and a body that is not blank."""
+    w, h = _video_size(path)
+    fr, _, _ = _read_frames(path, 20, start=max(0.0, _duration(path) - 0.5))
+    if not fr:
+        return False, ["no frames at the end"]
+    problems = []
+    if not geom.get("ended"):
+        problems.append("the playback never reached Replay")
+    if _bar_region_diff(fr[-1], fr[0], w, h, geom) > geom.get("tol", _BAR_TOL):
+        problems.append("last frame: control bar changes at the end (cut off?)")
+    if _body_blank(fr[-1], w, h, geom):
+        problems.append("last frame: the player body is blank")
+    return not problems, problems
+
+
+def _duration(path):
+    return float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", path],
+                                capture_output=True, text=True, check=True).stdout)
+
+
+def _opening_frame_problems(path):
+    """The opening-frames check of checks/animation_first_frames.py (no page text under the player, step
+    counter reading 1/N), applied to a fresh recording so a bad one is retried."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location(
+        "animation_first_frames", os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                                               "checks", "animation_first_frames.py"))
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return sorted(set(x.split(": ", 1)[1] for x in mod.problems(path)))
+
+
+def record_bar_animation(browser, url, k, m, label, dest, box_css):
+    """record_animation for the BAR_PLAYER_TYPES (same recorder settings: Playwright video, window = player
+    height + 40, 2x via doubled viewport/record size and page zoom 2, crop + fps=30 + scale 1600 lanczos +
+    libx264 crf 20, 2 s tail); only the box, the start and the end are found by the rules above."""
+    W = max(1150, int(box_css["w"]) + 48)
+    H = int(-(-box_css["h"] // 1)) + 40
+    with tempfile.TemporaryDirectory() as tmp:
+        ctx = browser.new_context(viewport={"width": W * 2, "height": H * 2}, color_scheme="light",
+                                  record_video_dir=tmp, record_video_size={"width": W * 2, "height": H * 2})
+        page = ctx.new_page()
+        t0 = time.monotonic()
+        page.goto(url, wait_until="domcontentloaded", timeout=60000)
+        page.wait_for_timeout(3000)
+        page.evaluate("document.documentElement.style.zoom = 2")
+        page.wait_for_timeout(1000)
+        block = page.locator(ANIMATION_SELECTOR).nth(k)
+        page.evaluate(_HIDE_PINNED)
+        if block.get_attribute("data-note-block-type") == "python_animation":
+            page.evaluate(_HIDE_AFTER_PLAYER, block.element_handle())  # before the jump, so no frame shows the page text
+        page.wait_for_timeout(300)
+        gap = block.evaluate("b => b.getBoundingClientRect().top") - (page.evaluate("innerHeight") + 1500)
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})", gap)
+        page.wait_for_timeout(1500)
+        if m > 0:  # pick the mode while out of view; a switched mode starts paused
+            block.locator("button[role=radio]").nth(m).click()
+            page.wait_for_timeout(500)
+        jump_mark = time.monotonic()
+        page.evaluate("y => window.scrollBy({top: y, behavior: 'instant'})",
+                      block.evaluate("b => b.getBoundingClientRect().top") - 10)
+        btype = block.get_attribute("data-note-block-type")
+        if btype == "python_animation":
+            # The crop is the player's finished height, but the Python player grows while it plays, so at the start
+            # the page text that follows it would show below its control bar. Hide everything after the player (the
+            # layout stays, only the paint goes), so the strip under the player is empty at any moment.
+            page.evaluate(_HIDE_AFTER_PLAYER, block.element_handle())  # again: the player is mounted now
+        geom = None
+        while time.monotonic() - jump_mark < 25:  # the player is mounted once its control bar is
+            geom = block.evaluate(_BAR_GEOM_JS)
+            if geom:
+                break
+            page.wait_for_timeout(50)
+        if not geom:
+            raise RuntimeError("the control bar never appeared")
+        start_geom = geom
+        mount_t = mark = time.monotonic()
+        play = block.locator('button[aria-label="Play"]')
+        if btype == "python_animation" and m == 0:
+            # The Python player plays by itself from its mount, and the video can show its first painted frame several
+            # steps in (5/60, 3/107). Restart it and pause it at step 1, like a switched mode, so the recorded
+            # playback starts at a click of ours and the first frame reads 1/N.
+            block.locator('button[aria-label="Restart"]').first.click()
+            page.wait_for_timeout(300)
+            pause = block.locator('button[aria-label="Pause"]')
+            if pause.count():
+                pause.first.click()
+            for _ in range(6):  # the pause can land after step 2 has begun: step back to 1
+                page.wait_for_timeout(300)
+                cur = block.evaluate(_BAR_GEOM_JS)
+                if not cur or cur["text"].startswith("1/"):
+                    break
+                block.locator('button[aria-label="Previous step"]').first.click()
+            else:
+                raise RuntimeError("could not hold the player at step 1")
+            page.wait_for_timeout(2000)
+        if (m > 0 or (btype == "python_animation" and m == 0)) and play.count():  # a switched mode starts paused: the playback starts at this click
+            play.first.click()
+            mark = time.monotonic()
+        last_geom, h_max, last_seen = geom, geom["h"], None
+        while time.monotonic() - mark < 400:  # the longest Python players run about 3 minutes
+            g = block.evaluate(_BAR_GEOM_JS)
+            if g:
+                last_geom, h_max = g, max(h_max, g["h"])
+                if g["replay"] and time.monotonic() - mark > 1:
+                    last_seen = time.monotonic()
+                    break
+            page.wait_for_timeout(100)
+        if last_seen is None:
+            raise RuntimeError("the playback never reached Replay")
+        # Park the pointer outside the player (no hover tooltip over the caption) and nudge the page so the
+        # compositor paints the final state: without this the headless video can keep showing the last
+        # frame before the Pause -> Replay swap (seen on the 16-step pipeline player).
+        page.mouse.move(2, 2)
+        page.wait_for_timeout(300)
+        page.mouse.move(6, 4)
+        page.screenshot(clip={"x": 0, "y": 0, "width": 8, "height": 8})  # forces a fresh paint into the video
+        page.wait_for_timeout(1700)
+        g = block.evaluate(_BAR_GEOM_JS)
+        if g:
+            last_geom, h_max = g, max(h_max, g["h"])
+        ctx.close()
+        geom = dict(last_geom, h=h_max, ended=True)
+        geom["start"] = {k: start_geom[k] for k in ("restart", "speed", "bar")}  # layout at mount (the player may grow)
+        if btype == "python_animation":
+            geom["tol"] = _PY_BAR_TOL
+        vids = [f for f in os.listdir(tmp) if f.endswith(".webm")]
+        x, y, w = (int(round(geom[c])) for c in "xyw")
+        h = int(round(h_max))
+        h -= h % 2
+        if x < 0 or y < 0 or x + w > W * 2 or y + h > H * 2:
+            return {"error": f"crop {x},{y},{w},{h} outside video {W * 2}x{H * 2}", "need_h": h / 2 + 60}
+        webm = os.path.join(tmp, vids[0])
+        pres = _bar_start_frame(webm, geom, x, y, w, h, max(0.0, (jump_mark - t0) - 1), 20)  # not before the jump: another player in view (a taller window) can look the same
+        start = pres + (mark - mount_t) + float(os.environ.get("ANIM_START_NUDGE", 0))
+        if btype == "python_animation" and m == 0:
+            # the video clock lags the script clock by up to about a second: start well inside the 2 s paused stretch
+            # at step 1 (before our Play click), not at the click, or the first frame can already be at step 2
+            start = max(pres, start - 1.0)  # a stubborn player: start a frame or two later
+        live = last_seen - mark
+        end = start + live + 2
+        os.makedirs(os.path.dirname(dest), exist_ok=True)
+        subprocess.run(["ffmpeg", "-y", "-loglevel", "error", "-ss", f"{start:.3f}", "-to", f"{end:.3f}", "-i", webm,
+                        "-vf", f"crop={w}:{h}:{x}:{y},fps=30,scale=1600:-2:flags=lanczos,format=yuv420p",
+                        "-c:v", "libx264", "-crf", "20", "-movflags", "+faststart", dest], check=True)
+    geom["h"] = h
+    return {"live": live, "box": {"x": x, "y": y, "w": w, "h": h}, "crop": (x, y, w, h), "video": (W * 2, H * 2), "geom": geom}
+
+
+# A "static animation": an *_animation block whose player never gets controls (no steps). The site draws it
+# as a plain picture and its footer reads "These tables are what the query/program reads." That is
+# deliberate, so it is saved as a 2x PNG; no footer means the player probably failed to load.
+STATIC_ANIMATION_FOOTER_RE = re.compile(r"These tables are what the .{1,40}? reads", re.I)
+
+
+def is_static_animation(block_text):
+    """True if the block's text carries the footer the site shows for a deliberate still animation."""
+    return bool(STATIC_ANIMATION_FOOTER_RE.search(block_text or ""))
+
+
 def record_animations(url, out_dir, slug, info, only=None):
     """Save every animation block's playback as an MP4 in ANIM_DIR: one per mode (toggle) if it has any.
 
@@ -1473,20 +2020,23 @@ def record_animations(url, out_dir, slug, info, only=None):
             page = ctx.new_page()
             page.goto(url, wait_until="domcontentloaded", timeout=60000)
             page.wait_for_timeout(3000)
-            block = page.locator('[data-note-block-type$="_animation"]').nth(k)
+            block = page.locator(ANIMATION_SELECTOR).nth(k)
             block.scroll_into_view_if_needed()  # the first mode plays by itself once in view
             try:  # Spark animations mount their controls only once in view
                 block.locator("button").first.wait_for(state="attached", timeout=10000)
             except Exception:
                 pass
-            box = block.evaluate(_PLAYER_BOX)
+            bar = block.get_attribute("data-note-block-type") in BAR_PLAYER_TYPES
+            slow = block.get_attribute("data-note-block-type") == "python_animation"
+            box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
-                # Seen once per lesson (see the four still-image cases): the site never mounts the
-                # player and leaves the code and seed table on screen. Keep that as a still image.
+                # Static animation (see is_static_animation): after scroll + wait the site still shows no
+                # player buttons, only the code and seed tables. Keep that as a still image.
                 page.wait_for_timeout(5000)
-                box = block.evaluate(_PLAYER_BOX)
+                box = block.evaluate(_BAR_BOX if bar else _PLAYER_BOX)
             if not box:
                 name = f"{slug}_animation_{k + 1}.png"
+                page.evaluate(_HIDE_FIXED)  # the pinned "Ask AI" button would sit on top of the still
                 bb = block.bounding_box()
                 shot = ctx.new_cdp_session(page).send("Page.captureScreenshot", {
                     "format": "png", "captureBeyondViewport": True, "clip": {
@@ -1494,36 +2044,61 @@ def record_animations(url, out_dir, slug, info, only=None):
                         "width": bb["width"], "height": bb["height"], "scale": 2}})
                 with open(os.path.join(img_dir, name), "wb") as fh:
                     fh.write(base64.b64decode(shot["data"]))
+                static = is_static_animation(block.inner_text())
                 ctx.close()
-                print(f"warning: animation {k + 1} has no player controls; saved a still image", file=sys.stderr)
+                if static:
+                    print(f"static animation: {slug} animation {k + 1} has no player (no steps); saved a still image {name}")
+                else:
+                    print(f"WARNING: {slug} animation {k + 1} has no player controls and no 'These tables are what ... reads' "
+                          f"footer: likely a recording failure, not a static animation; saved a still image {name} anyway",
+                          file=sys.stderr)
                 saved.setdefault(k, []).append((None, name))
                 continue
             # the player can grow while it plays (captions, tables): take the largest size seen so far
             box_css = {"w": box["w"], "h": box["h"]}
             ctx.close()
+            used = set()
             for m, label in enumerate(entry["labels"] or [None]):
                 name = f"{slug}_animation_{k + 1}" + (f"_{re.sub(r'[^a-z0-9]+', '-', label.lower()).strip('-')}"
                                                       if label else "") + ".mp4"
+                while name in used:  # two modes whose labels slug alike (score >= 70 / score > 70): keep both files
+                    name = name[:-4] + "-2.mp4"
+                used.add(name)
                 dest = os.path.join(ANIM_DIR, name)
+                mode_box = dict(box_css)  # per mode: a retry's growth must not leak into the other modes
                 for attempt in range(3):
                     try:
-                        st = record_animation(browser, url, k, m, label, dest, box_css)
+                        st = (record_bar_animation if bar else record_animation)(browser, url, k, m, label, dest, mode_box)
                     except Exception as e:  # a navigation timeout: wait and retry this one
                         print(f"  {name}: attempt {attempt + 1} failed ({type(e).__name__}: {str(e).splitlines()[0] if str(e) else ''}); retrying", file=sys.stderr)
                         time.sleep(10)
                         continue
                     if "error" in st:
-                        box_css["h"] = max(box_css["h"], st["need_h"])
+                        mode_box["h"] = max(mode_box["h"], st["need_h"])
                         continue
                     dur, fps = _media_stats(dest)
                     vw, vh = _video_size(dest)
                     st.update(name=name, dur=dur, fps=fps)
-                    start_ok, start_problems = start_check(dest, st["geom"])
-                    end_ok, end_problems = end_check(dest, st["geom"])
+                    start_ok, start_problems = (bar_start_check if bar else start_check)(dest, st["geom"])
+                    end_ok, end_problems = (bar_end_check if bar else end_check)(dest, st["geom"])
                     problems = start_problems + end_problems
-                    if fps < 10:
+                    if slow:
+                        # The Python player's long slow stretches change little per frame (a progress bar, one cell per
+                        # step), so 10 distinct frames/s is too strict: demand motion at least 3 times a second on
+                        # average and no frozen stretch longer than 2 s (a stalled recording).
+                        problems += _opening_frame_problems(dest)
+                        sc = _start_corr(dest)
+                        if sc < 0.8:
+                            problems.append(f"frame 0 is not the player's code panel (match {sc:.2f}): page text or a shifted layout")
+                        gap = _max_gap(dest)
+                        if fps < 3 or gap > 2.0:
+                            problems.append(f"{fps:.1f} distinct frames/s, longest frozen stretch {gap:.1f} s")
+                    elif fps < 10:
                         problems.append(f"only {fps:.1f} distinct frames/s")
-                    if st["live"] is not None and abs(dur - (st["live"] + 2)) > 0.3:
+                    # A bar player's video can end up to 1 s early (the video clock lags on a loaded machine; the
+                    # finished state is still on screen and the END CHECK covers it): keep at least a 1 s tail.
+                    lo = 1.0 if bar else 1.7
+                    if st["live"] is not None and not (st["live"] + lo <= dur <= st["live"] + 2.3):
                         problems.append(f"duration {dur:.1f} s vs live {st['live']:.1f} s + 2 s")
                     if vw != 1600 or vh % 2:
                         problems.append(f"size {vw}x{vh}")
@@ -1532,6 +2107,8 @@ def record_animations(url, out_dir, slug, info, only=None):
                         ANIM_STATS[name] = st
                         break
                     print(f"  {name}: attempt {attempt + 1} failed checks: {'; '.join(problems)}", file=sys.stderr)
+                    if bar and attempt >= 1:  # a window barely taller than the player can mis-place it: give it room (the crop stays the player)
+                        mode_box["h"] += 160
                 else:
                     raise RuntimeError(f"{name}: could not record a passing video")
                 saved.setdefault(k, []).append((label, name))
@@ -1547,11 +2124,49 @@ _HIDE_FIXED = """() => { for (const e of document.querySelectorAll('body *'))
 _CELL_ERROR = re.compile(r"Traceback|Error\b|Exception\b", re.I)
 
 
-def record_cells(url, out_dir, slug, count):
-    """Click Run on every executable_spark cell and save the whole cell as <slug>_cell_<n>.png.
+def _click_run(page, block, kind):
+    """Press the cell's run control. Spark: the "Run" button, and the output is drawn by JavaScript, so
+    wait until the cell text changes and then stays quiet for 1.5 s. Python: the ">>>" button reveals the
+    output the page already holds; wait until the cell grows taller. SQL: the "Show result" icon button (see below). Returns (text before, text after)."""
+    before = block.inner_text()
+    if kind == "executable_spark":
+        block.get_by_role("button", name="Run", exact=True).click()
+        began = time.monotonic()
+        last, stable_since = before, None
+        while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
+            page.wait_for_timeout(300)
+            now = block.inner_text()
+            if now != last:
+                last, stable_since = now, time.monotonic()
+            elif stable_since and time.monotonic() - stable_since >= 1.5:
+                break
+        return before, last
+    h0 = block.bounding_box()["height"]
+    # SQL: 3 icon-only buttons, "Animate this query", "Edit and run this query" and "Show result" (the
+    # table icon, third); "Show result" reveals the result the page already holds.
+    label = "Show result" if kind == "executable_sql" else ">>>"
+    buttons = block.get_by_role("button", name=label, exact=True)
+    if buttons.count() != 1:
+        print(f"warning: cell has {buttons.count()} '{label}' buttons, expected 1", file=sys.stderr)
+    buttons.first.click()
+    began = time.monotonic()
+    grew = False
+    while time.monotonic() - began < 8:  # the output panel animates open
+        page.wait_for_timeout(200)
+        if block.bounding_box()["height"] > h0 + 5:
+            grew = True
+            break
+    if not grew:
+        print(f"warning: cell did not grow after '{label}' (output not revealed?)", file=sys.stderr)
+    page.wait_for_timeout(1200)  # let the open animation finish
+    return before, block.inner_text()
+
+
+def record_cells(url, out_dir, slug, count, kind="executable_spark", start=0):
+    """Click the run control of every runnable cell and save the whole cell as <slug>_cell_<n>.png.
 
     Returns the file names in page order (None for a cell that could not be captured). Warns
-    about cells that show no output or an error.
+    about cells that show no output or an error. See _click_run for the control each kind uses.
     """
     if not count:
         return []
@@ -1569,37 +2184,53 @@ def record_cells(url, out_dir, slug, count):
                                 color_scheme="light", device_scale_factor=2)
         page.goto(url, wait_until="domcontentloaded")
         page.wait_for_timeout(4000)
-        blocks = page.locator('[data-note-block-type="executable_spark"]')
+        blocks = page.locator(f'[data-note-block-type="{kind}"]')
         if blocks.count() != count:
             print(f"warning: page has {blocks.count()} runnable cells, the HTML has {count}", file=sys.stderr)
         for i in range(min(count, blocks.count())):
             block = blocks.nth(i)
             block.scroll_into_view_if_needed()
             page.wait_for_timeout(800)
-            before = block.inner_text()
-            block.get_by_role("button", name="Run", exact=True).click()
-            began = time.monotonic()
-            last, stable_since = before, None
-            while time.monotonic() - began < 90:  # changed, then quiet for 1.5 s
-                page.wait_for_timeout(300)
-                now = block.inner_text()
-                if now != last:
-                    last, stable_since = now, time.monotonic()
-                elif stable_since and time.monotonic() - stable_since >= 1.5:
-                    break
+            before, last = _click_run(page, block, kind)
             result = last[len(before):] if last.startswith(before) else last
-            if last == before:
+            if kind == "executable_spark" and last == before:
                 print(f"warning: cell {i + 1} showed no output after Run", file=sys.stderr)
-            elif _CELL_ERROR.search(result):
+            elif kind == "executable_spark" and _CELL_ERROR.search(result):
                 print(f"warning: cell {i + 1} output looks like an error: {result.strip()[:120]!r}",
                       file=sys.stderr)
             page.evaluate(_HIDE_FIXED)
-            name = f"{slug}_cell_{i + 1}.png"
+            name = f"{slug}_cell_{start + i + 1}.png"  # start: cells of earlier kinds on a mixed page
             block.screenshot(path=os.path.join(img_dir, name))
             names.append(name)
         names += [None] * (count - len(names))
         browser.close()
     return names
+
+
+def record_regex_cards(url, out_dir, slug, count):
+    """Save each regex_cards block (the stacked pattern cards) as <slug>_regex_<n>.png at 2x."""
+    if not count:
+        return []
+    from playwright.sync_api import sync_playwright
+    img_dir = os.path.join(out_dir, "_images")
+    os.makedirs(img_dir, exist_ok=True)
+    names = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        page = browser.new_page(viewport={"width": 1000, "height": 900},
+                                color_scheme="light", device_scale_factor=2)
+        page.goto(url, wait_until="domcontentloaded")
+        page.wait_for_timeout(4000)
+        blocks = page.locator('[data-note-block-type="regex_cards"]')
+        for i in range(min(count, blocks.count())):
+            blocks.nth(i).scroll_into_view_if_needed()
+            page.wait_for_timeout(600)
+            page.evaluate(_HIDE_FIXED)
+            name = f"{slug}_regex_{i + 1}.png"
+            blocks.nth(i).screenshot(path=os.path.join(img_dir, name))
+            names.append(name)
+        browser.close()
+    return names + [None] * (count - len(names))
 
 
 def screenshot_diagrams(url, out_dir, slug):
@@ -1646,6 +2277,20 @@ def topic_dir(slug):
     return os.path.join("lessons", folder)
 
 
+def restore_astral_code(html):
+    """The site renders inline code one UTF-16 unit per span, so an emoji outside the BMP (a flag, say)
+    reaches the HTML as two U+FFFD spans per character. The page's embedded JSON still holds the real
+    character: put it back, matching each code value to its run of U+FFFD spans."""
+    for m in re.finditer(r'\\"type\\":\\"python_inline_code\\",\\"value\\":\\"([^"\\]+)\\"', html):
+        val = m.group(1)
+        if not re.search("[\U00010000-\U0010ffff]", val):
+            continue
+        run = "".join("(?:<span[^>]*>\ufffd</span>){2}" if ord(c) > 0xFFFF
+                      else "(?:<span[^>]*>" + re.escape(c) + "</span>)" for c in val)
+        html = re.sub(run, lambda _: "<span>" + val + "</span>", html, count=1)
+    return html
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     if not args:
@@ -1655,6 +2300,7 @@ def main():
     out_dir = args[1] if len(args) > 1 else topic_dir(slug)
     req = urllib.request.Request(url, headers={"User-Agent": "lesson-to-md/1.0"})
     html = urllib.request.urlopen(req, timeout=30).read().decode("utf-8", "ignore")
+    html = restore_astral_code(html)
     os.makedirs(out_dir, exist_ok=True)
     images = screenshot_diagrams(url, out_dir, slug) if "--screenshots" in sys.argv else []
     animations = (record_animations(url, out_dir, slug, animation_info(html))
@@ -1663,8 +2309,17 @@ def main():
         for _, name in entries:
             if name.endswith(".mp4"):
                 upload_animation(name)
-    n_cells = len(BeautifulSoup(html, "html.parser").find_all(attrs={"data-note-block-type": "executable_spark"}))
-    cells = record_cells(url, out_dir, slug, n_cells) if "--screenshots" in sys.argv else []
+    soup0 = BeautifulSoup(html, "html.parser")
+    cells, done = {}, 0  # every runnable kind on the page, each screenshotted with its own control
+    for cell_kind in CELL_KINDS:
+        n_cells = len(soup0.find_all(attrs={"data-note-block-type": cell_kind}))
+        if n_cells and "--screenshots" in sys.argv:
+            cells[cell_kind] = record_cells(url, out_dir, slug, n_cells, cell_kind, done)
+        done += n_cells
+    n_regex = len(soup0.find_all(attrs={"data-note-block-type": "regex_cards"}))
+    regex_images = record_regex_cards(url, out_dir, slug, n_regex) if "--screenshots" in sys.argv else []
+    switchers = (sql_switcher_tabs(url, out_dir if "--screenshots" in sys.argv else None, slug)
+                 if soup0.find(attrs={"data-note-block-type": "sql_switcher"}) else [])
     path = os.path.join(out_dir, slug + ".md")
     tmp_path = path + ".tmp"  # written in full, then renamed over the lesson
     with open(tmp_path, "w", encoding="utf-8") as f:
@@ -1696,8 +2351,17 @@ def main():
                 sections.append((anchor, exercises_markdown(group, shots, start)))
                 start += len(group)
         f.write(convert(html, images, sections, animations, drop_refs,
-                       load_drops(slug), cells))
+                       load_drops(slug), cells, regex_images, switchers))
     os.replace(tmp_path, path)
+    if any(os.sep + os.path.join(*d) + os.sep in os.path.abspath(path)
+           for d in (("learn", "python"), ("learn", "sql"), ("interview", "sql"))):
+        # Learn Python, Learn SQL, Interview SQL: exercise spots become links to placeholder files and
+        # hand trims are re-applied (tools/python_exercises.json, tools/sql_exercises.json); lessons
+        # without an entry are left alone
+        sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+        from python_exercise_placeholders import apply_lesson
+        n = apply_lesson(path)
+        print(f"note: {n} exercise placeholder(s) written (python_exercise_placeholders.py)", file=sys.stderr)
     print(path)
 
 

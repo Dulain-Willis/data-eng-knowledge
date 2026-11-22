@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 9 challenges
-
 # Deploying dbt: Beginner
 
 GitLab's data team keeps its dbt project in a public repository, and changes reach it through merge requests. Take one that edits an orders model. Before merge, that model and the models reading it build in the author's own schema. After merge a scheduled run builds it into production, and if a test fails there, the next step decides what dashboards show.
@@ -51,7 +49,7 @@ Notice what the table does not list: the SQL. ref('stg_orders') resolves to dbt_
 
 Jinja can see the target a run is on through target.name and target.schema. The common use is keeping dev builds small: a developer checking a join does not need 3 years of orders, so the model drops older rows when, and only when, the target is dev. The animation pins the cutoff to a fixed date so its rows are the same each time you play it; a real project writes current_date - interval '30' day in its place.
 
-![Animation](_images/dbt_deployment_beginner_animation_1.gif)
+https://github.com/user-attachments/assets/cb35bda1-a627-4f86-ba63-4775987e0242
 
 *$ dbt run --target dev*
 
@@ -101,7 +99,7 @@ Inside a selection dbt keeps DAG order and keeps the parallelism from threads. -
 
 A node left out of a selection keeps whatever its table held before the command. That sounds harmless until a new row arrives in a source. The animation starts with a full run, then inserts an order and runs only fct_orders, then widens the selection in each direction. Watch the row counts of the 2 tables after each step.
 
-![Animation](_images/dbt_deployment_beginner_animation_2.gif)
+https://github.com/user-attachments/assets/881d0fc3-b34d-4909-8e65-66476c8a3470
 
 *$ dbt run*
 
@@ -262,7 +260,7 @@ A nightly build of 40 models runs for 25 minutes. At minute 12 a not_null test d
 
 Running dbt build again rebuilds all 40 models, 37 of which are already correct, and takes another 25 minutes. dbt retry instead reads target/run_results.json and collects the nodes marked fail or error along with those marked skipped. It runs the same command with the same arguments on that list only. Here that is 4 nodes: the test, then the 3 skipped models in DAG order, because the test passing is what releases them. The 37 successes stay as they are, and the terminal counts 4 of 4.
 
-![Animation](_images/dbt_deployment_beginner_animation_3.gif)
+https://github.com/user-attachments/assets/3234c235-f42c-4e7a-a3e4-d9952b2b5946
 
 *$ dbt build*
 

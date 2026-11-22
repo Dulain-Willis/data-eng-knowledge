@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 9 challenges
-
 # The Log: Intermediate
 
 At LinkedIn, where Kafka was written, a topic takes every edit a member makes to their profile, and a new search index needs each member's current headline and nothing older. A second topic takes page views and must hold 7 days, then let them go. Both are directories of segment files, and what those files keep, drop and split decides whether either job works.
@@ -312,11 +310,11 @@ A record with a key goes to the partition at `hash(key) mod partition count`, an
 
 **orders: 3 partitions**
 
-![orders: 3 partitions](_images/kafka_the_log_intermediate_animation_1_orders-3-partitions.gif)
+https://github.com/user-attachments/assets/47264c22-e6ef-47dc-b862-66fd50001bb6
 
 **orders-v2: 6 partitions**
 
-![orders-v2: 6 partitions](_images/kafka_the_log_intermediate_animation_1_orders-v2-6-partitions.gif)
+https://github.com/user-attachments/assets/30b8e8b5-32b3-44e1-b2bd-ad21b14a5f2a
 
 Follow 1 key across the 2 topics. In `orders` its 2 records land together, and in `orders-v2` they land together again, though some keys sit on a different partition number than they do in `orders`. Either way a key's records stay together; only the directory that holds them changes. If `orders` were a topic's past and `orders-v2` its future at a higher count, a key that moved would be split across 2 directories.
 

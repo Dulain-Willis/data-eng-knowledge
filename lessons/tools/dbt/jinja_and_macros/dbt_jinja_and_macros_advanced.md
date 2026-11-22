@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Jinja and Macros: Advanced
 
 GitLab runs its analytics on a public dbt project. An engineer there adds a macro that reads the list of subscription plans from the warehouse and emits one revenue column per plan. CI's `dbt parse` passes with 0 plan columns. The nightly build produces 6. The model file is identical in both runs. Where did the second shape come from?
@@ -110,7 +108,7 @@ A payments feed carries a `method` column that holds card and bank today, and la
 {% endmacro %}
 ```
 
-![Animation](_images/dbt_jinja_and_macros_advanced_animation_1.gif)
+https://github.com/user-attachments/assets/5b68a55c-1b52-4a82-a1b2-4bee4aaa0a0b
 
 *$ dbt run*
 

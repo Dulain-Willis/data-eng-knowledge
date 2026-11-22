@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 15 challenges
-
 # Fault Tolerance: Advanced
 
 Say Netflix's overnight Spark job rolls up viewing hours per title for the Top 10 rows. At 3am a spot node vanishes, Spark replays 40 tasks, and the job finishes green. Whether the morning's rankings double-count a hit show comes down to one question: did each replayed task's output land once, or twice?

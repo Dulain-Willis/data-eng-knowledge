@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 12 challenges
-
 # Ingestion Patterns: Beginner
 
 Black Friday weekend at Shopify. Orders flood the storefront database, a payment partner fires a webhook for every charge, a shipping carrier drops a settlement file at 02:00, and the marketing team wants yesterday's ad spend from a vendor's API before the morning standup. Four sources, 4 ways the data shows up. The ingestion job written for each one decides whether Monday's dashboards are right or quietly short.

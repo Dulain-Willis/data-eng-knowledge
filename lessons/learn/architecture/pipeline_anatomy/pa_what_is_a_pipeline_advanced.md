@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 35 min · 12 challenges
-
 # Pipeline Anatomy: Advanced
 
 Picture Spotify in October: the Wrapped team needs a listening-sessions table that a recommendations team built 4 years ago for its own model. Royalty reporting reads it too. Wrapped wants column names frozen until December, recommendations wants rows by 06:00, royalties wants every row. That is 3 promises from 1 pipeline, and none of them is written down. This lesson is about writing them down.

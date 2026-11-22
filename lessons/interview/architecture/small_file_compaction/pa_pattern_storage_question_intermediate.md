@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 35 min · 2 challenges
-
 # The Storage Question: Intermediate
 
 Maya is in the onsite loop at Netflix, the company whose engineers created Apache Iceberg after the directory-based tables in their petabyte-scale Parquet lake kept giving concurrent writers and readers inconsistent answers. The interviewer draws one box labeled 'playback events, 100 billion rows a year' and asks: 'How would you store this?' Parquet, partitions, a table format, a lake or a warehouse, a bill at the end of the month. What the interviewer is testing is whether she can chain them: say why a columnar file reads a fraction of the bytes for a narrow query, pick a partition key by counting its distinct values and its skew, explain what a transaction log gives that a directory listing cannot, decide which workload belongs in a warehouse, and attach a dollar figure to the design. This lesson builds that chain, with the number each link turns on.

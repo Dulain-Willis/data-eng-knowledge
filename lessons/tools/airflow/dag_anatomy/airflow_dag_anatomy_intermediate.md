@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 6 challenges
-
 # DAG Anatomy: Intermediate
 
 Airbnb open-sourced Airflow in 2015. Say a pricing team there is launching a new smart-pricing model: on launch morning an engineer drops a new DAG into the folder, refreshes the home page, and sees nothing. The scheduler is healthy, the file is there, the tests passed on her laptop. Whether the model ships today depends on knowing what happens between a file landing and a DAG appearing.

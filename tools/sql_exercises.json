@@ -1,0 +1,172 @@
+{
+ "aggregating_beginner": [
+  {
+   "name": "Total and average profit per region",
+   "places": [
+    "A1",
+    "C1"
+   ],
+   "after": "With a `profit` and a `region` on each order",
+   "moved": [],
+   "empty_note": "No lesson text was moved here: the surrounding sentences teach, so they stay in the lesson (only the sentence that pointed at the exercise was cut).",
+   "trim": [
+    [
+     "never meant to meet. The practice `orders` table has a `profit` per order and a `region`; fill in the 2 aggregates that give total and average profit per region.",
+     "never meant to meet."
+    ],
+    [
+     "`SUM(profit)` and `AVG(profit)` in the same row let a reader spot",
+     "With a `profit` and a `region` on each order, `SUM(profit)` and `AVG(profit)` in the same row per region let a reader spot"
+    ]
+   ]
+  },
+  {
+   "trim_only": true,
+   "name": "trims",
+   "places": [
+    "A2",
+    "A3"
+   ],
+   "moved": [],
+   "trim": [
+    [
+     "the engine groups fewer rows. The practice `orders` table has a `region` and a `profit` per order; complete the query that keeps only regions with more than 1 order.",
+     "the engine groups fewer rows."
+    ],
+    [
+     "what the report means. Assemble the same query from its pieces below; 1 tile does not belong.",
+     "what the report means."
+    ]
+   ]
+  }
+ ],
+ "data_types_beginner": [
+  {
+   "trim_only": true,
+   "name": "trims",
+   "places": [
+    "A4"
+   ],
+   "moved": [],
+   "trim": [
+    [
+     "before the arithmetic runs. Supply the operator.",
+     "before the arithmetic runs."
+    ]
+   ]
+  }
+ ],
+ "joins_beginner": [
+  {
+   "name": "Join key and filter",
+   "places": [
+    "D"
+   ],
+   "after": "The logical execution order from earlier lessons places",
+   "moved": [
+    "The right key is `user_id` on both sides, the users primary key against the sessions foreign key, and the filter names the column the question asked about. The engine pairs first and filters second, so `s.pages_viewed` in the `WHERE` is a column of the paired row."
+   ],
+   "trim": [
+    [
+     "\n\nThe right key is `user_id` on both sides, the users primary key against the sessions foreign key, and the filter names the column the question asked about. The engine pairs first and filters second, so `s.pages_viewed` in the `WHERE` is a column of the paired row.",
+     ""
+    ]
+   ]
+  },
+  {
+   "trim_only": true,
+   "name": "trims",
+   "places": [
+    "A5",
+    "A6"
+   ],
+   "moved": [],
+   "trim": [
+    [
+     "on the product side, and the blank below is that condition.",
+     "on the product side."
+    ],
+    [
+     "already carry both a name and a total. The tiles below assemble a join followed by a filter over the practice database's `stores` and `retail_orders` tables, in the order the engine reads them.",
+     "already carry both a name and a total."
+    ]
+   ]
+  }
+ ],
+ "query_structure_intermediate": [
+  {
+   "trim_only": true,
+   "name": "trims",
+   "places": [
+    "A7",
+    "A8"
+   ],
+   "moved": [],
+   "trim": [
+    [
+     "rather than guessing which to use. The blank below is the same construction over the practice database.",
+     "rather than guessing which to use."
+    ],
+    [
+     "and caps the combined result. The practice database splits notification sends between `push_notifs` and `push_notifs_2fa`. Both tables have the same columns, which is the shape the next widget stacks.",
+     "and caps the combined result."
+    ]
+   ]
+  }
+ ],
+ "complex_data_advanced": [
+  {
+   "name": "Long tracks by id",
+   "places": [
+    "C2"
+   ],
+   "heading": "### Capstone: long tracks by id",
+   "heading_new": "### Long tracks by id",
+   "moved": [
+    "The `playlists` table has `playlist_id`, `track_ids` and `durations_sec`, with matching positions in the 2 arrays. Build a query that returns a row per playlist with an array of the track ids whose duration exceeds 180 seconds.",
+    "The final query combines the lesson: 2 parallel arrays, a pairing lambda, a filter and no UNNEST. For each playlist it returns the ids of tracks longer than 180 seconds as an array; on playlists 101 and 102 that is `['t9', 't7']` and `['t2', 't8']`."
+   ],
+   "trim": [
+    [
+     "### Capstone: long tracks by id\n\nThe final query combines the lesson: 2 parallel arrays, a pairing lambda, a filter and no UNNEST. For each playlist it returns the ids of tracks longer than 180 seconds as an array; on playlists 101 and 102 that is `['t9', 't7']` and `['t2', 't8']`.\n\n",
+     "### Capstone: long tracks by id\n\n"
+    ]
+   ]
+  }
+ ],
+ "query_structure_advanced": [
+  {
+   "name": "Assemble the subtraction",
+   "places": [
+    "A9",
+    "C3"
+   ],
+   "after": "The signup table counts attempts",
+   "moved": [
+    "List every signup attempt that was never confirmed, so that a user who tried twice and confirmed once still shows one remaining attempt, sorted by user."
+   ],
+   "trim": [
+    [
+     "and the sides in the right order. Arrange the tiles. Two of them do not belong.",
+     "and the sides in the right order."
+    ]
+   ]
+  }
+ ],
+ "sql_pattern_running_totals_beginner": [
+  {
+   "trim_only": true,
+   "name": "trims",
+   "places": [
+    "B"
+   ],
+   "moved": [],
+   "trim": [
+    [
+     "or an inventory ledger, which is why the capstones at the end of this lesson arrive in 4 different vocabularies.",
+     "or an inventory ledger."
+    ]
+   ]
+  }
+ ]
+}

@@ -1,5 +1,3 @@
-Beginner·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 9 challenges
-
 # Jinja and Macros: Beginner
 
 GitLab's data team runs its warehouse on dbt and publishes the project in its handbook. A mart counts merge requests per state, and the SELECT holds 3 near-identical CASE columns. A 4th state, locked, arrives. One engineer copies the merged column and changes only its alias. The quoted literal is untouched, so locked_mrs quietly counts merged requests. Jinja decides whether that bug can exist at all.
@@ -284,11 +282,11 @@ With the flag false, the compiled file has 2 columns and a blank gap where the b
 
 **['opened', 'merged', 'closed']**
 
-![['opened', 'merged', 'closed']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed.gif)
+https://github.com/user-attachments/assets/37354cab-1d77-4d6a-8dd7-6e2667ccb983
 
 **['opened', 'merged', 'closed', 'locked']**
 
-![['opened', 'merged', 'closed', 'locked']](_images/dbt_jinja_and_macros_beginner_animation_1_opened-merged-closed-locked.gif)
+https://github.com/user-attachments/assets/a9f3dacd-a15d-4f78-8e2c-6bb9715c2610
 
 *$ dbt run*
 

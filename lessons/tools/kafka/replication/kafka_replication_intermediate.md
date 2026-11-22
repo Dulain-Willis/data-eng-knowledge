@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 7 challenges
-
 # Replication: Intermediate
 
 At Netflix, every play, pause and scrub lands as an event in Kafka clusters spread across 3 availability zones. On a Tuesday evening one zone loses power during the finale of a hit series. Whether millions of viewers keep streaming, and whether the playback events from the last 2 seconds survive, comes down to where each partition's copies sit and how many of them were in sync.
@@ -56,11 +54,11 @@ kafka-get-offsets.sh --bootstrap-server broker1:9092 --topic orders prints 1 lin
 
 **Followers keep up**
 
-![Followers keep up](_images/kafka_replication_intermediate_animation_1_followers-keep-up.gif)
+https://github.com/user-attachments/assets/836ad3c0-db0c-4b1e-81ea-425dcf9d571e
 
 **Broker 3 fetches slowly**
 
-![Broker 3 fetches slowly](_images/kafka_replication_intermediate_animation_1_broker-3-fetches-slowly.gif)
+https://github.com/user-attachments/assets/cb23bcf7-08f9-411b-8d9d-cf4c4fee6bd4
 
 In the slow variant the leader keeps appending while the consumer's position freezes at the watermark. Broker 3 stays in the in-sync set throughout, since its stall is far shorter than 30 seconds, so the mark is pinned to its progress. When broker 3 catches up, the mark jumps and the consumer takes the held records in a burst.
 
@@ -122,11 +120,11 @@ Refusing a write pushes the problem back to the producer, which retries, buffers
 
 **acks=all**
 
-![acks=all](_images/kafka_replication_intermediate_animation_2_acks-all.gif)
+https://github.com/user-attachments/assets/8cb12b6c-b153-4fda-912b-4086b6f4c80b
 
 **acks=1**
 
-![acks=1](_images/kafka_replication_intermediate_animation_2_acks-1.gif)
+https://github.com/user-attachments/assets/69f245ef-973f-4a53-af54-468e0865c212
 
 With 1 broker down the in-sync set holds 2 replicas, the minimum, and both variants keep writing. The second kill drops the set to 1. In the `acks=all` variant every send from that point comes back with `NotEnoughReplicas` and the leader's log stops growing; in the `acks=1` variant the log keeps growing on a single disk, which is the situation the setting exists to prevent.
 
@@ -192,11 +190,11 @@ kafka-topics.sh --bootstrap-server broker1:9092 --describe --under-replicated-pa
 
 **Slow fetches**
 
-![Slow fetches](_images/kafka_replication_intermediate_animation_3_slow-fetches.gif)
+https://github.com/user-attachments/assets/da6ba370-c903-4b1f-9f18-9158b63b546e
 
 **Broker restart**
 
-![Broker restart](_images/kafka_replication_intermediate_animation_3_broker-restart.gif)
+https://github.com/user-attachments/assets/9cd92a8f-14ad-4276-a6d0-36d7ec6eda7d
 
 In both variants the watermark sticks while broker 2 still counts as in sync and jumps when it leaves. A stopped broker loses its place as soon as the controller sees it gone; a slow one keeps it until the lag timer, shortened to 1.5 seconds here, runs out, because until then a slow fetcher looks like a healthy one.
 
@@ -259,11 +257,11 @@ Broker 1 rejoins as a follower while broker 2 keeps leading, so after a few rest
 
 **Broker 2 out of sync**
 
-![Broker 2 out of sync](_images/kafka_replication_intermediate_animation_4_broker-2-out-of-sync.gif)
+https://github.com/user-attachments/assets/fa5c1584-d043-4b28-9ba4-ba1b21aad370
 
 **Both followers in sync**
 
-![Both followers in sync](_images/kafka_replication_intermediate_animation_4_both-followers-in-sync.gif)
+https://github.com/user-attachments/assets/842b4d9b-013c-4a7e-ad9a-b32866d874c6
 
 The replica list is 0, 2, 1. With both followers keeping up, broker 2 takes over because it comes first. In the slow variant, strike after the leader has removed broker 2 and the controller skips it for broker 1; strike before the removal and broker 2, still in sync, leads, holding everything readers were given because the mark was pinned to its progress. Broker 0 returns as a follower.
 

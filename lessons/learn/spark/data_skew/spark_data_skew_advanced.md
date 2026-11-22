@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 15 challenges
-
 # Data Skew: Advanced
 
 It is the night before Spotify Wrapped, and the job that joins a year of plays to artist metadata has run 6 hours. Of its 4,000 tasks, 3,999 finished in under 2 minutes. The last one holds every play of the year's biggest artist, and Spark's built-in skew fix never fired. Before the slides go live, you decide which technique takes over.

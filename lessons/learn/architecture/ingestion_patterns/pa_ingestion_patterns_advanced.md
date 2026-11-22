@@ -1,5 +1,3 @@
-Advanced·Pipeline Architecture · 38 min · 11 challenges
-
 # Ingestion Patterns: Advanced
 
 Noon on Black Friday at Shopify: a celebrity sneaker drop opens and orders pour into a shared database. The event pipeline must copy those orders out without slowing checkout, hand every order to shipping even if the broker blinks, swallow a surge it can't stop, and keep every other merchant's data flowing while a single storefront eats the capacity.
@@ -111,11 +109,11 @@ The transactional outbox moves the second write into the first system. Checkout 
 
 **Dual write**
 
-![Dual write](_images/pa_ingestion_patterns_advanced_animation_1_dual-write.gif)
+https://github.com/user-attachments/assets/b2342a39-ae69-465c-963b-49885c9e430b
 
 **Transactional outbox**
 
-![Transactional outbox](_images/pa_ingestion_patterns_advanced_animation_1_transactional-outbox.gif)
+https://github.com/user-attachments/assets/218ed9bc-ace6-4662-aea9-2b857b3c862f
 
 In the dual-write variant, the order at second 3 arrives while the broker is down: its row commits but its publish fails, so shipping never hears of it. In the outbox variant, rows written during the outage wait in the table. Then the publisher crashes after sending 103 and before marking it, so its next run sends 103 again, and shipping dedupes on the outbox id to create 1 shipment. The outbox turns maybe-never into at-least-once; consumer dedupe makes it effectively-once.
 

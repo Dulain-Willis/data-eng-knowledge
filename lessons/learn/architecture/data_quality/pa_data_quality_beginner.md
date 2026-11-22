@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 25 min · 11 challenges
-
 # Data Quality: Beginner
 
 Picture Airbnb's nightly bookings pipeline finishing at 04:00 with every task green. By 09:00 a product manager is celebrating a 40% jump in Paris reservations. The jump came from a retried load that wrote each booking twice. Nothing failed, nothing paged anyone, and the chart was wrong. This lesson is about the check that would have stopped that run at 04:01, before the chart ever drew.
@@ -302,11 +300,11 @@ The animation below runs the same gate both ways. `orders_staging` holds 4 rows 
 
 **Block**
 
-![Block](_images/pa_data_quality_beginner_animation_1_block.gif)
+https://github.com/user-attachments/assets/5df850c1-ec16-484f-becf-90c0c53011f8
 
 **Warn**
 
-![Warn](_images/pa_data_quality_beginner_animation_1_warn.gif)
+https://github.com/user-attachments/assets/7b77965f-f209-4995-bc10-d34866fd4856
 
 Under Block, the uniqueness check fails at 06:01, `publish_orders` never runs, and the dashboard keeps showing $480 from the 24 April partition, with its date. The number is a day old and correct. Under Warn, a message goes to the channel, `publish_orders` overwrites `fct_orders` with all 4 rows, and the dashboard shows $550. The true figure for 25 April is $415. The duplicate added $135 to revenue, and the only trace of it is a message in a channel at 06:01.
 

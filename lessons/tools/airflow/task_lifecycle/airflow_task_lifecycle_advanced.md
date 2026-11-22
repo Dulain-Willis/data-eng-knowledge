@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Task Lifecycle: Advanced
 
 Airflow began at Airbnb in 2014. This lesson follows a hypothetical nightly pricing run there: it spins up a scratch cluster, pulls listings from a rate-limited service, waits for an analyst to sign off, and must publish before a 07:00 dashboard. Tonight the pull hits its limit at 03:10 and a worker pod dies mid-load. Each event leaves a different trace in the grid, and this lesson reads each one.
@@ -136,11 +134,11 @@ Play the night below. A manual trigger at 02:02 creates the run; `create_tmp` ru
 
 **load_orders fails**
 
-![load_orders fails](_images/airflow_task_lifecycle_advanced_animation_1_load-orders-fails.gif)
+https://github.com/user-attachments/assets/dbba6082-6df4-4f2a-8cfb-30f9f715f4d7
 
 **load_orders succeeds**
 
-![load_orders succeeds](_images/airflow_task_lifecycle_advanced_animation_1_load-orders-succeeds.gif)
+https://github.com/user-attachments/assets/c6701868-ec22-42c7-a721-20dac9be5a19
 
 | What fails | load_orders | aggregate | drop_tmp | Run |
 | --- | --- | --- | --- | --- |

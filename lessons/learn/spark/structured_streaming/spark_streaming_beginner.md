@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 13 challenges
-
 # Structured Streaming: Beginner
 
 At 11:58 pm on New Year's Eve, ride requests flood Uber's app from San Francisco's SoMa district. Surge pricing for each zone is only as good as the request counts behind it: a count that lands 10 minutes late prices a crowd that has already gone home. Here is how Spark keeps that count current, one small batch at a time, and what makes it fast or cheap.

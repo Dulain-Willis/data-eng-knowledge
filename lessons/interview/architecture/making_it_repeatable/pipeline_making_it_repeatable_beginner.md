@@ -1,5 +1,3 @@
-Beginner·Pipeline Architecture · 20 min · 4 challenges
-
 # Making It Repeatable: Beginner
 
 Ines is 40 minutes into her data engineering loop at Airbnb, the company whose data team open-sourced a workflow orchestrator now used across the industry. On the shared screen are 5 boxes: pull yesterday's bookings, load them raw, build a nightly revenue table, check it, refresh the finance dashboard. "Right now these are separate cron jobs at fixed times," the interviewer says. "Last Tuesday the load ran long, the revenue job started on schedule anyway, and finance saw half a day of bookings. Someone reran it by hand and revenue doubled. Then a fix shipped straight to production and broke the dashboard for a morning. How would you make this repeatable?" Ines recognizes the pattern under the story: order tasks by data readiness, make every rerun safe, and give changes a path to production that catches mistakes first.

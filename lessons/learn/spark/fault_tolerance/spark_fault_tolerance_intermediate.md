@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 17 challenges
-
 # Fault Tolerance: Intermediate
 
 Say the nightly Spark job at Airbnb totals yesterday's bookings per host into a payouts table that finance reads at 6am. At 02:40 its driver runs out of memory mid-write and the job fails. The on-call engineer presses rerun. Whether a host ends up paid twice or only partly depends on how that job commits files and replaces partitions, and on how it merges changes when its work is replayed.

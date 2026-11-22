@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 27 min · 12 challenges
-
 # Event Streams
 
 An Uber rider taps request at 8:02, a driver accepts at 8:03, the car arrives at 8:09, the trip ends at 8:31, and a tip lands 4 hours later from a phone that was offline in a tunnel. Pricing, driver pay, fraud checks and the receipt all read the same sequence of facts. A trip is a history, and this lesson shows how to model one.

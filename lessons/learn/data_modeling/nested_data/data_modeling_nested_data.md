@@ -1,5 +1,3 @@
-Intermediate·Data Modeling · 15 min · 12 challenges
-
 # Nested Data
 
 An Airbnb listing page shows a host, a location and a checklist of amenities: wifi, kitchen, free parking, 23 items on one listing and 4 on the next. A guest filters on 'has a dishwasher' and expects results in under a second. Whether those amenities live inside the listing row or in a table of their own decides how that filter runs and how the search index is rebuilt.

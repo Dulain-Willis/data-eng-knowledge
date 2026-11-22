@@ -1,5 +1,3 @@
-Advanced·Spark · 14 min · 13 challenges
-
 # Cluster Sizing: Advanced
 
 Take the 2 a.m. job at Netflix that rebuilds every member's viewing history: it must land within 45 minutes, before morning dashboards read it. It runs on cheap spot nodes and grows from 2 executors to 50 in seconds. At 2:20 the cloud reclaims a node holding shuffle files its last stage needs. Whether the job finishes, and what each run costs, was decided in its config before it started.

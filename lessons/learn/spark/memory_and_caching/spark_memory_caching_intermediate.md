@@ -1,5 +1,3 @@
-Intermediate·Spark · 14 min · 16 challenges
-
 # Memory and Caching: Intermediate
 
 Uber's nightly trip pipeline joins a week of rides to driver records, caches the result, and feeds 3 fare reports. Tonight 2 executors vanish mid-join with exit code 137, while their heaps sit half empty and no OutOfMemoryError appears anywhere. Raise the heap, raise the overhead, or drop the cache? Picking right depends on knowing which slice of executor memory actually ran out.

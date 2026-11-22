@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 6 challenges
-
 # Consumer Groups: Intermediate
 
 At Uber, a consumer group reads completed trips from a topic and writes each driver's earnings to a ledger. One night a deploy restarts every member of the group at once. By morning, 1,400 drivers are missing a trip and 300 others were paid twice. Which trips vanished, which repeated, and which setting decided each outcome is what this lesson works out.
@@ -120,12 +118,11 @@ Every row of that table is a repeat or a no-op, and none is a loss. Committing a
 
 **Commit before the work**
 
-![Commit before the work](_images/kafka_consumer_groups_intermediate_animation_1_commit-before-the-work.gif)
+https://github.com/user-attachments/assets/c12a7c16-cd23-4081-a127-d428693b771a
 
 **Commit after the write**
 
-![Commit after the write](_images/kafka_consumer_groups_intermediate_animation_1_commit-after-the-write.gif)
-
+https://github.com/user-attachments/assets/9fb7b30e-5f0a-46f9-a23a-ce5ab7068a4f
 
 <br>
 
@@ -200,11 +197,11 @@ The consumer gives your code a place to act before the handover. Pass a `Consume
 
 **c1 commits after each write**
 
-![c1 commits after each write](_images/kafka_consumer_groups_intermediate_animation_2_c1-commits-after-each-write.gif)
+https://github.com/user-attachments/assets/c3494aaf-c9c1-4f16-9814-a900aa8a1992
 
 **c1 never commits**
 
-![c1 never commits](_images/kafka_consumer_groups_intermediate_animation_2_c1-never-commits.gif)
+https://github.com/user-attachments/assets/34cdc4d7-4c9d-4878-a64d-6c26cfc12ac1
 
 With auto-commit on, the consumer commits the position itself before rejoining. That is the third commit moment from the first section, and it carries the same blind spot: the position, not the finished line. A rebalance that arrives with an unprocessed batch sitting in a worker pool commits that batch as done, and the new owner skips it.
 
@@ -277,11 +274,11 @@ There are 3 fixes, listed in the order to try them. Lower `max.poll.records`, so
 
 **c1 takes 3 s a batch**
 
-![c1 takes 3 s a batch](_images/kafka_consumer_groups_intermediate_animation_3_c1-takes-3-s-a-batch.gif)
+https://github.com/user-attachments/assets/8cd8d3d6-eecc-4091-b527-3c7f7d8647ed
 
 **c1 takes 0.3 s a batch**
 
-![c1 takes 0.3 s a batch](_images/kafka_consumer_groups_intermediate_animation_3_c1-takes-0-3-s-a-batch.gif)
+https://github.com/user-attachments/assets/8a3939ce-ab37-4b98-bb9e-1709f0314284
 
 - Log line to watch: a CommitFailedException whose message names a rebalance
 - Metric to watch: the group's rebalance rate, and lag rising on every partition together
@@ -341,11 +338,11 @@ That sink made the replay safe because an upsert by product id is idempotent, th
 
 **No reset**
 
-![No reset](_images/kafka_consumer_groups_intermediate_animation_4_no-reset.gif)
+https://github.com/user-attachments/assets/76db860a-17f6-4738-bc15-ed5c91cc6c44
 
 **Reset to offset 1**
 
-![Reset to offset 1](_images/kafka_consumer_groups_intermediate_animation_4_reset-to-offset-1.gif)
+https://github.com/user-attachments/assets/7caf4ac8-91b6-4fb5-9877-1d99868ea0c2
 
 How far back you can go has 3 limits. Retention: an offset older than the partition's first offset no longer exists, so the tool warns and uses the first offset instead. Compaction: on a compacted topic, older values that compaction has already removed are gone, so the cleaned part of the log replays as the latest value per key, while the recent part not yet cleaned still holds every version; a replay there rebuilds current state and can't be relied on for history. Lag: the instant the group starts, its lag equals the size of the window, 13,040 records in the tables above, and an alert set on lag fires until the group catches up.
 

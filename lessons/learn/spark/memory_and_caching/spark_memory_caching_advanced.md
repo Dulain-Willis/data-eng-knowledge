@@ -1,5 +1,3 @@
-Advanced·Spark · 15 min · 15 challenges
-
 # Memory and Caching: Advanced
 
 It is 3 a.m. at Uber, and a nightly surge-pricing feature job has died for the third time. One stage spends 40% of its task time collecting garbage, the cached trips table has fallen to 61% in memory without a single error, and the latest executors vanished with exit code 137 and no stack trace. Which memory region failed decides which fix ships before the morning model refresh.

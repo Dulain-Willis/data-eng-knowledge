@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/airflow.svg)](https://airflow.apache.org/)·20 min · 7 challenges
-
 # Scheduling: Advanced
 
 Shopify shows a live globe of sales every Black Friday Cyber Monday weekend, Friday through Monday. This lesson builds the batch pipeline behind a globe like it in Airflow. Regional checkout files land at unpredictable minutes, the weekend's summary windows follow a retail calendar, a running total must never count an hour twice, and a mid-weekend schedule change must not drop an hour. Each is a scheduling decision.
@@ -26,12 +24,11 @@ When `land` reaches success, Airflow writes an asset event: the asset, the insta
 
 **Landing succeeds every hour**
 
-![Landing succeeds every hour](_images/airflow_scheduling_advanced_animation_1_landing-succeeds-every-hour.gif)
+https://github.com/user-attachments/assets/8d6f1e35-5d24-4497-a47c-df5fc07b2bad
 
 **Landing fails at 02:00**
 
-![Landing fails at 02:00](_images/airflow_scheduling_advanced_animation_1_landing-fails-at-02-00.gif)
-
+https://github.com/user-attachments/assets/8724214d-f92b-4136-900b-84a16190d1fb
 
 <br>
 
@@ -354,11 +351,11 @@ depends_on_past=True is a task setting, set on 1 task or through default_args fo
 
 **depends_on_past=True**
 
-![depends_on_past=True](_images/airflow_scheduling_advanced_animation_2_depends-on-past-true.gif)
+https://github.com/user-attachments/assets/32820c8f-4a29-4bac-af6a-4ce636dfe3ac
 
 **depends_on_past=False**
 
-![depends_on_past=False](_images/airflow_scheduling_advanced_animation_2_depends-on-past-false.gif)
+https://github.com/user-attachments/assets/89fdcfb6-cf1a-49a7-a3f9-c067d88c34ed
 
 | Run (logical date) | Created at | extract | rollup | Run state |
 | --- | --- | --- | --- | --- |

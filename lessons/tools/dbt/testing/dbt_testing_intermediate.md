@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 8 challenges
-
 # Testing: Intermediate
 
 Shopify pays its merchants through Shopify Payments, which sends each one a regular payout. Take the dbt project behind a payouts model like `fct_payouts`. In one nightly build, a test finds 14 order lines whose refund exceeds the line's total. Stop the build and every merchant's payout runs late; let it finish and 14 merchants are paid the wrong amount. The test's severity decides which.
@@ -70,11 +68,11 @@ The animation below builds `stg_orders` and `fct_orders` from the same 5 raw row
 
 **severity: warn**
 
-![severity: warn](_images/dbt_testing_intermediate_animation_1_severity-warn.gif)
+https://github.com/user-attachments/assets/068cbe46-41c4-44c6-af1a-1ac0221dd10c
 
 **severity: error**
 
-![severity: error](_images/dbt_testing_intermediate_animation_1_severity-error.gif)
+https://github.com/user-attachments/assets/694dc0ab-9572-433f-b887-3eb703d6474c
 
 *$ dbt build*
 

@@ -1,5 +1,3 @@
-Advanced·[![](../../tool-marks/kafka.png)](https://kafka.apache.org/)·20 min · 7 challenges
-
 # Consumer Groups: Advanced
 
 Take one consumer group behind Shopify's checkout on Black Friday: 48 pods reading the orders topic, and a deploy restarts them 4 at a time. If every restart stops all 48 for a rebalance, orders back up at least 12 times before the rollout finishes. Whether each stop lasts seconds or never happens comes down to the rebalance protocol, how a restarted pod rejoins, and the timeouts around both.
@@ -69,12 +67,11 @@ The animation plays the eager protocol under the range assignor: c1 reads 3 part
 
 **c2 joins at 3 s**
 
-![c2 joins at 3 s](_images/kafka_consumer_groups_advanced_animation_1_c2-joins-at-3-s.gif)
+https://github.com/user-attachments/assets/830a8ab2-6f42-4247-9b64-3e391a03105d
 
 **c1 alone**
 
-![c1 alone](_images/kafka_consumer_groups_advanced_animation_1_c1-alone.gif)
-
+https://github.com/user-attachments/assets/f9d26cd8-c822-4aaf-b0fb-90d920c9ac3c
 
 <br>
 
@@ -213,12 +210,11 @@ Both variants run c1 and c2 as static members with a 6 s session timeout, and bo
 
 **back at 5 s**
 
-![back at 5 s](_images/kafka_consumer_groups_advanced_animation_2_back-at-5-s.gif)
+https://github.com/user-attachments/assets/c4cfd3b4-3a74-46fe-9727-09718ca9fe85
 
 **never back**
 
-![never back](_images/kafka_consumer_groups_advanced_animation_2_never-back.gif)
-
+https://github.com/user-attachments/assets/516113b6-b3cc-4b67-a3a9-e5c041a44503
 
 <br>
 

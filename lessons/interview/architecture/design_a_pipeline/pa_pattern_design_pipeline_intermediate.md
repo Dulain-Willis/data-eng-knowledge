@@ -1,5 +1,3 @@
-Intermediate·Pipeline Architecture · 20 min · 4 challenges
-
 # Design a Pipeline: Intermediate
 
 You are 20 minutes into the design round at a food delivery marketplace.

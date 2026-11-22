@@ -1,5 +1,3 @@
-Intermediate·[![](../../tool-marks/dbt.png)](https://www.getdbt.com/)·20 min · 11 challenges
-
 # Jinja and Macros: Intermediate
 
 GitLab publishes its whole dbt project in the open, macros folder included. Picture a week there in which 2 revenue reports disagree by cents on the same orders, because 6 models each convert cents to dollars with their own rounding. One macro gives all 6 the same arithmetic, a test written once guards every amount column, and a variable picks the quarter to rebuild.
@@ -68,11 +66,11 @@ The override is written at the call, in the one model whose column needs it, so 
 
 **places=2**
 
-![places=2](_images/dbt_jinja_and_macros_intermediate_animation_1_places-2.gif)
+https://github.com/user-attachments/assets/5bf7a3db-5d00-4d50-9377-05dcabd646e6
 
 **places=0**
 
-![places=0](_images/dbt_jinja_and_macros_intermediate_animation_1_places-0.gif)
+https://github.com/user-attachments/assets/e1d50028-2d3e-45f2-887a-bd3d990f3b55
 
 *$ dbt run*
 

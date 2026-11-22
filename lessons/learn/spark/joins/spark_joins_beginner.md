@@ -1,5 +1,3 @@
-Beginner·Spark · 13 min · 17 challenges
-
 # Joins: Beginner
 
 At Spotify, a data engineer builds Brazil's daily top artists by joining a day of stream events to a lookup of the few thousand artists eligible for the chart. The events table is vast; the lookup is a few MB. Written one way, the job pushes every event across the cluster and runs for an hour. Written another, it ships the lookup to each executor and the events never move.
