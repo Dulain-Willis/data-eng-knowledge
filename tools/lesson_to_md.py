@@ -1750,6 +1750,14 @@ def record_bar_animation(browser, url, k, m, label, dest, box_css):
             pause = block.locator('button[aria-label="Pause"]')
             if pause.count():
                 pause.first.click()
+            for _ in range(6):  # the pause can land after step 2 has begun: step back to 1
+                page.wait_for_timeout(300)
+                cur = block.evaluate(_BAR_GEOM_JS)
+                if not cur or cur["text"].startswith("1/"):
+                    break
+                block.locator('button[aria-label="Previous step"]').first.click()
+            else:
+                raise RuntimeError("could not hold the player at step 1")
             page.wait_for_timeout(2000)
         if (m > 0 or (btype == "python_animation" and m == 0)) and play.count():  # a switched mode starts paused: the playback starts at this click
             play.first.click()
