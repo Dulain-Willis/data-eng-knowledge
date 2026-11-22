@@ -101,25 +101,64 @@ The key plan appears twice, so SPLIT_TO_MAP rejects the input and the whole quer
 
 </details>
 
-Spacing causes the quietest failures. Hand-written log lines often put a space after each `;`, and the split keeps that space as part of the next key. Run each tab against the same 2 lines:
+Spacing causes the quietest failures. Hand-written log lines often put a space after each `;`, and the split keeps that space as part of the next key. Run each version against the same 2 lines:
+
+**Raw ;**
 
 Splitting on ';' leaves the following space at the front of every later key, so this read has to ask for ' status', space first.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | line_id, |
-|  | SPLIT_TO_MAP(line, ';', '=')[' status'] AS status |
-|  | FROM app_log |
+```sql
+SELECT
+  line_id,
+  SPLIT_TO_MAP(line, ';', '=')[' status'] AS status
+FROM app_log
+```
 
-Result
+Result:
 
-| line_id | status |
-| --- | --- |
-| 1 | 502 |
-| 2 | 200 |
+```
+line_id | status
+1 | 502
+2 | 200
+```
 
-2 rows
+**REPLACE**
+
+REPLACE turns every '; ' into ';' before the split, so the keys come out clean and ['status'] works.
+
+```sql
+SELECT
+  line_id,
+  SPLIT_TO_MAP(REPLACE(line, '; ', ';'), ';', '=')['status'] AS status
+FROM app_log
+```
+
+Result:
+
+```
+line_id | status
+1 | 502
+2 | 200
+```
+
+**Wider delim**
+
+A delimiter can be several characters long. Splitting on '; ' works while every line puts exactly 1 space after each semicolon.
+
+```sql
+SELECT
+  line_id,
+  SPLIT_TO_MAP(line, '; ', '=')['status'] AS status
+FROM app_log
+```
+
+Result:
+
+```
+line_id | status
+1 | 502
+2 | 200
+```
 
 Whichever version the data calls for, the arguments keep their jobs: the text first, then the delimiter between entries, then the one between each key and its value. Swapping the last 2 on `'page=2&size=50'` makes it split on `=` instead. Ahead of `2&size` and `50` comes the entry `page`, which holds no `&`, so the query fails. Every value still comes back as VARCHAR, so a number read from the map needs a CAST before any arithmetic.
 
@@ -411,26 +450,67 @@ Read `hello_hex` 2 digits at a time. The first digit of a pair counts 16s, the s
 
 ### Comparing digests when the case differs
 
-A hash function such as `SHA256(bytes)` returns its digest as 32 bytes of VARBINARY. Raw bytes cannot sit safely in a header or a JSON field, as the Base64 section showed, and a text column has the same limit, so senders write those 32 bytes out as 64 hex characters, and that text is what you end up comparing against. Many senders write it in lowercase, while TO_HEX writes uppercase, and a plain string comparison fails on every row even when the bytes agree. In the switcher, `computed_hex` is your side's TO_HEX output for each event's SHA-256 digest, `sent_digest` is the partner's lowercase copy, and each tab checks them a different way.
+A hash function such as `SHA256(bytes)` returns its digest as 32 bytes of VARBINARY. Raw bytes cannot sit safely in a header or a JSON field, as the Base64 section showed, and a text column has the same limit, so senders write those 32 bytes out as 64 hex characters, and that text is what you end up comparing against. Many senders write it in lowercase, while TO_HEX writes uppercase, and a plain string comparison fails on every row even when the bytes agree. In the examples, `computed_hex` is your side's TO_HEX output for each event's SHA-256 digest, `sent_digest` is the partner's lowercase copy, and each version checks them a different way.
+
+**String =**
 
 Comparing the uppercase TO_HEX output with the lowercase text returns false for both rows, although the 2 digests describe identical bytes.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | event_id, |
-|  | LENGTH(sent_digest) AS hex_chars, |
-|  | computed_hex = sent_digest AS digest_matches |
-|  | FROM signatures |
+```sql
+SELECT
+  event_id,
+  LENGTH(sent_digest) AS hex_chars,
+  computed_hex = sent_digest AS digest_matches
+FROM signatures
+```
 
-Result
+Result:
 
-| event_id | hex_chars | digest_matches |
-| --- | --- | --- |
-| evt_101 | 64 | 0 |
-| evt_102 | 64 | 0 |
+```
+event_id | hex_chars | digest_matches
+evt_101 | 64 | 0
+evt_102 | 64 | 0
+```
 
-2 rows
+**LOWER**
+
+Lowercasing the computed side puts both strings in the same case, and the comparison holds.
+
+```sql
+SELECT
+  event_id,
+  LENGTH(sent_digest) AS hex_chars,
+  LOWER(computed_hex) = sent_digest AS digest_matches
+FROM signatures
+```
+
+Result:
+
+```
+event_id | hex_chars | digest_matches
+evt_101 | 64 | 1
+evt_102 | 64 | 1
+```
+
+**Bytes =**
+
+FROM_HEX turns both texts back into bytes and compares those, so case stops mattering. Against a live hash, the right side is the SHA256 output itself.
+
+```sql
+SELECT
+  event_id,
+  LENGTH(sent_digest) AS hex_chars,
+  FROM_HEX(sent_digest) = FROM_HEX(computed_hex) AS digest_matches
+FROM signatures
+```
+
+Result:
+
+```
+event_id | hex_chars | digest_matches
+evt_101 | 64 | 1
+evt_102 | 64 | 1
+```
 
 | ✓ Base64 | ✗ Hex |
 | --- | --- |
