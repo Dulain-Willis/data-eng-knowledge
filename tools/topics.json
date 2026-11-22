@@ -113,5 +113,19 @@
   "sql_pattern_string_manipulation": "interview/sql/string_manipulation",
   "sql_pattern_deduplication": "interview/sql/deduplication",
   "sql_pattern_type_casting": "interview/sql/type_casting",
-  "sql_pattern_semi_structured": "interview/sql/semi_structured_data"
+  "sql_pattern_semi_structured": "interview/sql/semi_structured_data",
+  "python_foundations": "learn/python/foundations",
+  "python_expressions": "learn/python/expressions",
+  "python_control_flow": "learn/python/control_flow",
+  "python_loops": "learn/python/loops",
+  "python_functions": "learn/python/functions",
+  "python_strings": "learn/python/strings",
+  "python_lists": "learn/python/lists",
+  "python_dictionaries": "learn/python/dictionaries",
+  "python_sets": "learn/python/sets",
+  "python_collections": "learn/python/collections",
+  "python_data_structures": "learn/python/data_structures",
+  "python_problem_solving": "learn/python/problem_solving",
+  "python_complexity": "learn/python/complexity",
+  "python_functional": "learn/python/functional_programming"
 }
