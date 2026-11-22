@@ -63,5 +63,34 @@
   "python_problem_solving_advanced": [
     "Capstone: the fullest gap",
     "This one combines 3 patterns: sort the input, walk 2"
+  ],
+  "_comment_sql_learn": "Learn SQL drops (tile puzzles and their intro/explanation blocks, from HANDOFF.md section 6). Prefixes are the block text as the converter sees it (inline code gets a space around it). Sentence-level trims of 'mixed' paragraphs are hand edits, not here.",
+  "window_functions_beginner": [
+    "The practice table employees in the platform",
+    "Among the distractors, ORDER BY department runs",
+    "The blanks below ask for that shape on the practice",
+    "Every distractor runs. ORDER BY salary gives a",
+    "The puzzle below is the inner query, split into"
+  ],
+  "joins_beginner": [
+    "The correct tile matches the item's product_id to",
+    "The ON tile holds the pairing condition and the"
+  ],
+  "query_structure_advanced": [
+    "Drill: expand the features",
+    "The drill hands over an accounts table with a",
+    "Assemble the subtraction"
+  ],
+  "string_functions_beginner": [
+    "Put the duplicate finder together yourself. The"
+  ],
+  "data_types_beginner": [
+    "The same query, descending, assembled from tiles."
+  ],
+  "aggregating_beginner": [
+    "The leftover tile, WHERE COUNT ( * ) > 2 , is the"
+  ],
+  "filtering_beginner": [
+    "The order that holds the query together is SELECT ,"
   ]
 }
