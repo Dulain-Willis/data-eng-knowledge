@@ -51,7 +51,7 @@ def frames(path):
 def counter_box(fr, H):
     """Rows (first, last) and first column of the counter text, or None. The counter is the only bright text
     near x 1455..1510 with empty margins left and right of it (page text runs across the whole width)."""
-    ys = [y for y in range(max(H - 300, 0), H) if max(fr[y * W + 1455:y * W + 1510]) > 70]
+    ys = [y for y in range(max(H - 700, 0), H) if max(fr[y * W + 1455:y * W + 1510]) > 70]
     runs = []
     for y in ys:
         if runs and y == runs[-1][-1] + 1:
@@ -59,7 +59,7 @@ def counter_box(fr, H):
         else:
             runs.append([y])
     for r in runs:
-        if all(max(fr[y * W + 1440:y * W + 1453]) <= 70 and max(fr[y * W + 1510:y * W + 1514]) <= 70 for y in r):
+        if 8 <= len(r) <= 15 and all(max(fr[y * W + 1440:y * W + 1453]) <= 70 and max(fr[y * W + 1510:y * W + 1514]) <= 70 for y in r):
             x0 = next(x for x in range(1455, 1510) if max(fr[y * W + x] for y in r) > 60)
             return r[0], r[-1], x0
     return None
