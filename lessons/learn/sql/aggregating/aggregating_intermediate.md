@@ -20,30 +20,71 @@ There are 2 families of expression in a SELECT list, and the family decides how 
 
 ### Where the collapse happens
 
-GROUP BY sets how many rows survive: 1 per distinct combination of the grouped columns, which is why 6 orders from 3 customers group into 3 rows. With no GROUP BY, a single aggregate in the SELECT list collapses the whole table into exactly 1 row, even an empty table, where COUNT(\*) returns 0 on its 1 row. If a query has neither a GROUP BY nor an aggregate, no rows collapse and the row count is whatever WHERE let through. The 3 tabs below run on the same 6 orders. Only the first keeps all 6, and the other 2 come back with 1 row and 3 rows.
+GROUP BY sets how many rows survive: 1 per distinct combination of the grouped columns, which is why 6 orders from 3 customers group into 3 rows. With no GROUP BY, a single aggregate in the SELECT list collapses the whole table into exactly 1 row, even an empty table, where COUNT(\*) returns 0 on its 1 row. If a query has neither a GROUP BY nor an aggregate, no rows collapse and the row count is whatever WHERE let through. The 3 versions below run on the same 6 orders. Only the first keeps all 6, and the other 2 come back with 1 row and 3 rows.
+
+**Row-level**
 
 amount + 5 runs on each of the 6 orders, so 6 rows come back, 1 per order.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | order_id, |
-|  | amount, |
-|  | amount + 5 AS amount_with_fee |
-|  | FROM orders |
+```sql
+SELECT
+  order_id,
+  amount,
+  amount + 5 AS amount_with_fee
+FROM orders
+```
 
-Result
+Result:
 
-| order_id | amount | amount_with_fee |
-| --- | --- | --- |
-| 1 | 120 | 125 |
-| 2 | 80 | 85 |
-| 3 | 60 | 65 |
-| 4 | 300 | 305 |
-| 5 | 40 | 45 |
-| 6 | 90 | 95 |
+```
+order_id | amount | amount_with_fee
+1 | 120 | 125
+2 | 80 | 85
+3 | 60 | 65
+4 | 300 | 305
+5 | 40 | 45
+6 | 90 | 95
+```
 
-6 rows
+**Aggregate**
+
+COUNT and SUM fold all 6 orders into a single row: 6 orders worth 690.
+
+```sql
+SELECT
+  COUNT(*) AS order_count,
+  SUM(amount) AS total
+FROM orders
+```
+
+Result:
+
+```
+order_count | total
+6 | 690
+```
+
+**Grouped**
+
+GROUP BY customer_id folds the 6 orders into 3 rows, 1 per customer.
+
+```sql
+SELECT
+  customer_id,
+  COUNT(*) AS order_count,
+  SUM(amount) AS total
+FROM orders
+GROUP BY customer_id
+```
+
+Result:
+
+```
+customer_id | order_count | total
+C1 | 3 | 270
+C2 | 2 | 120
+C3 | 1 | 300
+```
 
 
 <br>
@@ -253,26 +294,71 @@ A single longest run is a noisy clue: 1 lucky hash with 20 leading zeros would s
 
 A standard error is a band, and around 2 estimates in 3 land inside it; almost all land within 3 bands. With the default on a true count of 50 million listeners, 2 runs in 3 return a figure within about 1.15 million of the truth, and a result off by more than 3.5 million would be rare. An optional second argument sets the band you will accept, and a smaller band costs a sketch with more buckets, still kilobytes, so tightening is cheap down to the lowest value the engine allows.
 
+**Exact**
+
 COUNT(DISTINCT) builds a set of user ids per artist and returns 4 listeners for Bolt, 3 for Aria and 2 for Cove.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | artist, |
-|  | COUNT(DISTINCT user_id) AS listeners |
-|  | FROM streams |
-|  | GROUP BY artist |
-|  | ORDER BY listeners DESC |
+```sql
+SELECT
+  artist,
+  COUNT(DISTINCT user_id) AS listeners
+FROM streams
+GROUP BY artist
+ORDER BY listeners DESC
+```
 
-Result
+Result:
 
-| artist | listeners |
-| --- | --- |
-| Bolt | 4 |
-| Aria | 3 |
-| Cove | 2 |
+```
+artist | listeners
+Bolt | 4
+Aria | 3
+Cove | 2
+```
 
-3 rows
+**Approximate**
+
+APPROX_DISTINCT builds a sketch per artist instead; on 12 rows it lands on the same 4, 3 and 2.
+
+```sql
+SELECT
+  artist,
+  APPROX_DISTINCT(user_id) AS listeners
+FROM streams
+GROUP BY artist
+ORDER BY listeners DESC
+```
+
+Result:
+
+```
+artist | listeners
+Bolt | 4
+Aria | 3
+Cove | 2
+```
+
+**Tighter**
+
+A second argument of 0.01 asks for a 1% standard error, which buys a larger sketch and the same answer here.
+
+```sql
+SELECT
+  artist,
+  APPROX_DISTINCT(user_id, 0.01) AS listeners
+FROM streams
+GROUP BY artist
+ORDER BY listeners DESC
+```
+
+Result:
+
+```
+artist | listeners
+Bolt | 4
+Aria | 3
+Cove | 2
+```
 
 | ✓ Do | ✗ Don't |
 | --- | --- |
@@ -322,27 +408,96 @@ https://github.com/user-attachments/assets/22bd50b6-edd6-442b-a029-991a3aceec49
 
 You can sort by an alias, by the aggregate expression written again, by the position of the column in the SELECT list, or by an aggregate that the SELECT list doesn't show at all. All 4 produce the same order on the orders table. The alias reads best, the expression repeats itself but survives a renamed alias, the position breaks when someone reorders the SELECT list, and the unselected aggregate is for sorting by a figure you do not want to display.
 
+**Alias**
+
 ORDER BY the alias total_spent, which exists because SELECT runs before ORDER BY.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | customer_id, |
-|  | COUNT(\*) AS order_count, |
-|  | SUM(amount) AS total_spent |
-|  | FROM orders |
-|  | GROUP BY customer_id |
-|  | ORDER BY total_spent DESC |
+```sql
+SELECT
+  customer_id,
+  COUNT(*) AS order_count,
+  SUM(amount) AS total_spent
+FROM orders
+GROUP BY customer_id
+ORDER BY total_spent DESC
+```
 
-Result
+Result:
 
-| customer_id | order_count | total_spent |
-| --- | --- | --- |
-| C3 | 1 | 300 |
-| C1 | 3 | 270 |
-| C2 | 2 | 120 |
+```
+customer_id | order_count | total_spent
+C3 | 1 | 300
+C1 | 3 | 270
+C2 | 2 | 120
+```
 
-3 rows
+**Expression**
+
+ORDER BY SUM(amount) repeats the aggregate; the engine computes it once and reuses it.
+
+```sql
+SELECT
+  customer_id,
+  COUNT(*) AS order_count,
+  SUM(amount) AS total_spent
+FROM orders
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC
+```
+
+Result:
+
+```
+customer_id | order_count | total_spent
+C3 | 1 | 300
+C1 | 3 | 270
+C2 | 2 | 120
+```
+
+**Position**
+
+ORDER BY 3 names the third selected column, total_spent, by its position.
+
+```sql
+SELECT
+  customer_id,
+  COUNT(*) AS order_count,
+  SUM(amount) AS total_spent
+FROM orders
+GROUP BY customer_id
+ORDER BY 3 DESC
+```
+
+Result:
+
+```
+customer_id | order_count | total_spent
+C3 | 1 | 300
+C1 | 3 | 270
+C2 | 2 | 120
+```
+
+**Unselected**
+
+ORDER BY SUM(amount) sorts by a total the result never shows: C3, C1, C2 with only their counts.
+
+```sql
+SELECT
+  customer_id,
+  COUNT(*) AS order_count
+FROM orders
+GROUP BY customer_id
+ORDER BY SUM(amount) DESC
+```
+
+Result:
+
+```
+customer_id | order_count
+C3 | 1
+C1 | 3
+C2 | 2
+```
 
 *Position numbers refer to the SELECT list of the same query, so adding a column before total_spent silently changes what ORDER BY 3 sorts by.*
 

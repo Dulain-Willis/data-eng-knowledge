@@ -119,26 +119,73 @@ SUBSTR('beatbox.io', -2) returns io, the last 2 characters. SUBSTR('beatbox.io',
 
 ### 3 ways to take the last 4
 
-A payout export lists each artist's bank account, and the report may show only the last 4 characters. The switcher holds 3 versions of the same query. The first uses a negative start. The second computes the start from LENGTH: for a 22-character account, LENGTH minus 3 is 19, and positions 19 to 22 are the last 4. The third subtracts 4 instead of 3, the off-by-one that returns 5 characters; run it and count.
+A payout export lists each artist's bank account, and the report may show only the last 4 characters. The examples hold 3 versions of the same query. The first uses a negative start. The second computes the start from LENGTH: for a 22-character account, LENGTH minus 3 is 19, and positions 19 to 22 are the last 4. The third subtracts 4 instead of 3, the off-by-one that returns 5 characters; run it and count.
+
+**Negative**
 
 A negative start counts from the right end, so -4 lands on the fourth character from the end for every row regardless of its length.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | artist_name, |
-|  | CONCAT('\*\*\*\*', SUBSTR(bank_account, - 4)) AS masked_account |
-|  | FROM payouts |
+```sql
+SELECT
+  artist_name,
+  CONCAT('****', SUBSTR(bank_account, - 4)) AS masked_account
+FROM payouts
+```
 
-Result
+Result:
 
-| artist_name | masked_account |
-| --- | --- |
-| Low Tide | \*\*\*\*3000 |
-| Paper Moons | \*\*\*\*6819 |
-| Static Bloom | \*\*\*\*4300 |
+```
+artist_name | masked_account
+Low Tide | ****3000
+Paper Moons | ****6819
+Static Bloom | ****4300
+```
 
-3 rows
+**LENGTH math**
+
+LENGTH minus 3 is the position of the fourth character from the end, so this version returns the same 4 characters with more arithmetic.
+
+```sql
+SELECT
+  artist_name,
+  CONCAT(
+    '****',
+    SUBSTR(bank_account, LENGTH(bank_account) - 3)
+  ) AS masked_account
+FROM payouts
+```
+
+Result:
+
+```
+artist_name | masked_account
+Low Tide | ****3000
+Paper Moons | ****6819
+Static Bloom | ****4300
+```
+
+**Off by one**
+
+LENGTH minus 4 is the position of the fifth character from the end, so this version leaks one extra digit in every row.
+
+```sql
+SELECT
+  artist_name,
+  CONCAT(
+    '****',
+    SUBSTR(bank_account, LENGTH(bank_account) - 4)
+  ) AS masked_account
+FROM payouts
+```
+
+Result:
+
+```
+artist_name | masked_account
+Low Tide | ****13000
+Paper Moons | ****26819
+Static Bloom | ****64300
+```
 
 When the count is larger than what remains, SUBSTR hands back whatever is left, so `SUBSTR('LT', 1, 3)` is LT. For display that is harmless. For validation it hides a fault: a currency code that should read EUR arrives as EU, passes through every SUBSTR in the query, and nothing marks it short. LENGTH is the check when the length matters, and `WHERE LENGTH(currency_code) != 3` lists the short codes before any SUBSTR runs on them.
 
@@ -438,29 +485,53 @@ ORDER BY rows_found DESC
 
 ### Joins fail on the space you cannot see
 
-The artists table holds clean names, and the export's names carry stray spaces, so a join on the raw column pairs only the rows that happen to be clean. The switcher holds both versions. The raw join leaves 2 artists with NULL amounts, which a LEFT JOIN reveals and an INNER JOIN would drop without a word. Trimming the export side inside ON restores every pair.
+The artists table holds clean names, and the export's names carry stray spaces, so a join on the raw column pairs only the rows that happen to be clean. The examples hold both versions. The raw join leaves 2 artists with NULL amounts, which a LEFT JOIN reveals and an INNER JOIN would drop without a word. Trimming the export side inside ON restores every pair.
+
+**Raw join**
 
 Only Paper Moons matches, because its export name carries no extra space; the other 2 artists come back with NULL amounts.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | a.artist_name, |
-|  | r.amount |
-|  | FROM artists AS a |
-|  | LEFT JOIN royalty_rows AS r |
-|  | ON a.artist_name = r.artist_name |
-|  | ORDER BY a.artist_id |
+```sql
+SELECT
+  a.artist_name,
+  r.amount
+FROM artists AS a
+LEFT JOIN royalty_rows AS r
+  ON a.artist_name = r.artist_name
+ORDER BY a.artist_id
+```
 
-Result
+Result:
 
-| artist_name | amount |
-| --- | --- |
-| Low Tide | NULL |
-| Paper Moons | 980.5 |
-| Static Bloom | NULL |
+```
+artist_name | amount
+Low Tide | NULL
+Paper Moons | 980.5
+Static Bloom | NULL
+```
 
-3 rows
+**TRIM in ON**
+
+TRIM on the export side makes every name equal to its clean counterpart, and all 3 artists receive their amount.
+
+```sql
+SELECT
+  a.artist_name,
+  r.amount
+FROM artists AS a
+LEFT JOIN royalty_rows AS r
+  ON a.artist_name = TRIM(r.artist_name)
+ORDER BY a.artist_id
+```
+
+Result:
+
+```
+artist_name | amount
+Low Tide | 1250
+Paper Moons | 980.5
+Static Bloom | 12400.75
+```
 
 
 <br>

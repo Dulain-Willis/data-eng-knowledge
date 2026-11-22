@@ -124,25 +124,69 @@ Every column comes back NULL, which is how a result grid displays UNKNOWN. `NULL
 
 A `WHERE` clause lets a row through when its condition evaluates to TRUE. FALSE drops the row, and UNKNOWN drops it in exactly the same way. That second drop is silent: no error, no warning, the row is absent from the result and nothing says so. The store's `orders` table has 5 orders, and 2 of them, ORD-002 and ORD-004, have no region recorded because they came through a partner channel that does not send one. Three filters over that table show what the gaps do.
 
+**= 'US'**
+
 Orders whose region is US. Returns 2 rows, ORD-001 and ORD-005.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | order_id, |
-|  | amount, |
-|  | region |
-|  | FROM orders |
-|  | WHERE region = 'US' |
+```sql
+SELECT
+  order_id,
+  amount,
+  region
+FROM orders
+WHERE region = 'US'
+```
 
-Result
+Result:
 
-| order_id | amount | region |
-| --- | --- | --- |
-| ORD-001 | 100 | US |
-| ORD-005 | 250 | US |
+```
+order_id | amount | region
+ORD-001 | 100 | US
+ORD-005 | 250 | US
+```
 
-2 rows
+**<> 'US'**
+
+Orders whose region is anything other than US. Returns 1 row, ORD-003, the EU order. The 2 orders with no region do not count as other than US.
+
+```sql
+SELECT
+  order_id,
+  amount,
+  region
+FROM orders
+WHERE region <> 'US'
+```
+
+Result:
+
+```
+order_id | amount | region
+ORD-003 | 150 | EU
+```
+
+**both**
+
+Orders that are US or are not US. Returns 3 rows. ORD-002 and ORD-004 fail both halves, because UNKNOWN OR UNKNOWN is UNKNOWN.
+
+```sql
+SELECT
+  order_id,
+  amount,
+  region
+FROM orders
+WHERE region = 'US'
+  OR region <> 'US'
+```
+
+Result:
+
+```
+order_id | amount | region
+ORD-001 | 100 | US
+ORD-003 | 150 | EU
+ORD-005 | 250 | US
+```
 
 In a two-valued world, the third query would return every row: a value either equals US or it does not. SQL returns 3 of 5. The 2 orders without a region are excluded by `= 'US'`, excluded by `<> 'US'`, and excluded by the combination, because an UNKNOWN joined to an UNKNOWN with OR stays UNKNOWN. Those rows did not fail the test. They were never able to pass it.
 
@@ -382,23 +426,58 @@ Watching the sum accumulate shows the skip: 10 after ORD-001, nothing from ORD-0
 
 ### Two averages, one question
 
-The margin forecast from the intro failed on exactly this point. Finance asked for the average discount per order, meaning across every order placed. `AVG(discount)` answers a different question: the average discount among orders that had one. Both are legitimate figures, and the query has to be written for the one that was asked. The switcher runs both over the same 5 orders.
+The margin forecast from the intro failed on exactly this point. Finance asked for the average discount per order, meaning across every order placed. `AVG(discount)` answers a different question: the average discount among orders that had one. Both are legitimate figures, and the query has to be written for the one that was asked. The examples run both over the same 5 orders.
+
+**AVG**
 
 The average among orders that carry a discount. Divides 50 by 3 and returns 16.67.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | AVG(discount) AS avg_discount |
-|  | FROM orders |
+```sql
+SELECT
+  AVG(discount) AS avg_discount
+FROM orders
+```
 
-Result
+Result:
 
-| avg_discount |
-| --- |
-| 16.666666666666668 |
+```
+avg_discount
+16.666666666666668
+```
 
-1 row
+**SUM/COUNT(*)**
+
+The average across every order, with missing discounts counted as 0. Divides 50 by 5 and returns 10.
+
+```sql
+SELECT
+  1.0 * SUM(discount) / COUNT(*) AS avg_per_order
+FROM orders
+```
+
+Result:
+
+```
+avg_per_order
+10
+```
+
+**SUM/COUNT(x)**
+
+The same as AVG, written out. Divides 50 by COUNT(discount), which is 3, and returns 16.67. This is what AVG does internally.
+
+```sql
+SELECT
+  1.0 * SUM(discount) / COUNT(discount) AS avg_where_present
+FROM orders
+```
+
+Result:
+
+```
+avg_where_present
+16.666666666666668
+```
 
 The second form is the one the forecast needed, and it costs nothing extra: the sum is unchanged and the denominator switches to the row count. The choice between 16.67 and 10 is a business definition, so write the definition into the column name, `avg_discount_where_present` or `avg_discount_per_order`, and nobody downstream has to guess which question the number answers.
 

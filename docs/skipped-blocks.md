@@ -157,11 +157,11 @@ PED_TOOL_EXERCISES`) |
 
   Totals: 147 exercises left out, 130 animation blocks kept (129 MP4 videos and 1 still image: `sql_pattern_ctes_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, like the four Spark still-image cases).
   One sentence was trimmed by hand in the Markdown (not by the converter): in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. Re-running the converter on that lesson brings the clause back.
-- **Learn SQL exercises** (515 in 30 lessons, 10 cards x 3 tiers; all `sql`). Per lesson, with the run cells (`executable_sql`, 191 in all) that stay, the drag-the-tiles blocks (`sql_parsons`) left out, the animation blocks kept (all MP4 except 1 still) and the tab blocks (`sql_switcher`, converted as first tab only, see below):
+- **Learn SQL exercises** (515 in 30 lessons, 10 cards x 3 tiers; all `sql`). Per lesson, with the run cells (`executable_sql`, 191 in all) that stay, the drag-the-tiles blocks (`sql_parsons`) left out, the animation blocks kept (all MP4 except 1 still) and the tab blocks (`sql_switcher`, every tab kept as text, see below):
 
   <details><summary>Per-lesson counts</summary>
 
-  | Lesson | Card folder | Exercises left out | Run cells kept | Tile puzzles left out | Animations kept | Tab blocks (pending #22) | Regex blocks |
+  | Lesson | Card folder | Exercises left out | Run cells kept | Tile puzzles left out | Animations kept | Tab blocks (all tabs kept) | Regex blocks |
   |---|---|---|---|---|---|---|---|
   | `query_structure_beginner` | query_structure | 13 | 8 | 1 | 2 | 1 | 0 |
   | `query_structure_intermediate` | query_structure | 22 | 3 | 1 | 5 | 1 | 0 |
@@ -198,7 +198,7 @@ PED_TOOL_EXERCISES`) |
 
   Totals: 515 exercises left out, 34 tile puzzles left out, 93 animation blocks kept (92 MP4 videos and 1 still image: `complex_data_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, the same fallback as `sql_pattern_ctes_advanced`), 191 run cells kept as a screenshot of the whole cell after the table-icon "Show result" button was clicked (the other 2 buttons, "Animate this query" and "Edit and run this query", are never clicked) plus the code as a ```` ```sql ```` fence, 2 regex-cards blocks (`filtering_intermediate`, `filtering_advanced`) kept as a screenshot plus the pattern text. 5 of the 93 animations are `table_visualization` blocks (all in `aggregating_beginner`), which share the `sql_animation` player and are recorded the same way; the other 3 players in that lesson are `sql_animation`. 11 recordings failed the recorder's first-frame check ("no step counter drawn") and were re-recorded automatically.
 
-- **Learn SQL tabs, pending ticket #22.** 58 `sql_switcher` blocks (152 tabs) have no rule yet. The converter keeps only the first tab of each (generic conversion) and prints `no rule for block type 'sql_switcher'`; the owner decides how to render them (draft PR #24 / ticket #22). Per lesson, the tab names of each block (the first one is what the Markdown shows):
+- **Learn SQL tabs, kept as text (Option A of draft PR #24, applied by default in ticket #22).** 58 `sql_switcher` blocks (152 tabs) are no longer pending: nothing is left out. Each tab became a bold label with its name, its caption, its SQL as a ```sql fence and its result as text (`switcher_markdown` in `tools/lesson_to_md.py`), with no per-tab screenshot. The live page was read with every tab clicked; the sections were spliced into the existing lessons in place of each block's first-tab-only content (matched by order and the first tab's code), without re-running the converter, so the hand trims below are untouched. Lesson prose that said "tab" or "switcher" now says "version" / "examples" (the one caption that says "first tab" is the site's own text and stays). To switch to another option see `docs/OWNER-REVIEW.md`. Per lesson, the tab names of each block:
 
   <details><summary>Tab blocks (58 blocks, 152 tabs)</summary>
 
@@ -419,7 +419,7 @@ PED_TOOL_EXERCISES`) |
 | SQL run cells (`executable_sql`, 191) | `record_cells` + `CELL_FENCE` | Kept as lesson content: click the table-icon "Show result" button, one 2x screenshot of the whole cell, code as a ```` ```sql ```` fence under it |
 | `sql_parsons` (34, drag-the-tiles) | `SKIPPED_BLOCKS` | Interactive puzzle, answers not in the page; the prose that only introduces them is in `tools/drops.json` |
 | `table_visualization` (5, `aggregating_beginner`) | `ANIMATION_RE` / `ANIMATION_SELECTOR` | Same player as `sql_animation`, recorded as MP4 |
-| `sql_switcher` (58, 152 tabs) | generic conversion | First tab only, pending ticket #22 (see above) |
+| `sql_switcher` (58, 152 tabs) | `switcher_markdown` (tabs read by `sql_switcher_tabs`) | Every tab as text: bold name, caption, SQL fence, result (see above) |
 | `regex_cards` (3: 1 in `python_strings_advanced`, 2 in Learn SQL) | `record_regex_cards` + `regex_cards` | Screenshot of the stacked cards, pattern text kept as bullets |
 | `schema_story` blocks | `SKIPPED_BLOCKS` | Interactive, no answers in the page, so only a dangling question would remain |
 | "Official <tool> resources" panel (logo, version, quote, doc buttons) on Airflow, dbt, Kafka | `clean()` drops `[data-tool-partner-panel]` | Not wanted. The trademark line after it stays. |

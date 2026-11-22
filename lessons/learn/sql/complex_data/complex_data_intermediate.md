@@ -28,31 +28,59 @@ An array column holds an ordered list in each row, so a single cell can carry ev
 
 https://github.com/user-attachments/assets/a6577e3d-9249-471f-b94f-71eea8d4e302
 
-Listings 103 and 104 get NULL for `has_wifi`, and that NULL causes trouble once the question flips to listings without wifi. `NOT` applied to NULL is still NULL, and WHERE keeps only rows where the condition is true. The first tab returns zero rows even though 2 listings have no wifi entry. The second tab turns the unknown answer into false before negating, so a blank slot counts as no wifi.
+Listings 103 and 104 get NULL for `has_wifi`, and that NULL causes trouble once the question flips to listings without wifi. `NOT` applied to NULL is still NULL, and WHERE keeps only rows where the condition is true. The first version returns zero rows even though 2 listings have no wifi entry. The second version turns the unknown answer into false before negating, so a blank slot counts as no wifi.
+
+**NOT contains**
 
 Negates contains directly. Both listings without wifi hold a NULL slot, both conditions are NULL, and the result is empty.
 
-|  |  |
-| --- | --- |
-|  | WITH listings AS ( |
-|  | SELECT |
-|  | listing_id, |
-|  | ARRAY[amenity_1, amenity_2, amenity_3] AS amenities |
-|  | FROM listing_amenities |
-|  | ) |
-|  |  |
-|  | SELECT |
-|  | listing_id, |
-|  | amenities |
-|  | FROM listings |
-|  | WHERE NOT CONTAINS(amenities, 'wifi') |
+```sql
+WITH listings AS (
+  SELECT
+    listing_id,
+    ARRAY[amenity_1, amenity_2, amenity_3] AS amenities
+  FROM listing_amenities
+)
 
-Result
+SELECT
+  listing_id,
+  amenities
+FROM listings
+WHERE NOT CONTAINS(amenities, 'wifi')
+```
 
-| listing_id | amenities |
-| --- | --- |
+Result:
 
-0 rows
+```
+listing_id | amenities
+```
+
+**COALESCE**
+
+Replaces NULL with false before the NOT, so listings 103 and 104 pass the filter.
+
+```sql
+WITH listings AS (
+  SELECT
+    listing_id,
+    ARRAY[amenity_1, amenity_2, amenity_3] AS amenities
+  FROM listing_amenities
+)
+
+SELECT
+  listing_id,
+  amenities
+FROM listings
+WHERE NOT COALESCE(CONTAINS(amenities, 'wifi'), FALSE)
+```
+
+Result:
+
+```
+listing_id | amenities
+103 | ["kitchen",null,"parking"]
+104 | ["hot_tub","kitchen",null]
+```
 
 
 <br>
@@ -602,28 +630,54 @@ FROM listing_events
 
 ### Every result is VARCHAR
 
-Numbers come out as text, and text compares character by character. Sorting guest limits of 4, 10, 2 and 6 in descending order as text gives 6, 4, 2, 10, because the character 6 outranks the character 1. The first tab sorts the raw strings. The second casts to INTEGER inside the SELECT, so the sort sees numbers.
+Numbers come out as text, and text compares character by character. Sorting guest limits of 4, 10, 2 and 6 in descending order as text gives 6, 4, 2, 10, because the character 6 outranks the character 1. The first version sorts the raw strings. The second casts to INTEGER inside the SELECT, so the sort sees numbers.
+
+**Text sort**
 
 Sorts VARCHAR values: listing 102 with 10 guests lands last.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | JSON_EXTRACT_SCALAR(payload, '$.listing_id') AS listing_id, |
-|  | JSON_EXTRACT_SCALAR(payload, '$.max_guests') AS max_guests |
-|  | FROM listing_events |
-|  | ORDER BY max_guests DESC |
+```sql
+SELECT
+  JSON_EXTRACT_SCALAR(payload, '$.listing_id') AS listing_id,
+  JSON_EXTRACT_SCALAR(payload, '$.max_guests') AS max_guests
+FROM listing_events
+ORDER BY max_guests DESC
+```
 
-Result
+Result:
 
-| listing_id | max_guests |
-| --- | --- |
-| 104 | 6 |
-| 101 | 4 |
-| 103 | 2 |
-| 102 | 10 |
+```
+listing_id | max_guests
+104 | 6
+101 | 4
+103 | 2
+102 | 10
+```
 
-4 rows
+**Cast first**
+
+Sorts INTEGER values: listing 102 comes first.
+
+```sql
+SELECT
+  JSON_EXTRACT_SCALAR(payload, '$.listing_id') AS listing_id,
+  CAST(
+    JSON_EXTRACT_SCALAR(payload, '$.max_guests')
+    AS INTEGER
+  ) AS max_guests
+FROM listing_events
+ORDER BY max_guests DESC
+```
+
+Result:
+
+```
+listing_id | max_guests
+102 | 10
+104 | 6
+101 | 4
+103 | 2
+```
 
 CAST stops the whole query when one value will not convert, and event 4's price is TBD. `TRY_CAST` returns NULL for that row and lets the others through. Wrapped around the extraction, it gives a column that aggregates cleanly, and `COUNT` over that column reports how many rows had a usable price.
 
