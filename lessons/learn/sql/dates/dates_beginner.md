@@ -428,32 +428,55 @@ https://github.com/user-attachments/assets/a19fd937-8a08-4a8e-9e06-708bef9a3f50
 
 ### Nights, from timestamps
 
-Now the stays from the opening. Suppose a stays table records arrival and departure as TIMESTAMPs, with 15:00 check-in and 11:00 check-out as house rules. Taken straight on those TIMESTAMPs, a day difference can report a night short, which is how the payout query arrived at 2; whenever the question is nights, cast both ends to DATE. Leave them as TIMESTAMPs when the question is elapsed time, and ask for hours. Switch between the 2 tabs and compare the last column row by row.
+Now the stays from the opening. Suppose a stays table records arrival and departure as TIMESTAMPs, with 15:00 check-in and 11:00 check-out as house rules. Taken straight on those TIMESTAMPs, a day difference can report a night short, which is how the payout query arrived at 2; whenever the question is nights, cast both ends to DATE. Leave them as TIMESTAMPs when the question is elapsed time, and ask for hours. Compare the last column of the 2 versions row by row.
+
+**Nights**
 
 Cast both ends to DATE first and the stays report 3, 1 and 7 nights, the calendar answer a host bills.
 
-|  |  |
-| --- | --- |
-|  | SELECT |
-|  | stay_id, |
-|  | checkin_at, |
-|  | checkout_at, |
-|  | DATE_DIFF( |
-|  | 'day', |
-|  | CAST(checkin_at AS DATE), |
-|  | CAST(checkout_at AS DATE) |
-|  | ) AS nights |
-|  | FROM stays |
+```sql
+SELECT
+  stay_id,
+  checkin_at,
+  checkout_at,
+  DATE_DIFF(
+    'day',
+    CAST(checkin_at AS DATE),
+    CAST(checkout_at AS DATE)
+  ) AS nights
+FROM stays
+```
 
-Result
+Result:
 
-| stay_id | checkin_at | checkout_at | nights |
-| --- | --- | --- | --- |
-| 1 | 2024-03-15 15:00:00 | 2024-03-18 11:00:00 | 3 |
-| 2 | 2024-03-10 16:30:00 | 2024-03-11 10:00:00 | 1 |
-| 3 | 2024-03-01 15:00:00 | 2024-03-08 15:00:00 | 7 |
+```
+stay_id | checkin_at | checkout_at | nights
+1 | 2024-03-15 15:00:00 | 2024-03-18 11:00:00 | 3
+2 | 2024-03-10 16:30:00 | 2024-03-11 10:00:00 | 1
+3 | 2024-03-01 15:00:00 | 2024-03-08 15:00:00 | 7
+```
 
-3 rows
+**Hours**
+
+Leave the TIMESTAMPs as they are and ask for hours to get elapsed time: 68, 17 and 168, with the extra 30 minutes of stay 2 dropped.
+
+```sql
+SELECT
+  stay_id,
+  checkin_at,
+  checkout_at,
+  DATE_DIFF('hour', checkin_at, checkout_at) AS hours_stayed
+FROM stays
+```
+
+Result:
+
+```
+stay_id | checkin_at | checkout_at | hours_stayed
+1 | 2024-03-15 15:00:00 | 2024-03-18 11:00:00 | 68
+2 | 2024-03-10 16:30:00 | 2024-03-11 10:00:00 | 17
+3 | 2024-03-01 15:00:00 | 2024-03-08 15:00:00 | 168
+```
 
 When the unit is day and the question is about calendar days, measure between DATEs. Measure between TIMESTAMPs when you want elapsed time at a finer grain than days, such as how long a host took to reply to a message.
 
