@@ -14,5 +14,54 @@
   ],
   "spark_narrow_wide_shuffle_advanced": [
     "The drill hands you a program that already repartitions"
+  ],
+  "_comment_python_learn": "Learn Python drops: PROPOSED DEFAULTS from review PR #25 (27 places, 24 prefixes), pending owner decision. Delete or move an entry below to change a decision. Prefixes come from the converted Markdown. Practice (python_foundations_intermediate) matches 4 headings, all dropped. The 8 trims are NOT here: they are hand edits in a separate commit.",
+  "python_foundations_beginner": [
+    "int for the quantity, because a count of items is whole and",
+    "sep is applied between arguments and end after the last",
+    "The broken line divides only discount_cents by 100, because"
+  ],
+  "python_foundations_intermediate": [
+    "Practice"
+  ],
+  "python_control_flow_intermediate": [
+    "These last 2 drills put the whole lesson into a single"
+  ],
+  "python_expressions_beginner": [
+    "Capstone practice",
+    "Each program below pulls on more than one section at once,"
+  ],
+  "python_expressions_advanced": [
+    "Capstone: one event, every operator",
+    "The last 2 problems put the whole lesson into a single"
+  ],
+  "python_dictionaries_intermediate": [
+    "Put the views to work. The report below prints the largest",
+    "The runner below should let each job's settings beat the"
+  ],
+  "python_collections_intermediate": [
+    "Capstone: a ranking step end to end",
+    "The code quiz below puts all 5 ideas into one pipeline"
+  ],
+  "python_functional_beginner": [
+    "Capstone: One Pricing Pipeline",
+    "The 2 drills below combine the sections: a pure"
+  ],
+  "python_data_structures_beginner": [
+    "The third capstone builds 2 collections from the same list",
+    "The last capstone depends on what square brackets mean on a",
+    "The first exercise is about what a function can do to a",
+    "Both exercises hinge on what set",
+    "The first exercise mixes a set literal and a dict literal"
+  ],
+  "python_data_structures_intermediate": [
+    "The last practice runs the lesson's steps on a handful of"
+  ],
+  "python_sets_intermediate": [
+    "The last exercise uses each operator from this lesson."
+  ],
+  "python_problem_solving_advanced": [
+    "Capstone: the fullest gap",
+    "This one combines 3 patterns: sort the input, walk 2"
   ]
 }

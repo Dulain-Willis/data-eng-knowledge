@@ -1,6 +1,6 @@
 # What the converter skips
 
-`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for all 120 lessons in `lessons/` plus the 45 Spark slugs and the 60 Interview Python slugs (Interview Python checked 2026-11-17). For all 120 lessons the count equals the "N challenges" number in the header line, and for the 90 learn/interview lessons it also equals the number of `Exercise k of N` entries in the file.
+`tools/lesson_to_md.py` does not copy everything on a lesson page. This file lists what it leaves out or changes, and where each switch lives. Exercise counts come from the site's challenges endpoint (`/proxy/challenges/<slug>`), fetched fresh for all 120 lessons in `lessons/` plus the 45 Spark slugs, the 60 Interview Python slugs (checked 2026-11-17) and the 48 Interview SQL slugs (checked 2026-11-21). For all 120 lessons the count equals the "N challenges" number in the header line, and for the 90 learn/interview lessons it also equals the number of `Exercise k of N` entries in the file.
 
 ## Exercises, by area
 
@@ -14,7 +14,9 @@
 | dbt | 15 | 117 | `dbt`: compile_it 28, catch_the_defect 20, build_outcome 17, two_run_proof 16, select_the_nodes 15, model_it 15, draw_the_lineage 4, snapshot_timeline 2 | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Kafka | 15 | 114 | `kafka`: log_cleanup 20, delivery_trace 19, replica_trace 16, read_the_tape 14, connector_config 13, assign_the_group 10, route_the_keys 8, durability_dial 6, lag_board 4, crash_point 3, schema_rollout 1 | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Learn: Spark | 45 | 600 | `spark`, no `form` key | **Left out** (`SKIPPED_TOOL_EXERCISES`). The 45 Spark lessons are in `lessons/learn/spark/`; none of them has an `Exercise k of N` entry. |
+| Learn: Python | 42 | 811 | `python`, no `form` key; 720 have `{{ }}` blanks in `starter_code` (152 of them also a `tile_bank` of draggable snippets), 91 are `debug` tasks (`debug` key, no blanks); all have `test_examples` | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 | Interview: Python | 60 | 169 | `python`, no `form` key; every one has `starter_code` with `{{ }}` blanks, `input_bindings` and `test_examples` (no seed tables, no tile bank) | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
+| Interview: SQL | 48 | 147 | `sql`, no `form` key; every one has `starter_sql` (99 with `{{ }}` blanks), `data_tables` and `sampleData` | **Left out** (`SKIPPED_TOOL_EXERCISES`) |
 
 - **Kept exercises** (574 in total) are one file per lesson, numbered continuously (`Exercise 1 of N` to `N of N`). Each has the task, the starting canvas if there is one, and the solution in a collapsed fold. Inline multiple-choice questions are not exercises; they stay in the lesson.
 - **Spark exercises** (600, 45 lessons x 3 tiers, none has a `form` key; all have PySpark `starter_code`):
@@ -95,6 +97,165 @@
   | `py_pattern_async_advanced` | async_python | 11 | 2 |
 
   </details>
+- **Interview SQL exercises** (147 in 48 lessons, 2 to 5 per lesson; all `sql`; 99 have `{{ }}` blanks in `starter_sql`, the other 48 are write-the-query tasks; all carry seed tables). Per lesson, with the animations each lesson keeps (counted as animation blocks on the live page):
+
+  <details><summary>Per-lesson counts</summary>
+
+  | Lesson | Card folder | Exercises left out | Animations kept |
+  |---|---|---|---|
+  | `sql_pattern_top_n_per_group_beginner` | top_n_per_group | 4 | 1 |
+  | `sql_pattern_top_n_per_group_intermediate` | top_n_per_group | 4 | 3 |
+  | `sql_pattern_top_n_per_group_advanced` | top_n_per_group | 4 | 3 |
+  | `sql_pattern_running_totals_beginner` | running_totals | 4 | 2 |
+  | `sql_pattern_running_totals_intermediate` | running_totals | 4 | 4 |
+  | `sql_pattern_running_totals_advanced` | running_totals | 5 | 3 |
+  | `sql_pattern_period_over_period_beginner` | period_over_period | 4 | 3 |
+  | `sql_pattern_period_over_period_intermediate` | period_over_period | 4 | 3 |
+  | `sql_pattern_period_over_period_advanced` | period_over_period | 2 | 2 |
+  | `sql_pattern_self_join_beginner` | self_join | 4 | 2 |
+  | `sql_pattern_self_join_intermediate` | self_join | 5 | 3 |
+  | `sql_pattern_self_join_advanced` | self_join | 2 | 3 |
+  | `sql_pattern_anti_join_beginner` | anti_join | 4 | 2 |
+  | `sql_pattern_anti_join_intermediate` | anti_join | 4 | 5 |
+  | `sql_pattern_anti_join_advanced` | anti_join | 2 | 4 |
+  | `sql_pattern_gaps_and_islands_beginner` | gaps_and_islands | 4 | 2 |
+  | `sql_pattern_gaps_and_islands_intermediate` | gaps_and_islands | 4 | 2 |
+  | `sql_pattern_gaps_and_islands_advanced` | gaps_and_islands | 2 | 4 |
+  | `sql_pattern_retention_beginner` | retention_queries | 4 | 1 |
+  | `sql_pattern_retention_intermediate` | retention_queries | 2 | 6 |
+  | `sql_pattern_retention_advanced` | retention_queries | 2 | 2 |
+  | `sql_pattern_conditional_agg_beginner` | conditional_aggregation | 4 | 5 |
+  | `sql_pattern_conditional_agg_intermediate` | conditional_aggregation | 4 | 3 |
+  | `sql_pattern_conditional_agg_advanced` | conditional_aggregation | 2 | 3 |
+  | `sql_pattern_multi_table_joins_beginner` | multi_table_joins | 4 | 3 |
+  | `sql_pattern_multi_table_joins_intermediate` | multi_table_joins | 2 | 2 |
+  | `sql_pattern_multi_table_joins_advanced` | multi_table_joins | 2 | 1 |
+  | `sql_pattern_ctes_beginner` | with_clauses | 4 | 3 |
+  | `sql_pattern_ctes_intermediate` | with_clauses | 2 | 2 |
+  | `sql_pattern_ctes_advanced` | with_clauses | 2 | 2 |
+  | `sql_pattern_null_handling_beginner` | null_handling | 5 | 3 |
+  | `sql_pattern_null_handling_intermediate` | null_handling | 2 | 5 |
+  | `sql_pattern_null_handling_advanced` | null_handling | 2 | 3 |
+  | `sql_pattern_date_arithmetic_beginner` | date_arithmetic | 4 | 4 |
+  | `sql_pattern_date_arithmetic_intermediate` | date_arithmetic | 2 | 2 |
+  | `sql_pattern_date_arithmetic_advanced` | date_arithmetic | 2 | 3 |
+  | `sql_pattern_string_manipulation_beginner` | string_manipulation | 2 | 3 |
+  | `sql_pattern_string_manipulation_intermediate` | string_manipulation | 2 | 2 |
+  | `sql_pattern_string_manipulation_advanced` | string_manipulation | 2 | 1 |
+  | `sql_pattern_deduplication_beginner` | deduplication | 4 | 5 |
+  | `sql_pattern_deduplication_intermediate` | deduplication | 2 | 1 |
+  | `sql_pattern_deduplication_advanced` | deduplication | 2 | 3 |
+  | `sql_pattern_type_casting_beginner` | type_casting | 2 | 1 |
+  | `sql_pattern_type_casting_intermediate` | type_casting | 2 | 6 |
+  | `sql_pattern_type_casting_advanced` | type_casting | 2 | 1 |
+  | `sql_pattern_semi_structured_beginner` | semi_structured_data | 4 | 1 |
+  | `sql_pattern_semi_structured_intermediate` | semi_structured_data | 4 | 1 |
+  | `sql_pattern_semi_structured_advanced` | semi_structured_data | 2 | 1 |
+
+  </details>
+
+  Totals: 147 exercises left out, 130 animation blocks kept (129 MP4 videos and 1 still image: `sql_pattern_ctes_advanced` animation 1 never mounts its player on the live site, so only its code and seed table are shown, like the four Spark still-image cases).
+  One sentence was trimmed by hand in the Markdown (not by the converter): in `sql_pattern_running_totals_beginner`, the paragraph starting "The pull toward `GROUP BY`" lost its closing clause ", which is why the capstones at the end of this lesson arrive in 4 different vocabularies" because it pointed at removed exercises. Re-running the converter on that lesson brings the clause back.
+- **Learn Python exercises** (811 in 42 lessons, 14 cards x 3 tiers; all `python`; 720 fill-in-the-blank, 152 of those with a `tile_bank`, 91 `debug`). Per lesson, with the animations each lesson keeps and the run cells (`executable_python`, 548 in all) that stay:
+
+  <details><summary>Per-lesson counts</summary>
+
+  | Lesson | Card folder | Exercises left out | Animations kept |
+  |---|---|---|---|
+  | `python_foundations_beginner` | foundations | 17 | 1 |
+  | `python_foundations_intermediate` | foundations | 18 | 3 |
+  | `python_foundations_advanced` | foundations | 18 | 4 |
+  | `python_expressions_beginner` | expressions | 22 | 3 |
+  | `python_expressions_intermediate` | expressions | 20 | 1 |
+  | `python_expressions_advanced` | expressions | 19 | 3 |
+  | `python_control_flow_beginner` | control_flow | 19 | 6 |
+  | `python_control_flow_intermediate` | control_flow | 22 | 2 |
+  | `python_control_flow_advanced` | control_flow | 18 | 1 |
+  | `python_loops_beginner` | loops | 24 | 9 |
+  | `python_loops_intermediate` | loops | 19 | 8 |
+  | `python_loops_advanced` | loops | 17 | 6 |
+  | `python_functions_beginner` | functions | 18 | 5 |
+  | `python_functions_intermediate` | functions | 20 | 3 |
+  | `python_functions_advanced` | functions | 18 | 4 |
+  | `python_strings_beginner` | strings | 20 | 3 |
+  | `python_strings_intermediate` | strings | 23 | 4 |
+  | `python_strings_advanced` | strings | 23 | 1 |
+  | `python_lists_beginner` | lists | 20 | 10 |
+  | `python_lists_intermediate` | lists | 18 | 4 |
+  | `python_lists_advanced` | lists | 21 | 8 |
+  | `python_dictionaries_beginner` | dictionaries | 23 | 4 |
+  | `python_dictionaries_intermediate` | dictionaries | 19 | 2 |
+  | `python_dictionaries_advanced` | dictionaries | 20 | 1 |
+  | `python_sets_beginner` | sets | 19 | 3 |
+  | `python_sets_intermediate` | sets | 18 | 2 |
+  | `python_sets_advanced` | sets | 17 | 1 |
+  | `python_collections_beginner` | collections | 20 | 2 |
+  | `python_collections_intermediate` | collections | 19 | 3 |
+  | `python_collections_advanced` | collections | 18 | 8 |
+  | `python_data_structures_beginner` | data_structures | 19 | 5 |
+  | `python_data_structures_intermediate` | data_structures | 21 | 2 |
+  | `python_data_structures_advanced` | data_structures | 20 | 2 |
+  | `python_problem_solving_beginner` | problem_solving | 19 | 3 |
+  | `python_problem_solving_intermediate` | problem_solving | 18 | 3 |
+  | `python_problem_solving_advanced` | problem_solving | 20 | 5 |
+  | `python_complexity_beginner` | complexity | 15 | 2 |
+  | `python_complexity_intermediate` | complexity | 17 | 4 |
+  | `python_complexity_advanced` | complexity | 16 | 3 |
+  | `python_functional_beginner` | functional_programming | 20 | 2 |
+  | `python_functional_intermediate` | functional_programming | 19 | 3 |
+  | `python_functional_advanced` | functional_programming | 20 | 2 |
+
+  </details>
+
+  Totals: 811 exercises left out, 151 animation blocks kept (151 MP4 videos), 548 run cells kept as a screenshot of the whole cell after the `>>>` button was clicked plus the code as a ```` ```python ```` fence, 1 regex-cards block (`python_strings_advanced`) kept as a screenshot of the stacked cards plus the pattern text as bullets.
+- **Learn Python drops and trims (proposed defaults of review PR #25, pending owner decision).** Drops are in `tools/drops.json` under the comment key `_comment_python_learn` (27 places, 24 prefixes, since `Practice` in `python_foundations_intermediate` matches 4 headings). To change a decision, delete or add the entry and re-run the lesson. The 8 trims are hand edits of the Markdown in their own commit ("Learn Python hand trims"); re-running the converter overwrites them. The 21 places proposed as keep are left as they are.
+
+  <details><summary>Drops (27 places)</summary>
+
+  | Lesson | Block starts with |
+  |---|---|
+  | `python_foundations_beginner` | "int for the quantity, because a count of items is whole and" |
+  | `python_foundations_beginner` | "sep is applied between arguments and end after the last" |
+  | `python_foundations_beginner` | "The broken line divides only discount_cents by 100, because" |
+  | `python_foundations_intermediate` | "Practice" |
+  | `python_control_flow_intermediate` | "These last 2 drills put the whole lesson into a single" |
+  | `python_expressions_beginner` | "Capstone practice" |
+  | `python_expressions_beginner` | "Each program below pulls on more than one section at once," |
+  | `python_expressions_advanced` | "Capstone: one event, every operator" |
+  | `python_expressions_advanced` | "The last 2 problems put the whole lesson into a single" |
+  | `python_dictionaries_intermediate` | "Put the views to work. The report below prints the largest" |
+  | `python_dictionaries_intermediate` | "The runner below should let each job's settings beat the" |
+  | `python_collections_intermediate` | "Capstone: a ranking step end to end" |
+  | `python_collections_intermediate` | "The code quiz below puts all 5 ideas into one pipeline" |
+  | `python_functional_beginner` | "Capstone: One Pricing Pipeline" |
+  | `python_functional_beginner` | "The 2 drills below combine the sections: a pure" |
+  | `python_data_structures_beginner` | "The third capstone builds 2 collections from the same list" |
+  | `python_data_structures_beginner` | "The last capstone depends on what square brackets mean on a" |
+  | `python_data_structures_beginner` | "The first exercise is about what a function can do to a" |
+  | `python_data_structures_beginner` | "Both exercises hinge on what set" |
+  | `python_data_structures_beginner` | "The first exercise mixes a set literal and a dict literal" |
+  | `python_data_structures_intermediate` | "The last practice runs the lesson's steps on a handful of" |
+  | `python_sets_intermediate` | "The last exercise uses each operator from this lesson." |
+  | `python_problem_solving_advanced` | "Capstone: the fullest gap" |
+  | `python_problem_solving_advanced` | "This one combines 3 patterns: sort the input, walk 2" |
+
+  </details>
+
+  <details><summary>Hand trims (8 places)</summary>
+
+  | Place | Lesson | Change |
+  |---|---|---|
+  | 1 | `python_foundations_beginner` | cut last sentence "The program below computes a subtotal and stops on its last line." |
+  | 2 | `python_foundations_beginner` | cut opening sentence "The error names `Subtotal_cents`, with a capital S, ..." |
+  | 13 | `python_control_flow_intermediate` | "The second capstone hinges on a habit worth keeping for any type ladder:" became "A habit worth keeping for any type ladder:" |
+  | 21 | `python_expressions_advanced` | cut "The next program contains one of each." |
+  | 24 | `python_dictionaries_intermediate` | cut "The function below tags replayed events and was meant to leave its input alone." |
+  | 29 | `python_problem_solving_beginner` | "... before the drill below hands you a version with a mistake in it:" became "... of this lesson:" |
+  | 30 | `python_data_structures_beginner` | cut "The drill below depends on how each collection starts and grows." |
+  | 36 | `python_data_structures_beginner` | cut "That capstone kept a set beside a list so each answered its own question. The next one hands you a need and no code."; "Run the 4 questions on it in order" became "Run the 4 questions in order" (so "it" does not dangle) |
+
+  </details>
+
 - **Airflow today:** the `dag_repair` conversion code (20 exercises, in 4 lessons) still exists in `main()` but is switched off, so Airflow lessons contain no exercises. Reason recorded in the code: the exercises are buggy and Run/Submit need a login.
 - **Header line:** every lesson starts with `<tier>·<area> · N min · N challenges`. The converter leaves it as is, so for Airflow, dbt, Kafka (and Spark) lessons it states a number of exercises that are not in the file.
 
@@ -104,6 +265,8 @@
 |---|---|---|
 | Star ratings ("Daily Life", "Interviews") | `convert()` | Drawn on a canvas by JavaScript; the page source has no values |
 | `placed_challenge` stubs ("Loading the challenge") | `SKIPPED_BLOCKS` | Empty placeholder where an exercise widget would load; none left in the committed lessons |
+| Python run cells (`executable_python`, 548) | `record_cells` + `spark_cell` | Kept as lesson content: click `>>>` (reveals the output), one 2x screenshot of the whole cell, code as a fence under it |
+| `regex_cards` (1, `python_strings_advanced`) | `record_regex_cards` + `regex_cards` | Screenshot of the stacked cards, pattern text kept as bullets |
 | `schema_story` blocks | `SKIPPED_BLOCKS` | Interactive, no answers in the page, so only a dangling question would remain |
 | "Official <tool> resources" panel (logo, version, quote, doc buttons) on Airflow, dbt, Kafka | `clean()` drops `[data-tool-partner-panel]` | Not wanted. The trademark line after it stays. |
 | Prose that introduces a dropped exercise | `tools/drops.json` (hand-kept, applied only when exercises are left out) | See below |
@@ -129,7 +292,7 @@ The two data-modeling entries do nothing today: `drops.json` is applied only whe
 | To change | Edit |
 |---|---|
 | Bring Airflow exercises back | `INCLUDE_AIRFLOW_EXERCISES` in `tools/lesson_to_md.py` (only `dag_repair` has conversion code; the other forms have none) |
-| Leave out (or bring back) a tool's exercises | `SKIPPED_TOOL_EXERCISES` (matched on `challenge_type`; currently `dbt`, `kafka`, `spark`, `python`) |
+| Leave out (or bring back) a tool's exercises | `SKIPPED_TOOL_EXERCISES` (matched on `challenge_type`; currently `dbt`, `kafka`, `spark`, `python`, `sql`; the Learn Python lessons use `python` too) |
 | Drop a block type | `SKIPPED_BLOCKS` |
 | Drop one paragraph that points at a removed exercise | add an entry to `tools/drops.json` |
 | Drop the tool resources panel | the `[data-tool-partner-panel]` rule in `clean()` |
