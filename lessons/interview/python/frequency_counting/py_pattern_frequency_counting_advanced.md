@@ -212,7 +212,7 @@ FROM per_key
 
 Salting splits a hot key into S sub-keys. Each large-side row of that key draws a random salt from 0 to S - 1, each small-side row of that key is copied S times with salts 0 to S - 1, and the join condition becomes key plus salt. The hot key's rows can now spread across up to S workers. The animation measures the effect for 5 keys on 4 partitions, using key modulo 4 as the partition function, with S = 4 applied only to keys above 2,000 rows.
 
-https://github.com/user-attachments/assets/954fdebf-bfee-4e2c-9238-c88c038925d0
+https://github.com/user-attachments/assets/f731ab66-6c6b-4c72-a8fe-fde7ea5c0435
 
 *Partition loads before and after salting key 1 into 4 sub-keys.*
 
@@ -389,7 +389,7 @@ Per country, each worker keeps a Count-Min grid for the current minute and m can
 
 Adding grids merges counts. Merging candidate lists is where designs fail. If each worker reports its local top 2 and the merger sums whatever arrives, a tag that ranks third everywhere disappears, even when its global total beats every reported tag. The program reproduces the failure with 3 workers and K = 2, then reruns it with 3 candidates per worker.
 
-https://github.com/user-attachments/assets/356e4ccf-207d-4b9b-a360-acae2fc7156c
+https://github.com/user-attachments/assets/fc574df3-f714-41b1-b3bc-3c070cd6406d
 
 *Local top-m lists merged by summing the counts each worker reports.*
 

@@ -349,7 +349,7 @@ print(bool(ID_LIST.match("1" * 25 + "x")))
 
 The first call prints `True` at once. The second line has 25 digits and then an `x`, so `$` fails. Because the comma is optional, `(\d+,?)+` can carve the digit run into groups in many ways: all 25 digits as 1 group or 24 plus 1, then 23 plus 2 and on through every other split. The engine must reject each carving before it prints `False`.
 
-https://github.com/user-attachments/assets/8daf85a5-563e-49c6-8356-9b311515e9f8
+https://github.com/user-attachments/assets/1127e756-2c58-4310-96ec-324e5a92fbe6
 
 *The 8 ways (\d+,?)+ can carve 4 digits, in the order the greedy engine tries them.*
 

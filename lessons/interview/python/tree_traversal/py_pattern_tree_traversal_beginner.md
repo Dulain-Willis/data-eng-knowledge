@@ -73,7 +73,7 @@ def preorder(node, out):
 
 Move out.append(node.val) below the first recursive call and the function becomes inorder. Move it below the second and it becomes postorder. The animation runs all 3 at once: 1 walk, 3 lists, each appended at its own moment. Watch the call frames stack up on the way down the left edge, and notice that the inorder list receives 1 before anything else, because 1 is the first node whose left subtree is empty.
 
-https://github.com/user-attachments/assets/ae267064-52ec-4d3f-82c1-a54df9bc0224
+https://github.com/user-attachments/assets/7c48c441-fdb9-4a7c-86d4-5b329d15da83
 
 *1 walk fills 3 lists: before the left call, between the calls, after the right call.*
 

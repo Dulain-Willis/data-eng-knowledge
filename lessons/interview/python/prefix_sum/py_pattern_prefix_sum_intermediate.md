@@ -245,7 +245,7 @@ When coordinates are timestamps, the dense array becomes the cost. A day in seco
 
 Balance questions arrive in many costumes: the longest stretch with as many 0s as 1s, the number of log segments with as many logins as logouts, the longest run of matches where wins equal losses. None of them mentions a sum, but one recode turns each into a sum: map one symbol to +1 and the other to -1, and equal counts becomes a sum of 0. After the recode, each one is the target-sum question with k = 0, solved by the same one-pass scan over running totals.
 
-https://github.com/user-attachments/assets/d1ebba70-5bed-4c23-b209-ba6cf183e7f1
+https://github.com/user-attachments/assets/46428a74-7967-4c07-a685-350f24468789
 
 *Columns: index, char, prefix, longest so far, count so far*
 

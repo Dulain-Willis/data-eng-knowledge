@@ -262,7 +262,7 @@ Here the prompt fixes a budget: score lookups for 100 million user IDs on a work
 
 An int-to-float dict pays 3 costs per entry. Its share of the table runs from roughly 30 to 60 bytes in a large dict, depending on where the count sits between doublings. The key is a 28-byte `int` and the value a 24-byte `float`. String keys cost more: `'user:12345678'` is 62 bytes. A dict of dicts costs most, since every inner dict carries its own table of 232 bytes for up to 5 fields, and its keys and values come on top of that. The planner below prices a dict, sorted parallel arrays holding an 8-byte key and a 4-byte value, and a 1% Bloom filter. Estimate the dict figure for 10 million keys from the 335.5 MB table size before running it.
 
-https://github.com/user-attachments/assets/02568315-ff3f-4cc5-b0c1-ca4b2c49c41d
+https://github.com/user-attachments/assets/bc001979-2e42-45db-bdc7-2be1a32faaf9
 
 *Planning figures for int keys and float values on 64-bit CPython 3.9.*
 

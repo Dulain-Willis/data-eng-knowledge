@@ -130,7 +130,7 @@ Evolve looks like the best of both, and its cost is operational: every unseen ke
 
 The program below implements 3 of these policies over the same 3 records. Record `e2` sends `user_id` as a string, and record `e3` carries a `device` key the schema lacks. Predict every line, and give the `fail` run extra attention, since its `e2` line is where answers tend to go wrong.
 
-https://github.com/user-attachments/assets/82937b60-53c3-48ed-8131-dc248f0b9c80
+https://github.com/user-attachments/assets/39d1c48c-3974-43f0-aad6-028f026d4c40
 
 *The same 3 records loaded under 3 policies for keys and types the schema does not expect.*
 

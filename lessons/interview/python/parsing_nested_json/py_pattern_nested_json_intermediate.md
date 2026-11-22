@@ -393,7 +393,7 @@ query = (
 
 `startingOffsets` applies only to a query's first run: once a checkpoint exists, the query resumes from its stored offsets. `maxOffsetsPerTrigger` caps a batch at 600,000 messages across all partitions, which bounds recovery after an outage. Without it, the first batch after a 2-hour stop would try to pull 144 million messages at once.
 
-https://github.com/user-attachments/assets/9edd7ecf-7e9c-4bb6-9d67-54e203c5d3bf
+https://github.com/user-attachments/assets/5c933ebc-12a2-4504-b871-cc1f87289497
 
 *Routing on the required key catches both failure kinds*
 

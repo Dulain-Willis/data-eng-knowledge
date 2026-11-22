@@ -115,7 +115,7 @@ A FIFO queue built from 2 stacks fits in about 15 lines, so the interview spends
 
 `enqueue` pushes onto `inbox`. `dequeue` pops from `outbox`. When `outbox` is empty, pour: pop every item off `inbox` and push it onto `outbox`. Pouring reverses order, turning a newest-on-top inbox into an oldest-on-top outbox. The design has 1 rule that matters, and it concerns timing: pour only when `outbox` is empty.
 
-https://github.com/user-attachments/assets/9a379807-adbc-4a8c-bfd0-f8953b285844
+https://github.com/user-attachments/assets/0898824a-0ad8-4efd-b780-2288ff88a761
 
 *Batches b1 to b4 leave in arrival order; moves counts the items poured from inbox to outbox.*
 

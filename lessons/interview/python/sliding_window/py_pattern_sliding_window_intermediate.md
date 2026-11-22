@@ -121,7 +121,7 @@ When the rule depends on which items sit in the window rather than their total, 
 
 The standard first use is the longest substring with no repeated character. The window is valid while every count is 1. A new character can push only its own count to 2, so the loop shrinks while `counts[ch] > 1` for that character and never scans the whole map.
 
-https://github.com/user-attachments/assets/f73c2e54-a6c2-4f0f-8c85-d7b01e37124e
+https://github.com/user-attachments/assets/849ccddf-53e9-4ea6-b4d6-3f6e38596bb6
 
 *Index 2 evicts 2 characters: the p, then the first w.*
 

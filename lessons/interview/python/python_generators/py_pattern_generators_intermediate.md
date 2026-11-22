@@ -106,7 +106,7 @@ Predict the 3 printed lines before reading on. The output is 2 ['latam', 'other'
 
 The animation swaps parsing for arithmetic and logs each stage's work in trace. Value 2 is not read at all until value 1 has passed the filter. Value 2 becomes 20, and keep drops it before it reaches the batcher. Each stage holds only its current item, except batched, which holds up to size.
 
-https://github.com/user-attachments/assets/36a9d575-7a3a-496d-98b3-001647ff15ad
+https://github.com/user-attachments/assets/153a3a1d-068d-41aa-9b9d-5b2af3041d65
 
 *Each value clears the filter before the next value is read*
 
