@@ -58,7 +58,7 @@ def counter_box(fr, H):
             runs[-1].append(y)
         else:
             runs.append([y])
-    for r in runs:
+    for r in reversed(runs):  # lowest first: the control bar sits at the bottom, page-body glyphs can mimic the counter
         if 8 <= len(r) <= 15 and all(max(fr[y * W + 1440:y * W + 1453]) <= 70 and max(fr[y * W + 1510:y * W + 1514]) <= 70 for y in r):
             x0 = next(x for x in range(1455, 1510) if max(fr[y * W + x] for y in r) > 60)
             return r[0], r[-1], x0
